@@ -27,37 +27,47 @@
                 reader.onload = function(e) {
                     var data = e.target.result;
 
-                    var workbook = XLS.read(data, {type: 'binary'}),
-                        raw = workbook.Sheets["Complete responses"],
-                        tags = {},
-                        i = 2,
-                        row,
-                        words,
-                        word;
+                    try {
+                        var workbook = XLS.read(data, {type: 'binary'}),
+                            raw = workbook.Sheets["Complete responses"],
+                            tags = {},
+                            i = 2,
+                            row,
+                            words,
+                            word;
 
-                    while (row = raw['K' + i]) {
-                        words = row.w.trim().toLowerCase().split(/ and | or |\.|,|;|:|\?|!|&+/);
-                        for (var j = 0, wl = words.length; j < wl; j++) {
-                            word = words[j].trim();
-                            if (word.length) {
-                                if (tags[word]) {
-                                    tags[word]++;
-                                }
-                                else {
-                                    tags[word] = 1;
+                        while (row = raw['K' + i]) {
+                            words = row.w.trim().toLowerCase().split(/ and | or |\.|,|;|:|\?|!|&+/);
+                            for (var j = 0, wl = words.length; j < wl; j++) {
+                                word = words[j].trim();
+                                if (word.length) {
+                                    if (tags[word]) {
+                                        tags[word]++;
+                                    }
+                                    else {
+                                        tags[word] = 1;
+                                    }
                                 }
                             }
+                            i++;
                         }
-                        i++;
+
+                        var postData = {
+                            survey_google_id: workbook.Sheets.Overview.A2.w,
+                            tags: tags
+                        };
+                    }
+                    catch (e) {
+                        alert('Wrong XLS structure');
                     }
 
-                    var postData = {
-                        sub: _usrData.sub,
-                        tags: tags
-                    };
-
-                    $http.post('api/tags.php/test', postData);
+                    $http.post('api/tags.php', postData).success(function () {
+                        //navigate
+                    }).error(function () {
+                        //alert();
+                    });
                 };
+                
                 reader.readAsBinaryString(file);
             }
         };

@@ -1,6 +1,6 @@
 <?php
-if (!defined('IN_BMC')) {
-    die('Access Denied!');
+if (!defined('AUTHORISED')) {
+    die();
 }
 
 
@@ -13,17 +13,21 @@ class bDb {
     //var debug
 
     // The constructor. Get the mysql info vars and connect to the server
-    function bDb ($my_host, $my_user, $my_pass, $my_db, $my_charset) {
-        $this->link = @mysql_connect($my_host, $my_user, $my_pass, TRUE); // Connect to the MySQL server
+    function bDb ($db_host, $db_user, $db_pass, $db_name, $db_charset) {
+        $this->link = @mysql_connect($db_host, $db_user, $db_pass, TRUE); // Connect to the MySQL server
 
         if (!$this->link) {
             trigger_error(mysql_error());
         }
-        if (!@mysql_select_db($my_db, $this->link) || !@mysql_query("SET NAMES $my_charset", $this->link)) {
+        if (!@mysql_select_db($db_name, $this->link) || !@mysql_query("SET NAMES $db_charset", $this->link)) {
             trigger_error(mysql_error());
         }
     }
 
+    
+    function a ($str) {
+        return mysql_real_escape_string('"'.$str.'"'); 
+    }
 
 //***************************************************************************
     function evaluate ($query_str) {
@@ -51,6 +55,13 @@ class bDb {
 
             // Return the number of rows affected by this operation
             return mysql_affected_rows();
+
+        }
+        
+        elseif (strtolower(substr(ltrim($query_str), 0, 6)) != 'insert') {
+            
+            // Return last id
+            return mysql_insert_id();
 
         }
 
@@ -105,5 +116,6 @@ class bDb {
 } // End class
 
 
+include_once "db_settings.php";
 
-$db = bDb('127.0.0.1', 'root@localhost', '', 'surveydata', 'utf8');
+$db = new bDb($db_host, $db_user, $db_pass, $db_name, $db_charset);

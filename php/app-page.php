@@ -16,10 +16,7 @@
     <script src="node_modules/ng-file-upload/dist/ng-file-upload.js"></script>
     <script src="node_modules/xlsjs/dist/xls.js"></script>
     <script>
-        _usrData = {
-            xsrf_token: '<?php echo $_SESSION['xsrf_token'] ?>',
-            sub: '<?php echo $_SESSION['sub'] ?>'
-        }
+        xsrf_token = '<?php echo $_SESSION['xsrf_token'] ?>';
     </script>
     <script src="js/config.js"></script>
     <script src="js/file-upload.js"></script>
@@ -31,7 +28,6 @@
         <a href="#" onclick="signOut();return false;">Sign out</a>
         <script>
             function signOut() {
-                localStorage.removeItem('xsrf_token');
                 var form = $('<form action=/ method=post><input type=hidden name=logout value=' + xsrf_token + '></form>');
                 $(document.body).append(form);
                 form.submit();

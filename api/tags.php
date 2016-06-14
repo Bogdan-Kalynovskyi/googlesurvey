@@ -1,19 +1,30 @@
 <?php
-    include_once 'db_mysql.php';
+    include_once 'auth.php';
 
-// get the HTTP method, path and body of the request
-    $method = $_SERVER['REQUEST_METHOD'];
-    $request = explode('/', trim($_SERVER['PATH_INFO'], '/'));
-echo $request;
-    //$input = json_decode(file_get_contents('php://input'),true);
-      
-    switch ($method) {
+    switch ($METHOD) {
         case 'GET':
-            $sql = "select * from `$table`".($key?" WHERE id=$key":''); break;
         case 'PUT':
-            $sql = "update `$table` set $set where id=$key"; break;
         case 'POST':
-            $sql = "insert into `$table` set $set"; break;
+            post();
+            break;
         case 'DELETE':
-            $sql = "delete `$table` where id=$key"; break;
     }
+
+
+function post () {
+    global $db;
+
+    $survey_id = $db->evaluate('SELECT id FROM surveys WHERE user_google_id = '.$db->a($_SESSION['user_google_id']));
+    if (!$survey_id) {
+        $survey_id = $db->query('INSERT INTO surveys (survey_google_id, user_google_id) VALUES ('.$db->a($_POST['survey_google_id']).', '.$db->a($_SESSION['user_google_id']).')');
+    }
+
+//    $tags1 = $db->query('INSERT INTO tags (tag, count, survey_id) VALUES '.$survey_id);
+//    $tags2 = $_POST['tags'];
+
+//    print_r($tags1);
+//    print_r($tags2);
+//    for ($i = 0; $i < count($tags2); $i++) {
+//        
+//    }
+}

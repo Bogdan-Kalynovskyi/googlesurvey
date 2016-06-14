@@ -38,14 +38,15 @@
     <div class="col-md-1"></div>
 </div>
 
-<form action="/" method="post" id="loginRedirect">
-    <input type="hidden" name="google_auth_token">
+<form action="/" method="post">
+    <input type="hidden" name="auth_google_token">
 </form>
 
 <script>
     function onSignIn (googleUser) {
-        document.getElementsByName('google_auth_token')[0].value = googleUser.getAuthResponse().id_token;
-        document.getElementById('loginRedirect').submit();
+        var hidden = document.getElementsByName('auth_google_token')[0];
+        hidden.value = googleUser.getAuthResponse().id_token;
+        hidden.parentNode.submit();
     }
 
     // check for 3d party cookies are enabeld code

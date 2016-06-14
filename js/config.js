@@ -39,10 +39,7 @@
         };
 
 
-        if (xsrf_token) {
-            localStorage.setItem('xsrf_token', xsrf_token);
-            $httpProvider.defaults.headers.common.Authorization = xsrf_token;
-        }
+        $httpProvider.defaults.headers.common.Authorization = xsrf_token;
 
 
         $httpProvider.interceptors.push(function ($q, $injector) {
@@ -85,9 +82,7 @@
                 responseError: function (response) {
                     switch (response.status) {
                         case 401 :
-                            alert('Our fuckup! Somebody has purged the database so your session is no longer valid. Please reload the page to log in again.');
-                            localStorage.removeItem('xsrf_token');
-                            document.cookie = '';  //delete PHPSSID and Google cookies all at once
+                            alert('Our fuckup! Somebody restarted PHP so your session vanished. Please reload the page to log in again.');
                             break;
 
                         case -1:
