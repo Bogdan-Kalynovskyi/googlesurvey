@@ -26,7 +26,7 @@ class bDb {
 
     
     function a ($str) {
-        return mysql_real_escape_string('"'.$str.'"'); 
+        return '"'.mysql_real_escape_string($str).'"'; 
     }
 
 //***************************************************************************
@@ -116,6 +116,6 @@ class bDb {
 } // End class
 
 
-include_once "db_settings.php";
+include "db_settings.php";
 
 $db = new bDb($db_host, $db_user, $db_pass, $db_name, $db_charset);

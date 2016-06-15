@@ -1,11 +1,7 @@
 (function () {
     'use strict';
-    //
-    // app.service('TagsService', function ($http) {
-    //     this.readTags = function (userToken) {
-    //         return $http.get()
-    //     }
-    // });
+
+    google.charts.load('current', {'packages':['table', 'bar']});
 
 
     angular.module('app').directive('customOnChange', function() {
@@ -61,14 +57,72 @@
                         alert('Wrong XLS structure');
                     }
 
+                    reader.drawTable(postData);
+
                     $http.post('api/tags.php', postData).success(function () {
-                        //navigate
-                    }).error(function () {
-                        //alert();
                     });
                 };
                 
                 reader.readAsBinaryString(file);
+
+
+                reader.drawTable = function (postData) {
+                    var tags = postData.tags,
+                        tagsArray = [];
+
+                    for (var i in tags) {
+                        tagsArray.push([i, tags[i]]);
+                    }
+
+                    function sortFunction (a, b) {
+                        if (a[1] > b[1]) {
+                            return -1;
+                        }
+                        else if (a[1] < b[1]) {
+                            return 1;
+                        }
+                        else {
+                            return 0;
+                        }
+                    }
+
+                    tagsArray.sort(sortFunction);
+
+                    google.charts.setOnLoadCallback(drawTable);
+                    google.charts.setOnLoadCallback(drawChart);
+
+
+                    function drawTable () {
+                        var data = new google.visualization.DataTable();
+
+                        data.addColumn('string', 'Tag');
+                        data.addColumn('number', 'Count');
+
+                        data.addRows(tagsArray);
+
+                        var table = new google.visualization.Table($('#table_div')[0]);
+
+                        table.draw(data, {showRowNumber: false, width: '100%', height: '100%'});
+                    }
+
+                    function drawChart() {
+                        tagsArray.unshift(['Tag', 'Count']);
+                        var data = google.visualization.arrayToDataTable(tagsArray);
+
+                        var options = {
+                            chart: {
+                                title: 'What\'s the first thing that comes to your mind when you think of Adelaide?',
+                                subtitle: 'Results for Survey ID: ' + postData.survey_google_id
+                            },
+                            bars: 'horizontal' // Required for Material Bar Charts.
+                        };
+
+                        var container = $('#barchart_material').height(18 * tagsArray.length),
+                            chart = new google.charts.Bar(container[0]);
+
+                        chart.draw(data, options);
+                    }
+                }
             }
         };
 

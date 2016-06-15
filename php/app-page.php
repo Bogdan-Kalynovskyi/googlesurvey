@@ -15,6 +15,7 @@
     <!--    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>-->
     <script src="node_modules/ng-file-upload/dist/ng-file-upload.js"></script>
     <script src="node_modules/xlsjs/dist/xls.js"></script>
+    <script src="//www.gstatic.com/charts/loader.js"></script>
     <script>
         xsrf_token = '<?php echo $_SESSION['xsrf_token'] ?>';
     </script>
@@ -38,5 +39,12 @@
     <div ui-view></div>
 
     <footer></footer>
+    <table class="columns">
+        <tr>
+            <td><div id="table_div" style="border: 1px solid #ccc"></div></td>
+            <td><div id="barchart_material" style="border: 1px solid #ccc; width: 600px;"></div></td>
+        </tr>
+    </table>
+
 </body>
 </html>

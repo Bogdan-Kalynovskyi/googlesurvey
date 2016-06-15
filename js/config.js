@@ -81,8 +81,9 @@
 
                 responseError: function (response) {
                     switch (response.status) {
-                        case 401 :
-                            alert('Our fuckup! Somebody restarted PHP so your session vanished. Please reload the page to log in again.');
+                        case 401:
+                        case 403:
+                            alert(response.text);
                             break;
 
                         case -1:

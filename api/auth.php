@@ -10,17 +10,12 @@
         define('AUTHORISED', true);
     }
     else {
-        header($_SERVER["SERVER_PROTOCOL"]." 401 Unauthorized", true, 401);
+        header("HTTP/1.0 401 Unauthorized", true, 401);
+        echo 'Our fuckup! Somebody restarted PHP so your session vanished. Please reload the page to log in again.';
         die;
     }
 
 
-// get the HTTP method, path and body of the request
-    
-    $METHOD = $_SERVER['REQUEST_METHOD'];
-    if ($METHOD === 'POST') {
-        $PAYLOAD = json_decode(file_get_contents('php://input'), true);
-    }
-          
+// connect to db
     
     include "db_mysql.php";
