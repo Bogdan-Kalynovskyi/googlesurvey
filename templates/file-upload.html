@@ -1,8 +1,17 @@
 <!--<div ngf-select ng-model="file" class="button" ngf-multiple="false"-->
      <!--accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"-->
      <!--ngf-pattern="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'">Select File</div>-->
-<input type="file" custom-on-change="uploadFile" accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+<input type="file" custom-on-change="ctrl.uploadFile" accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
 <!--<div ngf-drop ng-model="file" class="drop-box"-->
      <!--ngf-drag-over-class="'dragover'" ngf-multiple="false" ngf-allow-dir="false"-->
      <!--ngf-pattern="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'">Drop file</div>-->
 <!--<div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>-->
+
+<hr>
+<button id="btn-delete" class="btn btn-primary">Merge Selected</button>
+<button id="btn-merge" class="btn btn-danger">Delete Selected</button>
+<div layout="row" layout-sd="column">
+     <div flex id="tags-table"></div>
+     <div flex id="tags-barchart"></div>
+</div>
+<input placeholder="Tags..."><button class="btn btn-default">Bulk Add</button>

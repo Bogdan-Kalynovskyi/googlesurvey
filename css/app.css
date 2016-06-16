@@ -1,0 +1,13 @@
+#tags-table tbody {
+    height: 420px;
+    overflow-y: auto;
+}
+
+#tags-table tbody td:first-child {
+    text-align: center;
+}
+
+#tags-barchart {
+    border: 1px solid #ccc;
+    width: 600px;
+}

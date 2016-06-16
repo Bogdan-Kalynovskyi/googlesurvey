@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    google.charts.load('current', {'packages':['table', 'bar']});
+    google.charts.load('current', {'packages':['bar']});
 
 
     angular.module('app').directive('customOnChange', function() {
@@ -15,12 +15,15 @@
     });
 
 
-    angular.module('app').controller('UploadCtrl', function ($scope, $http) {
-        $scope.uploadFile = function (event){
+    angular.module('app').controller('UploadCtrl', function ($http) {
+        var ctrl = this;
+        
+        
+        this.uploadFile = function (event) {
             var file = event.target.files[0];
             if (file && !file.$error) {
                 var reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     var data = e.target.result;
 
                     try {
@@ -34,7 +37,7 @@
 
                         while (row = raw['K' + i]) {
                             words = row.w.trim().toLowerCase().split(/ and | or |\.|,|;|:|\?|!|&+/);
-                            for (var j = 0, wl = words.length; j < wl; j++) {
+                            for (var j = 0, len = words.length; j < len; j++) {
                                 word = words[j].trim();
                                 if (word.length) {
                                     if (tags[word]) {
@@ -47,82 +50,29 @@
                             }
                             i++;
                         }
-
-                        var postData = {
-                            survey_google_id: workbook.Sheets.Overview.A2.w,
-                            tags: tags
-                        };
                     }
                     catch (e) {
                         alert('Wrong XLS structure');
+                        return;
                     }
 
-                    reader.drawTable(postData);
+                    var postData = {
+                        survey_google_id: workbook.Sheets.Overview.A2.w,
+                        tags: tags
+                    };
 
                     $http.post('api/tags.php', postData).success(function () {
                     });
+                    
+                    new Table(postData, {
+                        table: document.getElementById('tags-table'),
+                        chart: document.getElementById('tags-barchart'),
+                        btnDelete: document.getElementById('btn-delete'),
+                        btnMerge: document.getElementById('btn-merge')
+                    });
                 };
-                
+
                 reader.readAsBinaryString(file);
-
-
-                reader.drawTable = function (postData) {
-                    var tags = postData.tags,
-                        tagsArray = [];
-
-                    for (var i in tags) {
-                        tagsArray.push([i, tags[i]]);
-                    }
-
-                    function sortFunction (a, b) {
-                        if (a[1] > b[1]) {
-                            return -1;
-                        }
-                        else if (a[1] < b[1]) {
-                            return 1;
-                        }
-                        else {
-                            return 0;
-                        }
-                    }
-
-                    tagsArray.sort(sortFunction);
-
-                    google.charts.setOnLoadCallback(drawTable);
-                    google.charts.setOnLoadCallback(drawChart);
-
-
-                    function drawTable () {
-                        var data = new google.visualization.DataTable();
-
-                        data.addColumn('string', 'Tag');
-                        data.addColumn('number', 'Count');
-
-                        data.addRows(tagsArray);
-
-                        var table = new google.visualization.Table($('#table_div')[0]);
-
-                        table.draw(data, {showRowNumber: false, width: '100%', height: '100%'});
-                    }
-
-                    function drawChart() {
-                        tagsArray.unshift(['Tag', 'Count']);
-                        var data = google.visualization.arrayToDataTable(tagsArray);
-
-                        var options = {
-                            chart: {
-                                title: 'What\'s the first thing that comes to your mind when you think of Adelaide?',
-                                subtitle: 'Results for Survey ID: ' + postData.survey_google_id
-                            },
-                            bars: 'horizontal' // Required for Material Bar Charts.
-                        };
-
-                        var container = $('#barchart_material').height(18 * tagsArray.length),
-                            chart = new google.charts.Bar(container[0]);
-
-                        chart.draw(data, options);
-                    }
-                }
             }
         };
 
