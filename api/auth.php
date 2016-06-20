@@ -6,7 +6,7 @@
 // compare header with xsrf token to cookie-based session
 
     session_start();
-    if (isset($_SERVER['HTTP_AUTHORIZATION']) && $_SERVER['HTTP_AUTHORIZATION'] === $_SESSION['xsrf_token']) {
+    if (isset($_SERVER['HTTP_AUTHORIZATION']) && $_SERVER['HTTP_AUTHORIZATION'] === $_SESSION['xsrfToken']) {
         define('AUTHORISED', true);
     }
     else {

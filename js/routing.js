@@ -6,9 +6,9 @@
         $urlRouterProvider.otherwise('/');
         $stateProvider.state('home', {
             url: '/',
-            controller: 'UploadCtrl',
+            controller: 'Dashboard',
             controllerAs: 'ctrl',
-            templateUrl: 'templates/file-upload.html'
+            templateUrl: 'templates/dashboard.html'
         });
         
     });

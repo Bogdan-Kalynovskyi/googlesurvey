@@ -1,10 +1,41 @@
-#tags-table tbody {
-    height: 420px;
-    overflow-y: auto;
+header,
+section {
+    padding: 10px;
 }
 
-#tags-table tbody td:first-child {
+header,
+.toolbar {
+    background: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+header h5 {
+    display: inline-block;
+}
+
+header .logout {
+    float: right;
+}
+
+
+.toolbar {
+    top: 40px;
+}
+
+.tables {
+    margin-top: 220px;
+}
+
+
+#tags-table td:first-child {
     text-align: center;
+}
+
+#tags-table td {
+    font-size: 14px;
+    padding: 3px;
 }
 
 #tags-barchart {

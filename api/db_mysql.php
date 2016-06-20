@@ -14,12 +14,12 @@ class bDb {
 
     // The constructor. Get the mysql info vars and connect to the server
     function bDb ($db_host, $db_user, $db_pass, $db_name, $db_charset) {
-        $this->link = @mysql_connect($db_host, $db_user, $db_pass, TRUE); // Connect to the MySQL server
+        $this->link = mysql_connect($db_host, $db_user, $db_pass, TRUE); // Connect to the MySQL server
 
         if (!$this->link) {
             trigger_error(mysql_error());
         }
-        if (!@mysql_select_db($db_name, $this->link) || !@mysql_query("SET NAMES $db_charset", $this->link)) {
+        if (!mysql_select_db($db_name, $this->link)/* || !mysql_query("SET NAMES $db_charset", $this->link)*/) {
             trigger_error(mysql_error());
         }
     }
@@ -29,14 +29,16 @@ class bDb {
         return '"'.mysql_real_escape_string($str).'"'; 
     }
 
+    
+    function b ($str) {
+        return intval($str); 
+    }
+
 //***************************************************************************
     function evaluate ($query_str) {
 
-        $this->result = @mysql_query($query_str, $this->link);
-        if ($this->result === false) {
-            trigger_error(mysql_error() . ' ==>> ' . htmlentities($query_str));
-        }
-
+        $this->result = mysql_query($query_str, $this->link);
+        
         return @mysql_result($this->result, 0, 0); // or trigger_error(var_dump...);
     }
 
@@ -45,24 +47,16 @@ class bDb {
     // Perform the MySQL queries
     function query ($query_str, $multi = true, $smart = false) {
 
-        $this->result = @mysql_query($query_str, $this->link); // Do the quer
-        if ($this->result === false) {
-            trigger_error(mysql_error() . ' ==>> ' . htmlentities($query_str));
-            return null;
-        }
-
-        if (strtolower(substr(ltrim($query_str), 0, 6)) != 'select') { //SET //and others
-
+        $this->result = mysql_query($query_str, $this->link); // Do the quer
+        
+        if (strtolower(substr(ltrim($query_str), 0, 7)) != 'select ') { //SET //and others
             // Return the number of rows affected by this operation
             return mysql_affected_rows();
-
         }
         
-        elseif (strtolower(substr(ltrim($query_str), 0, 6)) != 'insert') {
-            
-            // Return last id
+        elseif (strtolower(substr(ltrim($query_str), 0, 7)) != 'insert ') {
+            // Return last insert id
             return mysql_insert_id();
-
         }
 
 
@@ -104,13 +98,8 @@ class bDb {
     }
 
     function row_count ($query_str) {
-        $this->result = @mysql_query($query_str, $this->link);
-        if ($this->result === false) {
-            trigger_error(mysql_error() . ' ==>> ' . htmlentities($query_str));
-            return null;
-        }
-
-        return @mysql_num_rows($this->result);
+        $this->result = mysql_query($query_str, $this->link);
+        return mysql_num_rows($this->result);
     }
 
 } // End class

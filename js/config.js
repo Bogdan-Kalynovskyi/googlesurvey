@@ -20,13 +20,13 @@
         if (IEVersion !== -1) {
             document.documentElement.className = 'ie' + IEVersion;
             if (IEVersion < 10) {
-                alert('You are using Internet Explorer ' + IEVersion + '. Sorry, but we are only supporting Internet Explorer 10 and above. Chrome, Firefox and Safari are also supported.');
+                bootstrapAlert('You are using Internet Explorer ' + IEVersion + '. Sorry, but we are only supporting Internet Explorer 10 and above. Chrome, Firefox and Safari are also supported.');
             }
         }
 
         function info (message) {
             if (!document.hidden && allowAlert) {
-                alert(message);
+                bootstrapAlert(message);
                 allowAlert = false;
                 setTimeout(function () {
                     allowAlert = true;
@@ -39,7 +39,7 @@
         };
 
 
-        $httpProvider.defaults.headers.common.Authorization = xsrf_token;
+        $httpProvider.defaults.headers.common.Authorization = xsrfToken;
 
 
         $httpProvider.interceptors.push(function ($q, $injector) {
@@ -83,7 +83,7 @@
                     switch (response.status) {
                         case 401:
                         case 403:
-                            alert(response.text);
+                            bootstrapAlert(response.data);
                             break;
 
                         case -1:
@@ -98,5 +98,19 @@
                 }
             };
         });
-    })
+    });
+
+
+
+    angular.module('app').directive('customOnChange', function() {
+        return {
+            restrict: 'A',
+            link: function (scope, element, attrs) {
+                var onChangeHandler = scope.$eval(attrs.customOnChange);
+                element.bind('change', onChangeHandler);
+            }
+        };
+    });
+
+    
 })();

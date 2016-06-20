@@ -1,0 +1,29 @@
+<!--<div ngf-select ng-model="file" class="button" ngf-multiple="false"-->
+     <!--accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"-->
+     <!--ngf-pattern="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'">Select File</div>-->
+<!--<div ngf-drop ng-model="file" class="drop-box"-->
+     <!--ngf-drag-over-class="'dragover'" ngf-multiple="false" ngf-allow-dir="false"-->
+     <!--ngf-pattern="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'">Drop file</div>-->
+<!--<div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>-->
+<section class="toolbar">
+     Load tags by survey Id
+     <input ng-model="ctrl.surveyId"> <button ng-click="ctrl.loadBySurveyId()">Load</button>
+     <br>
+     or
+     <br>
+     <input type="file" custom-on-change="ctrl.uploadFile" accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+
+     <hr>
+     <button ng-click="ctrl.mergeRows()" class="btn btn-sm btn-primary">Merge Selected</button>
+     <button ng-click="ctrl.deleteRows()" class="btn btn-sm btn-danger">Delete Selected</button>
+     <br>
+     <br>
+     <input placeholder="Tags..."> <button ng-click="ctrl.addTags()">Bulk Add</button>
+</section>
+
+<section class="tables">
+     <div layout="row" layout-sd="column">
+          <div flex id="tags-table"></div>
+          <div flex id="tags-barchart"></div>
+     </div>
+</section>
