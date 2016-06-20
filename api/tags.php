@@ -30,7 +30,13 @@ catch (Exception $e) {
 function get () {
     global $db;
 
-    echo json_encode($db->query('SELECT FROM tags WHERE survey_id = '.$db->a($_GET['surveyId'])));
+    $surveyId = intval($db->evaluate('SELECT id FROM surveys WHERE survey_google_id = '.$db->a($_GET['surveyGoogleId'])));
+    $query = mysql_query('SELECT * FROM tags WHERE survey_id = '.$surveyId);
+    $result = array();
+    while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
+        $result[$row[2]] = intval($row[3]);
+    }
+    echo json_encode([$surveyId, $result]);
 }
 
 
@@ -38,7 +44,7 @@ function create () {
     global $db;
 
     $post = json_decode(file_get_contents('php://input'), true);
-    $surveyId = $db->evaluate('SELECT id FROM surveys WHERE survey_google_id = '.$db->a($post['surveyGoogleId']));
+    $surveyId = intval($db->evaluate('SELECT id FROM surveys WHERE survey_google_id = '.$db->a($post['surveyGoogleId'])));
     if (!$surveyId) {
         $surveyId = $db->query('INSERT INTO surveys (survey_google_id, user_google_id) VALUES ('.$db->a($post['surveyGoogleId']).', '.$db->b($_SESSION['userGoogleId']).')');
     }

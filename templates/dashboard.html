@@ -7,10 +7,9 @@
 <!--<div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>-->
 <section class="toolbar">
      Load tags by survey Id
-     <input ng-model="ctrl.surveyId"> <button ng-click="ctrl.loadBySurveyId()">Load</button>
+     <input ng-model="ctrl.surveyId" placeholder="Google Survey ID"> <button ng-click="ctrl.loadBySurveyId()">Load</button>
      <br>
      or
-     <br>
      <input type="file" custom-on-change="ctrl.uploadFile" accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
 
      <hr>

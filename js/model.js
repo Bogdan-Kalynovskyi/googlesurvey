@@ -45,23 +45,13 @@
 
 
         this.initBySurveyId = function (surveyId) {
-            this.surveyId = surveyId;
-            return this.getTags(surveyId).success(function (response) {
-                var tagsObj = response.data;
-                debugger;
-                that.tagsArr = objToArr(tagsObj);
-                that.tagsGoo = arrToGoo(that.tagsArr);
-            });
-        };
-
-
-        this.loadTags = function (surveyId) {
-            return $http.get(api, {
-                surveyId: surveyId
-            }).success(function (response) {
-                that.tagsArr = objToArr(response.data);
-                sortTags();
-                that.tagsGoo = arrToGoo(that.tagsArr);
+            return $http.get(api + '?surveyGoogleId=' + encodeURIComponent(surveyId)).success(function (response) {
+                google.charts.setOnLoadCallback(function () {
+                    that.surveyId = response[0];
+                    that.tagsArr = objToArr(response[1]);
+                    sortTags();
+                    that.tagsGoo = arrToGoo(that.tagsArr);
+                });
             });
         };
 

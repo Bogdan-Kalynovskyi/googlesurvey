@@ -9,10 +9,10 @@
             table = new Table(document.getElementById('tags-table')),
             chart = new Chart(document.getElementById('tags-barchart'));
 
-        
+
         this.loadBySurveyId = function () {
-            google.charts.setOnLoadCallback(function () {
-                model.loadTags(this.surveyId).success(function () {
+            model.initBySurveyId(that.surveyId).success(function () {
+                google.charts.setOnLoadCallback(function () {
                     table.create(model.tagsArr);
                     chart.create(model.tagsGoo);
                 });

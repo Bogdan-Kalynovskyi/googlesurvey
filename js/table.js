@@ -77,5 +77,6 @@ function Table (container) {
 
 
 bootstrapAlert = function (message) {
-    $('#modal-placeholder').html('<div class="alert alert-danger alert-dismissable"><a class=close data-dismiss=alert>×</a><div>' + message + '</div><button class="btn btn-sm block-center">Ok</button></div>');
+    $('#modal-placeholder').html('<div class="modal fade"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal">&times;</button></div><div class="modal-body">' + message + '</div><button class="btn btn-sm block-center" data-dismiss="modal">Ok</button></div></div></div>');
+    $('.modal').modal('show');
 };

@@ -9,6 +9,7 @@ header,
     position: fixed;
     top: 0;
     left: 0;
+    width: 100%;
 }
 
 header h5 {
@@ -25,7 +26,7 @@ header .logout {
 }
 
 .tables {
-    margin-top: 220px;
+    margin-top: 240px;
 }
 
 
@@ -34,7 +35,7 @@ header .logout {
 }
 
 #tags-table td {
-    font-size: 14px;
+    font-size: 13px;
     padding: 3px;
 }
 
