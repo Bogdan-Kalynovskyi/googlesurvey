@@ -101,7 +101,10 @@
                 var arr = [];
                 str = str.toLowerCase().split(/ and | or |\.|,|;|:|\?|!|&+/);
                 for (var i = 0; i < str.length; i++) {
-                    arr.push([str[i].trim(), 0]);
+                    var word = str[i].trim();
+                    if (word.length) {
+                        arr.push([word, 0]);
+                    }
                 }
 
                 model.appendTags(arr);

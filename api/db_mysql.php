@@ -49,16 +49,17 @@ class bDb {
 
         $this->result = mysql_query($query_str, $this->link); // Do the quer
         
-        if (strtolower(substr(ltrim($query_str), 0, 7)) != 'select ') { //SET //and others
+        $begin = strtolower(substr(ltrim($query_str), 0, 7));
+        if ($begin !== 'select ') { //SET //and others
+            if ($begin === 'insert ') {
+                // Return last insert id
+                return mysql_insert_id();
+            }
+
             // Return the number of rows affected by this operation
             return mysql_affected_rows();
         }
         
-        elseif (strtolower(substr(ltrim($query_str), 0, 7)) != 'insert ') {
-            // Return last insert id
-            return mysql_insert_id();
-        }
-
 
         // Return multiple rows stored in a multi dimensional array
         if ($multi) {
@@ -79,8 +80,6 @@ class bDb {
             }
 
             return $this->output; // Return the multi demensional array
-
-
         }
 
         // Return the result in a one dimensional array

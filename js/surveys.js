@@ -4,11 +4,15 @@
     angular.module('app').service('surveys', function ($http) {
         var that = this,
             api = 'api/surveys.php';
+        
+        this.surveys = {};
 
         
         this.loadSurveys = function () {
             return $http.get(api).success(function (response) {
-                that.surveys = response;
+                if (response) {
+                    that.surveys = response;
+                }
             });
         };
 

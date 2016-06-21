@@ -23,8 +23,8 @@ catch (Exception $e) {
 
 function get () {
     global $db;
-
-    echo json_encode($db->query('SELECT * FROM surveys WHERE user_google_id = '.$db->b($_SESSION['userGoogleId']), true, true));
+    
+    echo json_encode($db->query('SELECT * FROM surveys WHERE user_google_id = '.$db->a($_SESSION['userGoogleId']), true, true));
 }
 
 
