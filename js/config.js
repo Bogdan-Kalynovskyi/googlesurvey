@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    angular.module('app', ['ui.router', 'ngFileUpload']).config(function ($locationProvider, $sceProvider, $httpProvider) {
+    angular.module('app', ['ui.router']).config(function ($locationProvider, $sceProvider, $httpProvider) {
         $locationProvider.html5Mode(true);
 
 

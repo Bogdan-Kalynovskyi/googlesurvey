@@ -36,7 +36,7 @@ function get () {
     while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
         $result[$row[2]] = intval($row[3]);
     }
-    echo json_encode([$surveyId, $result]);
+    echo json_encode($result);
 }
 
 
@@ -46,11 +46,11 @@ function create () {
     $post = json_decode(file_get_contents('php://input'), true);
     $surveyId = intval($db->evaluate('SELECT id FROM surveys WHERE survey_google_id = '.$db->a($post['surveyGoogleId'])));
     if (!$surveyId) {
-        $surveyId = $db->query('INSERT INTO surveys (survey_google_id, user_google_id) VALUES ('.$db->a($post['surveyGoogleId']).', '.$db->b($_SESSION['userGoogleId']).')');
+        $surveyId = $db->query('INSERT INTO surveys (survey_google_id, user_google_id, question) VALUES ('.$db->a($post['surveyGoogleId']).', '.$db->a($_SESSION['userGoogleId']).', '.$db->a($post['question']).')');
     }
     else {
         header("HTTP/1.0 403 Forbidden", true, 403);
-        echo "You cannot load the same survey twice. Please delete it and try again.";
+        echo "This survey has already been uploaded. You cannot upload it twice. You can delete it and try again.";
         die;
     }
 

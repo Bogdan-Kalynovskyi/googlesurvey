@@ -36,19 +36,22 @@
                 bootstrapAlert('Could not parse Excel file');
                 return;
             }
-
-            return this.saveNewSurvey(workbook.Sheets.Overview.A2.w, tagsObj).success(function (response) {
-                // TODO: there is a moment when surveyId is undefined!!!!
-                that.surveyId = response;
+            
+            var tmp = workbook.Sheets.Overview;
+            return this.saveNewSurvey(tmp.A2.w, tmp.C2.w, tagsObj).then(function () {
+                return {
+                    survey_google_id: tmp.A2.w,
+                    question: tmp.C2.w
+                }
             });
         };
 
 
         this.initBySurveyId = function (surveyId) {
+            this.surveyId = surveyId;
             return $http.get(api + '?surveyGoogleId=' + encodeURIComponent(surveyId)).success(function (response) {
                 google.charts.setOnLoadCallback(function () {
-                    that.surveyId = response[0];
-                    that.tagsArr = objToArr(response[1]);
+                    that.tagsArr = objToArr(response);
                     sortTags();
                     that.tagsGoo = arrToGoo(that.tagsArr);
                 });
@@ -56,14 +59,19 @@
         };
 
 
-        this.saveNewSurvey = function (surveyGoogleId, tagsObj) {
+        this.saveNewSurvey = function (surveyGoogleId, question, tagsObj) {
             this.tagsArr = objToArr(tagsObj);
             sortTags();
             this.tagsGoo = arrToGoo(this.tagsArr);
             
             return $http.post(api, {
                 surveyGoogleId: surveyGoogleId,
+                question: question,
                 tagsObj: tagsObj
+            })
+            .then(function (response) {
+                // TODO: there is a moment when surveyId is undefined!!!!
+                return that.surveyId = response.data;
             });
         };
 
@@ -169,7 +177,6 @@
         }
 
 
-
         this.selectedIndexes = function () {
             var selected = [],
                 checkboxes = tbody.getElementsByTagName('input');
@@ -181,5 +188,6 @@
             }
             return selected;
         };
+        
     });
 })();

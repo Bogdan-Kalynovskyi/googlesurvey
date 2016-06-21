@@ -23,3 +23,11 @@ function Chart (container) {
         chart.draw(tagsGoo);
     }
 }
+
+
+
+
+bootstrapAlert = function (message) {
+    $('#modal-placeholder').html('<div class="modal fade"><div class="modal-dialog"><div class="modal-content"><div class="modal-body"><button type="button" class="close" data-dismiss="modal">&times;</button><br>' + message + '<br><br><button class="btn btn-sm center-block" data-dismiss="modal">&nbsp; Ok &nbsp;</button></div></div></div></div>');
+    $('.modal').modal('show');
+};

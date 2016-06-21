@@ -5,7 +5,19 @@
      <!--ngf-drag-over-class="'dragover'" ngf-multiple="false" ngf-allow-dir="false"-->
      <!--ngf-pattern="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'">Drop file</div>-->
 <!--<div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>-->
-<section class="toolbar">
+
+<section class="surveys">
+     <table class="table">
+          <thead><tr>
+               <td>Google ID</td><td>Question</td>
+          </tr></thead>
+          <tbody ng-repeat="(id, survey) in ctrl.surveys">
+          <tr data-id="{{ id }}">
+               <td ng-bind="survey.survey_google_id"></td>
+               <td ng-bind="survey.question"></td>
+          </tr>
+          </tbody>
+     </table>
      Load tags by survey Id
      <input ng-model="ctrl.surveyId" placeholder="Google Survey ID"> <button ng-click="ctrl.loadBySurveyId()">Load</button>
      <br>
@@ -20,7 +32,7 @@
      <input placeholder="Tags..."> <button ng-click="ctrl.addTags()">Bulk Add</button>
 </section>
 
-<section class="tables">
+<section class="tags">
      <div layout="row" layout-sd="column">
           <div flex id="tags-table"></div>
           <div flex id="tags-barchart"></div>

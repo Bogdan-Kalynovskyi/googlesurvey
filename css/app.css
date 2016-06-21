@@ -4,7 +4,7 @@ section {
 }
 
 header,
-.toolbar {
+.surveys {
     background: white;
     position: fixed;
     top: 0;
@@ -21,11 +21,11 @@ header .logout {
 }
 
 
-.toolbar {
+.surveys {
     top: 40px;
 }
 
-.tables {
+.tags {
     margin-top: 240px;
 }
 
@@ -34,7 +34,26 @@ header .logout {
     text-align: center;
 }
 
-#tags-table td {
+.table tr {
+    position: relative;
+}
+
+.table tr:after {
+    content: 'x';
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    display: none;
+    opacity: 0;
+    transition: opacity .2s;
+}
+
+.table tr:after:hover {
+    display: block;
+    opacity: 1;
+}
+
+.table td {
     font-size: 13px;
     padding: 3px;
 }
