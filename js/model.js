@@ -49,7 +49,7 @@
 
         this.initBySurveyId = function (surveyId) {
             this.surveyId = surveyId;
-            return $http.get(api + '?surveyGoogleId=' + encodeURIComponent(surveyId)).success(function (response) {
+            return $http.get(api + '?surveyId=' + surveyId).success(function (response) {
                 google.charts.setOnLoadCallback(function () {
                     that.tagsArr = objToArr(response);
                     sortTags();

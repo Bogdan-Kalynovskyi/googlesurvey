@@ -1,32 +1,29 @@
-header,
-section {
-    padding: 10px;
+html,
+body {
+    height: 100%;
 }
 
-header,
-.surveys {
-    background: white;
+.logout {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-}
-
-header h5 {
-    display: inline-block;
-}
-
-header .logout {
-    float: right;
+    top: 8px;
+    right: 8px;
 }
 
 
-.surveys {
-    top: 40px;
+[ui-view] {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
-.tags {
-    margin-top: 240px;
+.flex-no-stretch {
+    flex-grow: 0;
+}
+
+.flex-stretch {
+    flex-grow: 1;
+    overflow: auto;
+    -webkit-overflow-scrolling: auto;
 }
 
 
@@ -48,7 +45,7 @@ header .logout {
     transition: opacity .2s;
 }
 
-.table tr:after:hover {
+.table tr:hover:after {
     display: block;
     opacity: 1;
 }
@@ -58,3 +55,17 @@ header .logout {
     padding: 3px;
 }
 
+#tags-table tbody td:nth-child(2) {
+    position: relative;
+}
+
+#tags-table tbody td:nth-child(2) > input {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+}
+
+#surveys,
+#tags {
+    padding: 10px;
+}

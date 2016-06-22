@@ -31,6 +31,6 @@ function get () {
 function delete () {
     global $db;
     
-    $db->query('DELETE FROM surveys WHERE survey_id = '.$db->b($_GET['surveyId']));
+    $db->query('DELETE FROM surveys WHERE id = '.$db->b($_GET['surveyId']));
     $db->query('DELETE FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']));
 }

@@ -38,21 +38,17 @@
 </head>
 
 <body>
-    <header>
-        <h5>Header</h5>
-        <a href="#" class="logout" onclick="logOut();return false;">Log out</a>
-        <script>
-            function logOut () {
-                var form = $('<form action=/ method=post><input type=hidden name=logout value=' + xsrfToken + '></form>');
-                $(document.body).append(form);
-                form.submit();
-            }
-        </script>
-    </header>
+    <a href="#" class="logout" onclick="logOut();return false;">Log out</a>
+    <script>
+        function logOut () {
+            var form = $('<form action=/ method=post><input type=hidden name=logout value=' + xsrfToken + '></form>');
+            $(document.body).append(form);
+            form.submit();
+        }
+    </script>
 
     <div ui-view></div>
 
-    <footer></footer>
     <div id="modal-placeholder"></div>
 </body>
 </html>

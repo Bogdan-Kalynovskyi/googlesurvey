@@ -30,8 +30,7 @@ catch (Exception $e) {
 function get () {
     global $db;
 
-    $surveyId = intval($db->evaluate('SELECT id FROM surveys WHERE survey_google_id = '.$db->a($_GET['surveyGoogleId'])));
-    $query = mysql_query('SELECT * FROM tags WHERE survey_id = '.$surveyId);
+    $query = mysql_query('SELECT * FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']));
     $result = array();
     while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
         $result[$row[2]] = intval($row[3]);
@@ -105,18 +104,14 @@ function update () {
 
 function delete () {
     global $db;
-    
-//    if ($_GET['tag']) {
-//        $str = 'tag = '.$db->a($_GET['tag']);
-//    }
-//    else {
-        $arr = [];
-        $c = count($_GET['tags']);
-        for ($i = 0; $i < $c; $i++) {
-            $arr[$i] = 'tag = '.$db->a($_GET['tags'][$i]);
-        }
-        $str = '('.implode(' OR ', $arr).')';
-//    }
+
+    $arr = [];
+    $tags = $_GET['tags'];
+    $c = count($tags);
+    for ($i = 0; $i < $c; $i++) {
+        $arr[$i] = 'tag = '.$db->a($tags[$i]);
+    }
+    $str = '('.implode(' OR ', $arr).')';
 
     $db->query('DELETE FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']).' AND '.$str);
 }

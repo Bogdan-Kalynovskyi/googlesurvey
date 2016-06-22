@@ -5,14 +5,10 @@
         var that = this,
             api = 'api/surveys.php';
         
-        this.surveys = {};
-
         
         this.loadSurveys = function () {
             return $http.get(api).success(function (response) {
-                if (response) {
-                    that.surveys = response;
-                }
+                that.surveys = response ? response : {};
             });
         };
 

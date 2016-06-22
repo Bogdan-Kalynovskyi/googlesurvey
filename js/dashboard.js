@@ -13,19 +13,26 @@
         window.model = model;
         window.surveys = surveys;
 
-        surveys.loadSurveys().success(function (response) {
-            that.surveys = response;
+
+        surveys.loadSurveys().success(function () {
+            that.surveys = surveys.surveys;
         });
 
         
-        this.loadBySurveyId = function () {
+        this.loadSurveyById = function (id) {
             waiting4SurveyId = $q.defer();
-            model.initBySurveyId(that.surveyId).success(function () {
+            model.initBySurveyId(id).success(function () {
                 google.charts.setOnLoadCallback(function () {
                     table.create(model.tagsArr);
                     chart.create(model.tagsGoo);
+                    waiting4SurveyId.resolve();
                 });
             });
+        };
+
+        
+        this.deleteSurveyById = function (id) {
+            surveys.deleteSurvey(id);
         };
 
 
@@ -40,7 +47,7 @@
 
                         model.initByExcelData(e.target.result).then(function (surveyData) {
                             surveys._addSurvey(model.surveyId, surveyData);
-                            // todo add promise to all controls so that they work only when surveyId known
+                            waiting4SurveyId.resolve();
                         });
 
                         table.create(model.tagsArr);
