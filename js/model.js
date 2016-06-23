@@ -77,7 +77,7 @@
 
 
         this.appendTags = function (tagsArr) {
-            this.tagsArr.concat(tagsArr);
+            this.tagsArr = this.tagsArr.concat(tagsArr);
             sortTags();
             this.tagsGoo = arrToGoo(this.tagsArr);
 
@@ -119,7 +119,7 @@
             var tags = [];
             
             for (var i = 0, len = indexes.length; i < len; i++) {
-                var index = indexes[i];
+                var index = indexes[i] - i;
                 tags.push(this.tagsArr[index][0]);
                 this.tagsArr.splice(index, 1);
                 this.tagsGoo.removeRow(index);

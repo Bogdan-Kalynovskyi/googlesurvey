@@ -27,6 +27,7 @@ body {
 }
 
 
+#tags-table th:first-child,
 #tags-table td:first-child {
     text-align: center;
 }

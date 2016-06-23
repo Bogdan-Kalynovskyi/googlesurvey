@@ -67,7 +67,7 @@
                 var selected = index ? [index] : table.selectedIndexes();
 
                 for (var i = 0, len = selected.length; i < len; i++) {
-                    table.deleteRow(selected[i]);
+                    table.deleteRow(selected[i] - i);
                 }
 
                 model.deleteTags(selected);
@@ -91,7 +91,7 @@
                     index = selected[i];
                     tag += ', ' + model.tagsArr[index][0];
                     count += model.tagsArr[index][1];
-                    table.deleteRow(index);
+                    table.deleteRow(index - i);
                 }
                 tag = tag.substr(2);
 
