@@ -97,7 +97,7 @@
 
                 model.deleteTags(selected);
                 model.appendTags([[tag, count]]);
-                table.reset(model.tagsArr);
+                table.update(model.tagsArr);
                 chart.update(model.tagsGoo);
             });
         };
@@ -115,7 +115,7 @@
                 }
 
                 model.appendTags(arr);
-                table.reset(model.tagsArr);
+                table.update(model.tagsArr);
                 chart.update(model.tagsGoo);
             });
         };

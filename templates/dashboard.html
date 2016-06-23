@@ -33,7 +33,7 @@
 </div>
 <div id="tags" class="flex-stretch collapse in">
     <div class="container">
-        <div class="col-md-6"><input placeholder="Tags..."> <button ng-click="ctrl.addTags()">Bulk Add</button></div>
+        <div class="col-md-6"><input ng-model="ctrl.bulkAdd" placeholder="Tags..."> <button ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk Add</button></div>
         <div class="col-md-3"><button ng-click="ctrl.mergeRows()" class="btn btn-sm btn-primary">Merge Selected</button></div>
         <div class="col-md-3"><button ng-click="ctrl.deleteRows()" class="btn btn-sm btn-danger">Delete Selected</button></div>
     </div>

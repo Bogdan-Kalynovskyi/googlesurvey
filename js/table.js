@@ -3,7 +3,7 @@ function Table (container) {
 
     this.create = function (tagsArr) {
         if (tbody) {
-            this.reset(tagsArr);
+            this.update(tagsArr);
             return;
         }
 
@@ -62,7 +62,7 @@ function Table (container) {
     }
 
 
-    this.reset = function (tagsArr) {
+    this.update = function (tagsArr) {
         tbody.innerHTML = '';
         this.addRows(tagsArr);
     };
@@ -88,7 +88,7 @@ function Table (container) {
         }
         if (count) {
             row.children[1].innerHTML = count;
-            //this.reset(); //after resort
+            //this.update(); //after resort
         }
     };
 
