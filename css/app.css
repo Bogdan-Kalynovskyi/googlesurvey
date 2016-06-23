@@ -31,26 +31,20 @@ body {
     text-align: center;
 }
 
-.table tr {
+#tags-table tbody tr {
     position: relative;
 }
 
-.table tr:after {
+#tags-table tbody tr:hover:after {
     content: 'x';
     position: absolute;
-    top: 3px;
-    right: 3px;
-    display: none;
-    opacity: 0;
-    transition: opacity .2s;
+    top: 4px;
+    right: 4px;
 }
 
-.table tr:hover:after {
-    display: block;
-    opacity: 1;
-}
 
-.table td {
+.table td,
+.table th {
     font-size: 13px;
     padding: 3px;
 }

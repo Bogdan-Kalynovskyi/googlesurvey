@@ -6,7 +6,7 @@
 
     angular.module('app').controller('Dashboard', function ($q, model, surveys) {
         var that = this,
-            waiting4SurveyId = $q.defer(),
+            waiting4Id = $q.defer(),
             table = new Table(document.getElementById('tags-table')),
             chart = new Chart(document.getElementById('tags-barchart'));
 
@@ -20,12 +20,12 @@
 
         
         this.loadSurveyById = function (id) {
-            waiting4SurveyId = $q.defer();
+            waiting4Id = $q.defer();
             model.initBySurveyId(id).success(function () {
                 google.charts.setOnLoadCallback(function () {
                     table.create(model.tagsArr);
                     chart.create(model.tagsGoo);
-                    waiting4SurveyId.resolve();
+                    waiting4Id.resolve();
                 });
             });
         };
@@ -39,7 +39,7 @@
 
 
         this.uploadFile = function (event) {
-            waiting4SurveyId = $q.defer();
+            waiting4Id = $q.defer();
             var file = event.target.files[0];
             if (file && !file.$error) {
                 var reader = new FileReader();
@@ -49,7 +49,7 @@
 
                         model.initByExcelData(e.target.result).then(function (surveyData) {
                             surveys._addSurvey(model.surveyId, surveyData);
-                            waiting4SurveyId.resolve();
+                            waiting4Id.resolve();
                         });
 
                         table.create(model.tagsArr);
@@ -63,7 +63,7 @@
         
         
         this.deleteRows = function (index) {
-            waiting4SurveyId.then(function () {
+            waiting4Id.promise.then(function () {
                 var selected = index ? [index] : table.selectedIndexes(),
                     tags = [];
 
@@ -79,7 +79,7 @@
         
         
         this.mergeRows = function () {
-            waiting4SurveyId.then(function () {
+            waiting4Id.promise.then(function () {
                 var selected = table.selectedIndexes(),
                     index,
                     tag = '',
@@ -106,7 +106,7 @@
 
 
         this.addTags = function (str) {
-            waiting4SurveyId.then(function () {
+            waiting4Id.promise.then(function () {
                 var arr = [];
                 str = str.toLowerCase().split(/ and | or |\.|,|;|:|\?|!|&+/);
                 for (var i = 0; i < str.length; i++) {
