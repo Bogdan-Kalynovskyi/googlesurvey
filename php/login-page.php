@@ -49,7 +49,7 @@
 <div class="row center">
     <div class="col-sm-3">Logo</div>
     <div class="col-sm-9">
-        <h5>Log In using your Google account to proceed</h5><br>
+        <h5>Sign in using your Google account</h5><br>
         <div class="g-signin2" data-onsuccess="onSignIn"></div>
     </div>
 </div>

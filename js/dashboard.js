@@ -121,9 +121,9 @@
         };
 
 
-        this.updateTag = function (index, name) {
-            model.updateTag(index, name);
-            table.updateRow(index, name);
+        this.updateTag = function (index, name, oldName) {
+            model.updateTag(index, name, oldName);
+            //table.updateRow(index, name);
             chart.update(model.tagsGoo);
         };
 

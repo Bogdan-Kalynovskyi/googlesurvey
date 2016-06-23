@@ -15,7 +15,7 @@ if (isset($_SESSION['userGoogleId'])) {
 else {
     if (isset($_POST['authGoogleToken'])) {
         $url = 'https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=' . urlencode($_POST['authGoogleToken']);
-        $json = file_get_contents($url);
+        $json = @file_get_contents($url);
         $obj = json_decode($json);
         if (isset($obj->aud) && $obj->aud === $google_API_id) {
             $_SESSION['userGoogleId'] = $obj->sub;

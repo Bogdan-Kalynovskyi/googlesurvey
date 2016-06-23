@@ -84,7 +84,7 @@ function update () {
     global $db;
 
     $post = json_decode(file_get_contents('php://input'), true);
-    $db->query('UPDATE tags SET tag = '.$db->a($post['name']).', count = '.$db->b($post['count']).' WHERE '.$db->a($post['tag']).' AND survey_id = '.$db->b($post['surveyId']));
+    $db->query('UPDATE tags SET tag = '.$db->a($post['name']).', count = '.$db->b($post['count']).' WHERE tag = '.$db->a($post['old_name']).' AND survey_id = '.$db->b($post['surveyId']));
 }
 //
 //

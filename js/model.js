@@ -88,7 +88,7 @@
         };
 
 
-        this.updateTag = function (index, name, count) {
+        this.updateTag = function (index, name, oldName, count) {
             var tag = this.tagsArr[index];
             if (name) {
                 tag[0] = name;
@@ -102,6 +102,7 @@
             return $http.put(api, {
                 surveyId: this.surveyId,
                 name: tag[0],
+                old_name: oldName,
                 count: tag[1]
             });
         };

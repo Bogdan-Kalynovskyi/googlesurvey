@@ -50,12 +50,18 @@ function Table (container) {
             var target = evt.target;
 
             if (target.tagName === 'TD' && target.parentNode.children[1] === target) {
-                var input = $('<input>');
-                input.val(target.html());
+                var input = $('<input>'),
+                    oldName = target.innerHTML;
+                
+                input.val(oldName);
                 $(target).append(input);
                 input.focus();
                 input.on('blur', function () {
-
+                    var arr = Array.prototype.slice.call(tbody.children),
+                        index = arr.indexOf(target.parentNode);
+                    
+                    target.innerHTML = input.val();
+                    angular.element(document.querySelector('[ui-view]')).scope().ctrl.updateTag(index, input.val(), oldName);
                 });
             }
         });
@@ -84,10 +90,10 @@ function Table (container) {
     this.updateRow = function (i, tag, count) {
         var row = tbody.children[i];
         if (tag) {
-            row.children[0].innerHTML = tag;
+            row.children[1].innerHTML = tag;
         }
         if (count) {
-            row.children[1].innerHTML = count;
+            row.children[2].innerHTML = count;
             //this.update(); //after resort
         }
     };
