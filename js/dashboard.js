@@ -32,7 +32,9 @@
 
         
         this.deleteSurveyById = function (id) {
-            surveys.deleteSurvey(id);
+            if (confirm('Do you really want to delete this survey and all its data?')) {
+                surveys.deleteSurvey(id);
+            }
         };
 
 

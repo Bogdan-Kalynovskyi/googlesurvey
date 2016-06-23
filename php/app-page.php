@@ -25,16 +25,16 @@
 
     <div id="modal-placeholder"></div>
 
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
-    <!--    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">-->
-    <link rel="stylesheet" href="node_modules/angular-material/angular-material.css">
-    <!--    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/angular-material/1.0.9/angular-material.min.css">-->
-    <link rel="stylesheet" href="css/app.css">
+    <link rel=stylesheet href="node_modules/bootstrap/dist/css/bootstrap.css">
+    <!--    <link rel=stylesheet href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">-->
+    <link rel=stylesheet href="node_modules/angular-material/angular-material.css">
+    <!--    <link rel=stylesheet href="//cdnjs.cloudflare.com/ajax/libs/angular-material/1.0.9/angular-material.min.css">-->
+    <link rel=stylesheet href="css/app.css">
     <script src="node_modules/angular/angular.js"></script>
     <!--    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>-->
     <script src="node_modules/angular-ui-router/release/angular-ui-router.js"></script>
     <!--    <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.min.js"></script>-->
-    <!--    <script src="node_modules/jquery/dist/jquery.js"></script> BAD VERSION -->
+    <!--    <script src="node_modules/jquery/dist/jquery.js"></script> BAD VERSION bootstrap supports only 2.x -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/tether/1.3.2/js/tether.min.js"></script>
     <script src="node_modules/bootstrap/dist/js/bootstrap.js"></script>

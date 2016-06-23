@@ -11,7 +11,14 @@ function Chart (container) {
             chart = new google.charts.Bar(container);
             chart.draw(tagsGoo, {
                 chart: {
-                    title: ' '
+                    title: '  ',
+                    hAxis: {
+                        title: 'Count',
+                        minValue: 0
+                    },
+                    vAxis: {
+                        title: 'Tags'
+                    }
                 },
                 bars: 'horizontal' // Required for Material Bar Charts.
             });

@@ -6,12 +6,12 @@ function Table (container) {
             this.reset(tagsArr);
             return;
         }
-        
+
         var str = '<table class="table table-striped table-bordered table-hover">' +
-                    '<thead class="thead-inverse"><tr>' +
-                    '<td><input type=checkbox></td>' +
-                    '<td>Tag</td>' +
-                    '<td>Count</td>' +
+                    '<thead class="thead-default"><tr>' +
+                    '<th><input type=checkbox></th>' +
+                    '<th>Tag</th>' +
+                    '<th>Count</th>' +
                     '</tr></thead>' +
                     '<tbody>';
 
@@ -31,8 +31,8 @@ function Table (container) {
         addMasterCheckbox();
         addDynamicInput();
     };
-    
-    
+
+
     function addMasterCheckbox () {
         container.querySelector('thead input').onchange = function () {
             var checkboxes = tbody.getElementsByTagName('input'),
@@ -55,13 +55,13 @@ function Table (container) {
                 $(target).append(input);
                 input.focus();
                 input.on('blur', function () {
-                    
+
                 });
             }
         });
     }
-    
-    
+
+
     this.reset = function (tagsArr) {
         tbody.innerHTML = '';
         this.addRows(tagsArr);

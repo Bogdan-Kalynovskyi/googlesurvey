@@ -6,7 +6,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>Sign in using Google account</title>
     <meta name="google-signin-client_id" content="211499477101-d78crq8gs6sojr7grdlm9ebmoltiel71.apps.googleusercontent.com">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+    <link rel=stylesheet href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
     <script src="//apis.google.com/js/platform.js" async defer></script>
     <style>
         body {
@@ -27,7 +27,7 @@
             margin-left: -225px;
             top: 30px;
             z-index: 1000;
-            box-shadow: 0 0 32px darkred, 0 0 32px darkred;
+            box-shadow: 0 0 38px darkred;
             border-radius: 2px;
             border: 1px dashed darkred;
             padding: 16px;
@@ -75,8 +75,9 @@
 
 <div id="test3dPartyCookies"><strong>Hey, third party cookies are disabled in your browser.</strong><br>
     You cannot sign in using Google unless you enable them
-    <a target="_blank" href="https://www.google.com/search?q=how+do+I+enable+3rd+party+cookies+in+my+browser">Search Google how you can fix this in your browser</a></div>
-<iframe src="https://mindmup.github.io/3rdpartycookiecheck/start.html" style="display:none"></iframe>
+    <a target=_blank href="https://www.google.com/search?q=how+do+I+enable+3rd+party+cookies+in+my+browser">Search Google how you can fix this in your browser</a>
+</div>
+<iframe src="//mindmup.github.io/3rdpartycookiecheck/start.html" style="display:none"></iframe>
 
 <!-- load and cache some js to speedup next page -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" async defer></script>
@@ -84,5 +85,6 @@
 <script src="node_modules/ng-file-upload/dist/ng-file-upload.js" async defer></script>
 <script src="node_modules/xlsjs/dist/xls.js" async defer></script>
 <script src="//www.gstatic.com/charts/loader.js" async defer></script>
+
 </body>
 </html>
