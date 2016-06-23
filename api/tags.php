@@ -105,13 +105,14 @@ function update () {
 function delete () {
     global $db;
 
+    $post = json_decode(file_get_contents('php://input'), true);
     $arr = [];
-    $tags = $_GET['tags'];
+    $tags = $post['tags'];
     $c = count($tags);
     for ($i = 0; $i < $c; $i++) {
         $arr[$i] = 'tag = '.$db->a($tags[$i]);
     }
     $str = '('.implode(' OR ', $arr).')';
 
-    $db->query('DELETE FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']).' AND '.$str);
+    $db->query('DELETE FROM tags WHERE survey_id = '.$db->b($post['surveyId']).' AND '.$str);
 }

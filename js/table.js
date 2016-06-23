@@ -88,12 +88,25 @@ function Table (container) {
         }
         if (count) {
             row.children[1].innerHTML = count;
-            //this.reset();
+            //this.reset(); //after resort
         }
     };
 
 
     this.deleteRow = function (i) {
         tbody.removeChild(tbody.children[i]);
-    }
+    };
+
+
+    this.selectedIndexes = function () {
+        var selected = [],
+            checkboxes = tbody.getElementsByTagName('input');
+
+        for (var i = 0, len = checkboxes.length; i < len; i++) {
+            if (checkboxes[i].checked) {
+                selected.push(i);
+            }
+        }
+        return selected;
+    };
 }

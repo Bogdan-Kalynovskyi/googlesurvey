@@ -120,14 +120,18 @@
             
             for (var i = 0, len = indexes.length; i < len; i++) {
                 var index = indexes[i];
+                tags.push(this.tagsArr[index][0]);
                 this.tagsArr.splice(index, 1);
                 this.tagsGoo.removeRow(index);
-                tags.push(this.tagsArr[index][0]);
             }
 
-            return $http.delete(api, {
-                surveyId: this.surveyId,
-                tags: tags
+            return $http({  // because by default $http.delete does not send post body
+                url: api,
+                method: 'DELETE',
+                data: {
+                    surveyId: this.surveyId,
+                    tags: tags
+                }
             });
         };
 
@@ -176,18 +180,5 @@
             that.tagsArr.sort(compare);
         }
 
-
-        this.selectedIndexes = function () {
-            var selected = [],
-                checkboxes = tbody.getElementsByTagName('input');
-
-            for (var i = 0, len = this.tagsArr.length; i < len; i++) {
-                if (checkboxes[i].checked) {
-                    selected.push(i);
-                }
-            }
-            return selected;
-        };
-        
     });
 })();

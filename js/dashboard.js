@@ -64,11 +64,9 @@
         
         this.deleteRows = function (index) {
             waiting4Id.promise.then(function () {
-                var selected = index ? [index] : table.selectedIndexes(),
-                    tags = [];
+                var selected = index ? [index] : table.selectedIndexes();
 
                 for (var i = 0, len = selected.length; i < len; i++) {
-                    tags.push(model.tagsArr[selected[i]]);
                     table.deleteRow(selected[i]);
                 }
 
