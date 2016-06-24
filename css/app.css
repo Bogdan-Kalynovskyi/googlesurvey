@@ -5,8 +5,14 @@ body {
 
 .logout {
     position: fixed;
-    top: 8px;
-    right: 8px;
+    top: 4px;
+    right: 6px;
+    font-size: 13px;
+    color: white;
+}
+
+.logout:hover {
+    color: #eeeeee;
 }
 
 
@@ -40,7 +46,7 @@ body {
 
 
 #tags-chart {
-    margin-top: 35px;
+    margin-top: 34px;
 }
 
 .table td,

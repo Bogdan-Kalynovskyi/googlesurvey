@@ -4,7 +4,7 @@ function Chart (container) {
 
     function draw (tagsGoo) {
         try {
-            container.style.height = 26.045 * tagsGoo.getNumberOfRows() + 'px';
+            container.style.height = 26.05 * tagsGoo.getNumberOfRows() + 'px';
             if (!chart) {
                 chart = new google.charts.Bar(container);
             }
