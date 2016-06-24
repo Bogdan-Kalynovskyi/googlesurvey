@@ -158,7 +158,7 @@
 
 
         function arrToGoo (arr) {
-            arr.unshift(['Tag', 'Count']);
+            arr.unshift(['', '']);
             var tagsGoo = google.visualization.arrayToDataTable(arr);
             arr.shift();
             return tagsGoo;

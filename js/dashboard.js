@@ -8,7 +8,7 @@
         var that = this,
             waiting4Id = $q.defer(),
             table = new Table(document.getElementById('tags-table')),
-            chart = new Chart(document.getElementById('tags-barchart'));
+            chart = new Chart(document.getElementById('tags-chart'));
 
         window.model = model;
         window.surveys = surveys;

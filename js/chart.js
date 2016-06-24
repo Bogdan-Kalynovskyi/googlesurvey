@@ -4,28 +4,19 @@ function Chart (container) {
 
     function draw (tagsGoo) {
         try {
-            container.style.height = 26 * tagsGoo.getNumberOfRows() + 'px';
+            container.style.height = 26.045 * tagsGoo.getNumberOfRows() + 'px';
             if (!chart) {
                 chart = new google.charts.Bar(container);
             }
             chart.draw(tagsGoo, {
-                chart: {
-                    title: 'Answers',
-                    hAxis: {
-                        title: 'Count',
-                        minValue: 0
-                    },
-                    vAxis: {
-                        title: 'Tags'
-                    }
-                },
+                chart: {},
                 bars: 'horizontal' // Required for Material Bar Charts.
             });
         }
         catch (e) {
             setTimeout(function () {
                 draw(tagsGoo);
-            }, 500);
+            }, 1500);
         }
     }
 
@@ -36,6 +27,28 @@ function Chart (container) {
 }
 
 
+(function () {
+    var wait = false;
+    function resize () {
+        if (!wait) {
+            wait = true;
+
+            setTimeout(function () {
+                var container = document.querySelector('[ui-view]'),
+                    stretchDiv = document.querySelector('.stretch-vertically'),
+                    height = 0;
+
+                for (var i = 0; i < container.children.length - 1; i++) {
+                    height += container.children[i].offsetHeight;
+                }
+                stretchDiv.style.height = (window.innerHeight - height) + 'px';
+                wait = false;
+            }, 500);
+        }
+    }
+    window.addEventListener('resize', resize);
+    window.addEventListener('click', resize);
+})();
 
 
 bootstrapAlert = function (message) {

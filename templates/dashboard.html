@@ -6,10 +6,8 @@
      <!--ngf-pattern="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'">Drop file</div>-->
 <!--<div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>-->
 
-<div class="flex-no-stretch">
-    <button data-toggle="collapse" data-target="#surveys" class="btn btn-block btn-primary btn-sm">Surveys List</button>
-</div>
-<div id="surveys" class="flex-no-stretch collapse in">
+<button data-toggle="collapse" data-target="#surveys" class="btn btn-block btn-primary btn-sm">Surveys List</button>
+<div id="surveys" class="collapse in">
 
      <table class="table table-striped table-bordered table-hover">
           <thead class="thead-default"><tr>
@@ -26,20 +24,19 @@
      </table>
     Upload new survey from Excel file
     <input type="file" custom-on-change="ctrl.uploadFile" accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+    <br>
 </div>
-<br>
-<div class="flex-no-stretch">
-     <button data-toggle="collapse" data-target="#tags" class="btn btn-primary btn-sm btn-block">Tags</button>
-</div>
-<div id="tags" class="flex-stretch collapse in">
+
+<button data-toggle="collapse" data-target="#tags" class="btn btn-primary btn-sm btn-block">Tags</button>
+<div id="tags" class="stretch-vertically collapse in">
     <div class="container">
-        <div class="col-md-6"><input ng-model="ctrl.bulkAdd" placeholder="Tags..."> <button ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk Add</button></div>
-        <div class="col-md-3"><button ng-click="ctrl.mergeRows()" class="btn btn-sm btn-primary">Merge Selected</button></div>
-        <div class="col-md-3"><button ng-click="ctrl.deleteRows()" class="btn btn-sm btn-danger">Delete Selected</button></div>
+        <div class="col-sm-6"><input ng-model="ctrl.bulkAdd" placeholder="Tags..."> <button ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk Add</button></div>
+        <div class="col-sm-3"><button ng-click="ctrl.mergeRows()" class="btn btn-sm btn-primary">Merge Selected</button></div>
+        <div class="col-sm-3"><button ng-click="ctrl.deleteRows()" class="btn btn-sm btn-danger">Delete Selected</button></div>
     </div>
     <br>
     <div class="row">
         <div class="col-md-6" id="tags-table"></div>
-        <div class="col-md-6" id="tags-barchart"></div>
+        <div class="col-md-6" id="tags-chart"></div>
     </div>
 </div>

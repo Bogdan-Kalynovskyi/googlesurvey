@@ -11,20 +11,14 @@ body {
 
 
 [ui-view] {
-    display: flex;
-    flex-direction: column;
     height: 100%;
+    overflow: hidden;
 }
 
-.flex-no-stretch {
-    flex-grow: 0;
-    overflow-x: hidden;
-}
-
-.flex-stretch {
-    flex-grow: 1;
+.stretch-vertically {
     overflow: auto;
-    -webkit-overflow-scrolling: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 
@@ -44,6 +38,10 @@ body {
     /*right: 4px;*/
 /*}*/
 
+
+#tags-chart {
+    margin-top: 35px;
+}
 
 .table td,
 .table th {
