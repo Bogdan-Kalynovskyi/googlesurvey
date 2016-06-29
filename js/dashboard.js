@@ -10,8 +10,8 @@
             table = new Table(document.getElementById('tags-table')),
             chart = new Chart(document.getElementById('tags-chart'));
 
-        window.model = model;
-        window.surveys = surveys;
+
+        that.tagsPresent = false;
 
 
         surveys.loadSurveys().success(function () {
@@ -22,20 +22,29 @@
         this.loadSurveyById = function (id) {
             waiting4Id = $q.defer();
             model.initBySurveyId(id).success(function () {
-                google.charts.setOnLoadCallback(function () {
-                    table.create(model.tagsArr);
-                    chart.create(model.tagsGoo);
-                    waiting4Id.resolve();
-                });
+                show();
+                waiting4Id.resolve();
             });
         };
 
         
         this.deleteSurveyById = function (id) {
-            if (confirm('Do you really want to delete this survey and all its data?')) {
+            if (confirm('Do you really want to delete this survey and all its data?')) {  //todo bootstrap
                 surveys.deleteSurvey(id);
+                if (id === model.surveyId) {
+                    that.tagsPresent = false;
+                }
             }
         };
+
+
+        function show () {
+            google.charts.setOnLoadCallback(function () {
+                that.tagsPresent = true;
+                table.create(model.tagsArr);
+                chart.create(model.tagsGoo);
+            });
+        }
 
 
         this.uploadFile = function (event) {
@@ -44,17 +53,36 @@
             if (file && !file.$error) {
                 var reader = new FileReader();
                 reader.onload = function (e) {
-                    // to make coding synchronous, wait for google services to load
-                    google.charts.setOnLoadCallback(function () {
+                    var workbook = XLS.read(e.target.result, {type: 'binary'}),
+                        overview = workbook.Sheets.Overview,
+                        surveyId = surveys.findByGoogleId(overview.A2.w),
+                        msg = 'Survey with this id has already been uploaded. Do you want to overwrite existing one or add as a new survey?';
 
-                        model.initByExcelData(e.target.result).then(function (surveyData) {
-                            surveys._addSurvey(model.surveyId, surveyData);
+                    if (surveyId !== -1) {
+                        bootstrapConfirm(msg, 'Create new', 'Overwrite', function (response) {
+                            if (response === 1) {
+                                model.initByExcel(workbook).then(function (surveyData) {
+                                    surveys.addSurvey(model.surveyId, surveyData);
+                                    waiting4Id.resolve();
+                                });
+                                show();
+                            }
+                            else {
+                                model.truncateTags().then(function () {
+                                    model.initByExcel(workbook, surveyId);
+                                    show();
+                                    waiting4Id.resolve();
+                                });
+                            }
+                        });
+                    }
+                    else {
+                        model.initByExcel(workbook).then(function (surveyData) {
+                            surveys.addSurvey(model.surveyId, surveyData);
                             waiting4Id.resolve();
                         });
-
-                        table.create(model.tagsArr);
-                        chart.create(model.tagsGoo);
-                    });
+                        show();
+                    }
                 };
 
                 reader.readAsBinaryString(file);
@@ -122,9 +150,11 @@
 
 
         this.updateTag = function (index, name, oldName) {
-            model.updateTag(index, name, oldName);
-            //table.updateRow(index, name);
-            chart.update(model.tagsGoo);
+            if (name !== oldName) {
+                model.updateTag(index, name, oldName);
+                //table.updateRow(index, name);
+                chart.update(model.tagsGoo);
+            }
         };
 
     });

@@ -5,8 +5,8 @@ body {
 
 .logout {
     position: fixed;
-    top: 4px;
-    right: 6px;
+    top: 5px;
+    right: 7px;
     font-size: 13px;
     color: white;
 }
@@ -46,7 +46,7 @@ body {
 
 
 #tags-chart {
-    margin-top: 34px;
+    margin-top: 33px;
 }
 
 .table td,

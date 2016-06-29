@@ -8,12 +8,12 @@
         
         this.loadSurveys = function () {
             return $http.get(api).success(function (response) {
-                that.surveys = response ? response : {};
+                that.surveys = response;
             });
         };
 
 
-        this._addSurvey = function  (id, survey) {
+        this.addSurvey = function  (id, survey) {
             this.surveys[id] = survey;
         };
 
@@ -24,6 +24,16 @@
                 $('#tags-table').html();
                 $('#barchart_material').html();
             });
+        };
+
+
+        this.findByGoogleId = function (googleId) {
+            for (var i in this.surveys) {
+                if (this.surveys[i].survey_google_id === googleId) {
+                    return i;
+                }
+            }
+            return -1;
         };
         
     });

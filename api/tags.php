@@ -10,10 +10,10 @@ try {
         case 'POST':
             create();
             break;
-        case 'PUT':
+        case 'PATCH':
             update();
             break;
-        case 'PATCH':
+        case 'PUT':
             append();
             break;
         case 'DELETE':
@@ -43,16 +43,7 @@ function create () {
     global $db;
 
     $post = json_decode(file_get_contents('php://input'), true);
-    $surveyId = intval($db->evaluate('SELECT id FROM surveys WHERE survey_google_id = '.$db->a($post['surveyGoogleId'])));
-    if (!$surveyId) {
-        $surveyId = $db->query('INSERT INTO surveys (survey_google_id, user_google_id, question) VALUES ('.$db->a($post['surveyGoogleId']).', '.$db->a($_SESSION['userGoogleId']).', '.$db->a($post['question']).')');
-    }
-    else {
-        header("HTTP/1.0 403 Forbidden", true, 403);
-        echo "This survey has already been uploaded. You cannot upload it twice. You can delete it and try again.";
-        die;
-    }
-
+    $surveyId = $db->query('INSERT INTO surveys (survey_google_id, user_google_id, question) VALUES ('.$db->a($post['surveyGoogleId']).', '.$db->a($_SESSION['userGoogleId']).', '.$db->a($post['question']).')');
     appendTags($post['tagsObj'], $surveyId);
 
     echo $surveyId;
@@ -105,14 +96,19 @@ function update () {
 function delete () {
     global $db;
 
-    $post = json_decode(file_get_contents('php://input'), true);
-    $arr = [];
-    $tags = $post['tags'];
-    $c = count($tags);
-    for ($i = 0; $i < $c; $i++) {
-        $arr[$i] = 'tag = '.$db->a($tags[$i]);
+    if (isset($_GET['surveyId'])) {
+        $db->query('DELETE FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']));
     }
-    $str = '('.implode(' OR ', $arr).')';
+    else {
+        $post = json_decode(file_get_contents('php://input'), true);
+        $arr = [];
+        $tags = $post['tags'];
+        $c = count($tags);
+        for ($i = 0; $i < $c; $i++) {
+            $arr[$i] = 'tag = '.$db->a($tags[$i]);
+        }
+        $str = '('.implode(' OR ', $arr).')';
 
-    $db->query('DELETE FROM tags WHERE survey_id = '.$db->b($post['surveyId']).' AND '.$str);
+        $db->query('DELETE FROM tags WHERE survey_id = '.$db->b($post['surveyId']).' AND '.$str);
+    }
 }

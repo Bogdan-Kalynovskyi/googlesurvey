@@ -10,6 +10,8 @@
 </head>
 
 <body>
+    <h3 id="_loading" style="position: absolute; top: 50%; text-align: center; width: 100%">Loading...</h3>
+
     <a href="#" class="logout" onclick="logOut();return false;">Log out</a>
     <script>
         function logOut () {
@@ -18,8 +20,6 @@
             form.submit();
         }
     </script>
-
-    <h3 id="_loading" style="position: absolute; top: 50%; text-align: center; width: 100%">Loading...</h3>
 
     <div ui-view></div>
 
@@ -47,6 +47,7 @@
     <script>
         xsrfToken = '<?php echo $_SESSION['xsrfToken'] ?>';
     </script>
+    <script src="js/ui.js"></script>
     <script src="js/config.js"></script>
     <script src="js/table.js"></script>
     <script src="js/chart.js"></script>

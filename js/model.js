@@ -4,14 +4,16 @@
     angular.module('app').service('model', function ($http) {
         var that = this,
             api = 'api/tags.php';
+
         //this.surveyId;
         //this.tagsArr;
         //this.tagsGoo;
 
-        this.initByExcelData = function (data) {
+
+        this.initByExcel = function (workbook, overwriteSurveyId) {
             try {
-                var workbook = XLS.read(data, {type: 'binary'}),
-                    raw = workbook.Sheets["Complete responses"],
+                var raw = workbook.Sheets["Complete responses"],
+                    overview = workbook.Sheets.Overview,
                     tagsObj = {},
                     i = 2,
                     row;
@@ -33,17 +35,25 @@
                 }
             }
             catch (e) {
-                bootstrapAlert('Could not parse Excel file');
-                return;
+                bootstrapAlert('Could not parse answers from Excel file');
+                var deferred = $q.defer();
+                deferred.reject();
+                return deferred.promise();
             }
-            
-            var tmp = workbook.Sheets.Overview;
-            return this.saveNewSurvey(tmp.A2.w, tmp.C2.w, tagsObj).then(function () {
-                return {
-                    survey_google_id: tmp.A2.w,
-                    question: tmp.C2.w
-                }
-            });
+
+            if (overwriteSurveyId) {
+                this.surveyId = overwriteSurveyId;
+                this.tagsArr = [];
+                return this.appendTags(objToArr(tagsObj));
+            }
+            else {
+                return this.saveNewSurvey(overview.A2.w, overview.C2.w, tagsObj).then(function () {
+                    return {
+                        survey_google_id: overview.A2.w,
+                        question: overview.C2.w
+                    }
+                });
+            }
         };
 
 
@@ -81,7 +91,7 @@
             sortTags();
             this.tagsGoo = arrToGoo(this.tagsArr);
 
-            return $http.patch(api, {
+            return $http.put(api, {
                 surveyId: this.surveyId,
                 tagsObj: arrToObj(tagsArr)
             });
@@ -99,7 +109,7 @@
                 sortTags();
                 this.tagsGoo = arrToGoo(this.tagsArr);
             }
-            return $http.put(api, {
+            return $http.patch(api, {
                 surveyId: this.surveyId,
                 name: tag[0],
                 old_name: oldName,
@@ -137,6 +147,11 @@
         };
 
 
+         this.truncateTags = function () {
+             return $http.delete(api + '?surveyId=' + this.surveyId);
+         };
+
+
         function objToArr (obj) {
             var arr = [];
             for (var i in obj) {
@@ -158,10 +173,17 @@
 
 
         function arrToGoo (arr) {
-            arr.unshift(['', '']);
-            var tagsGoo = google.visualization.arrayToDataTable(arr);
-            arr.shift();
-            return tagsGoo;
+            if (google.visualization) {
+                arr.unshift(['', '']);
+                var tagsGoo = google.visualization.arrayToDataTable(arr);
+                arr.shift();
+                return tagsGoo;
+            }
+            else {
+                google.charts.setOnLoadCallback(function () {
+                    that.tagsGoo = arrToGoo(arr);
+                });
+            }
         }
 
 

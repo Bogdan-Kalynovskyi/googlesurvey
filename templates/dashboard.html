@@ -6,11 +6,12 @@
      <!--ngf-pattern="'application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'">Drop file</div>-->
 <!--<div ngf-no-file-drop>File Drag/Drop is not supported for this browser</div>-->
 
+
 <button data-toggle="collapse" data-target="#surveys" class="btn btn-block btn-primary btn-sm">Surveys List</button>
 <div id="surveys" class="collapse in">
 
      <table class="table table-striped table-bordered table-hover">
-          <thead class="thead-default"><tr>
+          <thead class="thead-default" ng-show="ctrl.surveys.length !== 0"><tr>
                <th></th><th></th><th>Google ID</th><th>Question</th>
           </tr></thead>
           <tbody ng-repeat="(id, survey) in ctrl.surveys">
@@ -27,13 +28,18 @@
     <br>
 </div>
 
-<button data-toggle="collapse" data-target="#tags" class="btn btn-primary btn-sm btn-block">Tags</button>
-<div id="tags" class="stretch-vertically collapse in">
+<button data-toggle="collapse" data-target="#tags" class="btn btn-primary btn-sm btn-block" ng-show="ctrl.tagsPresent">Tags</button>
+<div id="tags" class="stretch-vertically collapse in" ng-show="ctrl.tagsPresent">
     <div class="container">
         <div class="col-sm-6"><input ng-model="ctrl.bulkAdd" placeholder="Tags..."> <button ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk Add</button></div>
         <div class="col-sm-3"><button ng-click="ctrl.mergeRows()" class="btn btn-sm btn-primary">Merge Selected</button></div>
         <div class="col-sm-3"><button ng-click="ctrl.deleteRows()" class="btn btn-sm btn-danger">Delete Selected</button></div>
     </div>
+    <div class="container">
+        <label class="col-sm-6">Maximum amount of tags: <input ng-model="ctrl.max" type="number"></label>
+        <label class="col-sm-6">Minimum count to become a tag: <input ng-model="ctrl.min" type="number"></label>
+    </div>
+    <small>Click on tag title to edit it</small>
     <br>
     <div class="row">
         <div class="col-md-6" id="tags-table"></div>
