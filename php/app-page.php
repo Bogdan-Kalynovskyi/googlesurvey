@@ -12,16 +12,29 @@
 <body>
     <h3 id="_loading" style="position: absolute; top: 50%; text-align: center; width: 100%">Loading...</h3>
 
-    <a href="#" class="logout" onclick="logOut();return false;">Log out</a>
-    <script>
-        function logOut () {
-            var form = $('<form action=/ method=post><input type=hidden name=logout value=' + xsrfToken + '></form>');
-            $(document.body).append(form);
-            form.submit();
-        }
-    </script>
+    <header>
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link" ui-sref-active="active" ui-sref="upload"><span class="bullet">1</span> Upload or select survey</a> <big>&raquo;</big>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" ui-sref-active="active" ui-sref="tags"><span class="bullet">2</span> Manage tags and terms</a> <big>&raquo;</big>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" ui-sref-active="active" ui-sref="chart"><span class="bullet">3</span> View chart</a>
+            </li>
+            <a href class="logout pull-xs-right m-t-sm m-r-sm" onclick="logOut();return false;">Log out</a>
+        </div>
+        <script>
+            function logOut () {
+                var form = $('<form action=/ method=post><input type=hidden name=logout value=' + xsrfToken + '></form>');
+                $(document.body).append(form);
+                form.submit();
+            }
+        </script>
+    </header>
 
-    <div ui-view></div>
+    <div id="form-views" ng-controller="dashboard as ctrl" ui-view></div>
 
     <div id="modal-placeholder"></div>
 
