@@ -1,26 +1,4 @@
 (function () {
-    var wait = false;
-    function resize () {
-        if (!wait) {
-            wait = true;
-
-            setTimeout(function () {
-                var container = document.querySelector('[ui-view]'),
-                    stretchDiv = document.querySelector('.stretch-vertically'),
-                    height = 0;
-
-                for (var i = 0; i < container.children.length - 1; i++) {
-                    height += container.children[i].offsetHeight;
-                }
-                stretchDiv.style.height = (window.innerHeight - height) + 'px';
-                wait = false;
-            }, 500);
-        }
-    }
-    window.addEventListener('resize', resize);
-    window.addEventListener('click', resize);
-
-
     var modalStart = '<div class="modal fade"><div class=modal-dialog><div class=modal-content><div class=modal-body><button class=close data-dismiss=modal>&times;</button><br>',
         modalEnd = '</div></div></div></div>';
 

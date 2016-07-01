@@ -4,12 +4,25 @@
     angular.module('app').config(function ($stateProvider, $urlRouterProvider) {
                 
         $urlRouterProvider.otherwise('/');
-        $stateProvider.state('home', {
-            url: '/',
-            controller: 'Dashboard',
-            controllerAs: 'ctrl',
-            templateUrl: 'templates/dashboard.html'
-        });
-        
+        $stateProvider
+            .state('upload', {
+                url: '/',
+                templateUrl: 'templates/upload.html'
+            })
+
+            .state('tags', {
+                url: '/select-tags',
+                templateUrl: 'templates/select-tags.html'
+            })
+
+            .state('chart', {
+                url: '/chart',
+                templateUrl: 'templates/chart.html'
+            });
+            
+            // .state('form.payment', {
+            //     url: '/payment',
+            //     templateUrl: 'form-payment.html'
+            // });        
     });
 })();

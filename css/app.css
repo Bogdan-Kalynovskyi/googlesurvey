@@ -1,32 +1,12 @@
-html,
 body {
-    height: 100%;
+    padding: 10px;
 }
 
 .logout {
-    position: fixed;
-    top: 5px;
-    right: 7px;
-    font-size: 13px;
-    color: white;
+    float: right;
+    margin-right: 2px;
+    margin-top: 12px;
 }
-
-.logout:hover {
-    color: #eeeeee;
-}
-
-
-[ui-view] {
-    height: 100%;
-    overflow: hidden;
-}
-
-.stretch-vertically {
-    overflow: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-}
-
 
 #tags-table th:first-child,
 #tags-table td:first-child {
@@ -67,7 +47,67 @@ body {
     width: calc(100% - 4px);
 }
 
-#surveys,
-#tags {
-    padding: 10px;
+
+.bullet {
+    display: block;
+    float: left;
+    margin-top: 2px;
+    font-size: 15px;
+    line-height: 21px;
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    background: white;
+    color: #0275d8;
+    margin-right: 9px;
+}
+
+big {
+    font-size: 44px;
+    line-height: 1;
+    vertical-align: bottom;
+}
+
+/* ANIMATION STYLINGS
+============================================================================= */
+#form-views {
+    width: auto;
+}
+
+/* left and right added to ensure full width */
+#form-views.ng-enter,
+#form-views.ng-leave {
+    position: absolute;
+    left: 30px;
+    right: 30px;
+    transition: 0.5s all ease;
+}
+
+/* enter animation */
+#form-views.ng-enter {
+    animation: slideInRight 0.5s both ease;
+}
+
+/* leave animation */
+#form-views.ng-leave {
+    animation: slideOutLeft 0.5s both ease;
+}
+
+/* ANIMATIONS
+============================================================================= */
+/* slide out to the left */
+@keyframes slideOutLeft {
+    to {
+        transform: translateX(-200%);
+    }
+}
+
+/* slide in from the right */
+@keyframes slideInRight {
+    from {
+        transform: translateX(200%);
+    }
+    to {
+        transform: translateX(0);
+    }
 }

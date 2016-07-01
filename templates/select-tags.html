@@ -1,0 +1,17 @@
+<div id="tags">
+    <div class="container">
+        <div class="col-sm-6"><input ng-model="ctrl.bulkAdd" placeholder="Tags..."> <button ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk Add</button></div>
+        <div class="col-sm-3"><button ng-click="ctrl.mergeRows()" class="btn btn-sm btn-primary">Merge Selected</button></div>
+        <div class="col-sm-3"><button ng-click="ctrl.deleteRows()" class="btn btn-sm btn-danger">Delete Selected</button></div>
+    </div>
+    <div class="container">
+        <label class="col-sm-6">Maximum amount of tags: <input ng-model="ctrl.max" type="number"></label>
+        <label class="col-sm-6">Minimum count to become a tag: <input ng-model="ctrl.min" type="number"></label>
+    </div>
+    <small>Click on tag title to edit it</small>
+    <br>
+    <div class="row">
+        <div class="col-md-6" id="tags-table"></div>
+        <div class="col-md-6" id="tags-chart"></div>
+    </div>
+</div>

@@ -7,7 +7,6 @@
 
         //this.surveyId;
         //this.tagsArr;
-        //this.tagsGoo;
 
 
         this.initByExcel = function (workbook, overwriteSurveyId) {
@@ -63,7 +62,6 @@
                 google.charts.setOnLoadCallback(function () {
                     that.tagsArr = objToArr(response);
                     sortTags();
-                    that.tagsGoo = arrToGoo(that.tagsArr);
                 });
             });
         };
@@ -72,8 +70,7 @@
         this.saveNewSurvey = function (surveyGoogleId, question, tagsObj) {
             this.tagsArr = objToArr(tagsObj);
             sortTags();
-            this.tagsGoo = arrToGoo(this.tagsArr);
-            
+
             return $http.post(api, {
                 surveyGoogleId: surveyGoogleId,
                 question: question,
@@ -89,7 +86,6 @@
         this.appendTags = function (tagsArr) {
             this.tagsArr = this.tagsArr.concat(tagsArr);
             sortTags();
-            this.tagsGoo = arrToGoo(this.tagsArr);
 
             return $http.put(api, {
                 surveyId: this.surveyId,
@@ -102,12 +98,10 @@
             var tag = this.tagsArr[index];
             if (name) {
                 tag[0] = name;
-                this.tagsGoo.setCell(index, 0, name);
             }
             if (count) {
                 tag[1] = count;
                 sortTags();
-                this.tagsGoo = arrToGoo(this.tagsArr);
             }
             return $http.patch(api, {
                 surveyId: this.surveyId,
@@ -133,7 +127,6 @@
                 var index = indexes[i] - i;
                 tags.push(this.tagsArr[index][0]);
                 this.tagsArr.splice(index, 1);
-                this.tagsGoo.removeRow(index);
             }
 
             return $http({  // because by default $http.delete does not send post body
@@ -172,19 +165,12 @@
         }
 
 
-        function arrToGoo (arr) {
-            if (google.visualization) {
-                arr.unshift(['', '']);
-                var tagsGoo = google.visualization.arrayToDataTable(arr);
-                arr.shift();
-                return tagsGoo;
-            }
-            else {
-                google.charts.setOnLoadCallback(function () {
-                    that.tagsGoo = arrToGoo(arr);
-                });
-            }
-        }
+        this.arrToGoo = function (arr) {
+            arr.unshift(['', '']);
+            var tagsGoo = google.visualization.arrayToDataTable(arr);
+            arr.shift();
+            return tagsGoo;
+        };
 
 
         function sortTags () {

@@ -4,14 +4,11 @@
     google.charts.load('current', {'packages': ['bar']});
 
 
-    angular.module('app').controller('Dashboard', function ($q, model, surveys) {
+    angular.module('app').controller('dashboard', function ($q, $state, model, surveys) {
         var that = this,
             waiting4Id = $q.defer(),
             table = new Table(document.getElementById('tags-table')),
             chart = new Chart(document.getElementById('tags-chart'));
-
-
-        that.tagsPresent = false;
 
 
         surveys.loadSurveys().success(function () {
@@ -22,7 +19,7 @@
         this.loadSurveyById = function (id) {
             waiting4Id = $q.defer();
             model.initBySurveyId(id).success(function () {
-                show();
+                $state.go('tags');
                 waiting4Id.resolve();
             });
         };
@@ -31,20 +28,8 @@
         this.deleteSurveyById = function (id) {
             if (confirm('Do you really want to delete this survey and all its data?')) {  //todo bootstrap
                 surveys.deleteSurvey(id);
-                if (id === model.surveyId) {
-                    that.tagsPresent = false;
-                }
             }
         };
-
-
-        function show () {
-            google.charts.setOnLoadCallback(function () {
-                that.tagsPresent = true;
-                table.create(model.tagsArr);
-                chart.create(model.tagsGoo);
-            });
-        }
 
 
         this.uploadFile = function (event) {
@@ -65,12 +50,16 @@
                                     surveys.addSurvey(model.surveyId, surveyData);
                                     waiting4Id.resolve();
                                 });
-                                show();
+                                $state.go('tags').success(function () {
+                                    table.create(model.tagsArr);
+                                });
                             }
                             else {
                                 model.truncateTags().then(function () {
                                     model.initByExcel(workbook, surveyId);
-                                    show();
+                                    $state.go('tags').success(function () {
+                                        table.create(model.tagsArr);
+                                    });
                                     waiting4Id.resolve();
                                 });
                             }
@@ -81,7 +70,9 @@
                             surveys.addSurvey(model.surveyId, surveyData);
                             waiting4Id.resolve();
                         });
-                        show();
+                        $state.go('tags').success(function () {
+                            table.create(model.tagsArr);
+                        });
                     }
                 };
 
@@ -99,7 +90,6 @@
                 }
 
                 model.deleteTags(selected);
-                chart.update(model.tagsGoo);
             });
         };
         
@@ -126,7 +116,6 @@
                 model.deleteTags(selected);
                 model.appendTags([[tag, count]]);
                 table.update(model.tagsArr);
-                chart.update(model.tagsGoo);
             });
         };
 
@@ -144,7 +133,6 @@
 
                 model.appendTags(arr);
                 table.update(model.tagsArr);
-                chart.update(model.tagsGoo);
             });
         };
 
@@ -152,8 +140,6 @@
         this.updateTag = function (index, name, oldName) {
             if (name !== oldName) {
                 model.updateTag(index, name, oldName);
-                //table.updateRow(index, name);
-                chart.update(model.tagsGoo);
             }
         };
 
