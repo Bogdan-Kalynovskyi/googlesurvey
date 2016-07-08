@@ -10,7 +10,7 @@
 </head>
 
 <body ng-controller="dashboard as ctrl">
-    <h3 id="_loading" style="position: absolute; top: 50%; text-align: center; width: 100%">Loading...</h3>
+    <h3 id="_loading" style="position:absolute; top:45%; text-align:center; width:100%">Loading...</h3>
 
     <link rel=stylesheet href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
     <link rel=stylesheet href="css/app.css">
@@ -87,7 +87,7 @@
             <div class="col-xs-3"><button class="btn btn-sm btn-danger pull-xs-right" ng-click="ctrl.save()">Save & view chart</button></div>
         </div>
         <div class="row m-t-1">
-            <div class="col-xs-3"><small>Click on tag to edit it<br>Drag and drop items</small></div>
+            <div class="col-xs-3"><small>You can click tag for editing,<br>drag and drop items...</small></div>
             <label class="col-xs-4"><small>Maximum amount of tags:</small> <input ng-model="ctrl.maxTags" type="number"></label>
             <label class="col-xs-4"><small>Minimum repeat for a tag:</small> <input ng-model="ctrl.minRepeat" type="number"></label>
             <div class="col-xs-1"> <button class="btn btn-sm btn-primary pull-xs-right" ng-click="ctrl.filterTags()">Filter tags</button></div>

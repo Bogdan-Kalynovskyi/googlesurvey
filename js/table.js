@@ -74,7 +74,7 @@ function Table (container) {
 
 
     function assignDragNDrop () {
-        var starter, current, outline,
+        var current, outline,
             table = container.children[0];
 
         function getIndex (el, findTr) {
@@ -98,7 +98,7 @@ function Table (container) {
             }
             dt.setData("table", container.id);
 
-            starter = $(target).closest('[ondragover]')[0];
+            window._starter = $(target).closest('[ondragover]')[0];
         });
 
 
@@ -112,7 +112,7 @@ function Table (container) {
                     current = undefined;
                 }
 
-                if ((!starter || !starter.contains(target)) && (isTags || !starter)) {
+                if ((!window._starter || !window._starter.contains(target)) && (isTags || !container.contains(window._starter))) {
                     target = $(target).closest('[ondragover]')[0];
                     if (target) {
                         current = target;
