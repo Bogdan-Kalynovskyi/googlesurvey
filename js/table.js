@@ -145,7 +145,7 @@ function Table (container) {
 
 
         table.addEventListener('drop', function (evt) {
-            var target = $(target).closest('[ondragover]')[0],
+            var target = $(evt.target).closest('[ondragover]')[0],
                 dt = evt.dataTransfer,
                 from = {
                     index: +dt.getData('index'),

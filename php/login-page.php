@@ -82,8 +82,8 @@
 <!-- load and cache some js to speedup next page -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" async defer></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" async defer integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
-<script src="node_modules/angular/angular.js" async defer></script>
-<script src="node_modules/xlsjs/dist/xls.js" async defer></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js" async defer></script>
+<script src="js/xls.core.min.js" async defer></script>
 
 <script src="//www.gstatic.com/charts/loader.js"></script>
 <script>
