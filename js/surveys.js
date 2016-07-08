@@ -21,8 +21,6 @@
         this.deleteSurvey = function  (id) {
             return $http.delete(api + '?surveyId=' + id).success(function () {
                 delete that.surveys[id];
-                $('#tags-table').html();
-                $('#barchart_material').html();
             });
         };
 

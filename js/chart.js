@@ -16,12 +16,14 @@ function Chart (container) {
         catch (e) {
             setTimeout(function () {
                 draw(tagsGoo);
-            }, 1500);
+            }, 1000);
         }
     }
 
 
-    this.create = this.update = function (tagsGoo) {
-        draw(tagsGoo);
+    this.create = function (arr) {
+        arr.unshift(['', '']);
+        draw(google.visualization.arrayToDataTable(arr));
+        arr.shift();
     };
 }

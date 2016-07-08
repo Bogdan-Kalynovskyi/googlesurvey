@@ -46,13 +46,13 @@
     </script>
 
     <header>
-        <button class="btn btn-sm btn-primary" ng-class="{active: ctrl.state === 'surveys'}" ng-click="ctrl.navigate('surveys')">
+        <button class="btn btn-sm btn-primary" data-active="surveys" ng-click="ctrl.navigate('surveys')">
             <span class="bullet">1</span> Upload or select survey
         </button> <big>&raquo;</big>
-        <button class="btn btn-sm btn-primary" ng-class="{active: ctrl.state === 'tags'}" ng-click="ctrl.navigate('tags')">
+        <button class="btn btn-sm btn-primary" data-active="tags" ng-click="ctrl.navigate('tags')">
             <span class="bullet">2</span> Manage tags and terms
         </button> <big>&raquo;</big>
-        <button class="btn btn-sm btn-primary" ng-class="{active: ctrl.state === 'chart'}" ng-click="ctrl.navigate('chart')">
+        <button class="btn btn-sm btn-primary" data-active="chart" ng-click="ctrl.navigate('chart')">
             <span class="bullet">3</span> View chart
         </button>
         <a href class="logout" onclick="logOut();return false;">Log out</a>
@@ -66,7 +66,7 @@
     </header>
 
 
-    <div id="surveys" ng-show="ctrl.state === 'surveys'">
+    <div id="surveys" class="nav-body">
         <h6>Surveys</h6>
         <table class="table table-striped table-bordered table-hover">
             <thead class="thead-default" ng-show="ctrl.surveys.length !== 0"><tr>
@@ -87,31 +87,45 @@
     </div>
 
 
-    <div id="tags" ng-show="ctrl.state === 'tags'">
+    <div id="tags" class="nav-body">
         <div class="container">
-            <div class="col-xs-6">
-                <button class="btn btn-sm" ng-click="ctrl.sort()">Sort</button>
+            <div class="col-xs-2">
+                <button class="btn btn-sm btn-primary" ng-click="ctrl.sort()">Sort</button>
             </div>
-            <div class="col-xs-6">
-                <input ng-model="ctrl.bulkAdd" placeholder="Tags..."> <button class="btn btn-sm" ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk Add</button>
+            <div class="col-xs-7">
+                <input ng-model="ctrl.bulkAdd" placeholder="Tags..."> <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk Add</button>
+            </div>
+            <div class="col-xs-3">
+                <button class="btn btn-sm btn-danger" ng-click="ctrl.save()">Save & View Chart</button>
             </div>
         </div>
+        <hr>
         <div class="container">
-            <label class="col-xs-5">Maximum amount of tags: <input ng-model="ctrl.maxTags" type="number"></label>
-            <label class="col-xs-5">Minimum repeat to become a tag: <input ng-model="ctrl.minRepeat" type="number"></label>
-            <div class="col-xs-2"><button class="btn btn-sm btn-primary" ng-click="ctrl.filterTags()">Filter tags</button></div>
+            <label class="col-xs-4"><small>Maximum amount of tags:</small> <input ng-model="ctrl.maxTags" type="number"></label>
+            <label class="col-xs-4"><small>Minimum repeat for a tag:</small> <input ng-model="ctrl.minRepeat" type="number"></label>
+            <div class="col-xs-2"><br><button class="btn btn-sm btn-primary" ng-click="ctrl.filterTags()">Filter tags</button></div>
         </div>
-        <small>Click on tag title to edit it</small>
         <br>
+        <div class="row">
+            <div class="col-sm-6">
+                <h6>Used tags and terms</h6>
+            </div>
+            <div class="col-sm-6">
+                <h6>Unused terms</h6>
+            </div>
+        </div>
         <div class="row tbl-row">
-            <div class="col-sm-6 overflow" id="tags-table">
-                <h3>Used tags and terms</h3>
-            </div>
-            <div class="col-sm-6 overflow" id="terms-table">
-                <h3>Unused terms</h3>
-            </div>
+            <div class="col-sm-6 overflow" id="tags-table"></div>
+            <div class="col-sm-6 overflow" id="terms-table"></div>
         </div>
     </div>
+
+
+    <div id="chart" class="nav-body">
+        <div id="tags-chart"></div>
+        <button class="btn btn-sm btn-primary block-center m-t-3" ng-click="ctrl.navigate('surveys')">Go to surveys list</button>
+    </div>
+
 
 
     <div id="modal-placeholder"></div>

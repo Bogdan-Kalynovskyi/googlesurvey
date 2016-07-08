@@ -54,7 +54,7 @@ function getTerms () {
     $query = mysql_query('SELECT term, count FROM terms WHERE survey_id = '.$db->b($_GET['surveyId']));
     $result = array();
     while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
-        $result[$row[0]] = intval($row[1]);
+        $result[] = [$row[0], intval($row[1])];
     }
     echo json_encode($result);
 }
@@ -73,6 +73,8 @@ function create () {
 
 
 function append () {
+    global $db;
+
     $post = json_decode(file_get_contents('php://input'), true);
     $surveyId = $db->b($post['surveyId']);
     appendTags($post['tagsArr'], $surveyId);

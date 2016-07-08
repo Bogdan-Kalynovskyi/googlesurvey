@@ -5,30 +5,40 @@
 
 
     angular.module('app').controller('dashboard', function ($q, model, surveys) {
-        var that = this;
-
+        var that = this,
+            chart = new Chart(document.getElementById('tags-chart')),
+            oldState;
 
         model.tagsTable = new Table(document.getElementById('tags-table'));
         model.termsTable = new Table(document.getElementById('terms-table'));
-        
+        this.maxTags = 10;
+        this.minRepeat = 3;
 
+
+        $('.nav-body').hide();
         surveys.loadSurveys().success(function () {
-            that.state = 'surveys';
+            that.navigate('surveys');
             that.surveys = surveys.surveys;
         });
 
 
         this.navigate = function (state) {
-            this.state = state;
+            if (oldState) {
+                $('[data-active=' + oldState + ']').removeClass('active');
+                $('#' + oldState).hide();
+            }
+            $('[data-active=' + state + ']').addClass('active');
+            $('#' + state).show();
+            oldState = state;
 
             switch (state) {
-                case 'surveys':
-                    surveys.loadSurveys().success(function () {
-                        that.surveys = surveys.surveys;
-                    });
-                    break;
                 case 'chart':
-                    chart.create(model.arrToGoo(model.tagsArr));
+                    if (model.tagsArr.length) {
+                        chart.create(model.tagsArr);
+                    }
+                    else {
+                        alert('Tags loaded already?');
+                    }
                     break;
             }
         };
@@ -41,9 +51,7 @@
 
         
         this.filterTags = function () {
-            model.splitTags(that.maxTags, that.minRepeat);
-            model.tagsTable.create(model.tagsArr);
-            model.termsTable.create(model.termsArr);
+            model.splitTags(this.maxTags, this.minRepeat);
         };
 
         
@@ -56,6 +64,16 @@
             model.getTermsBySurveyId(id).success(function () {
                 model.termsTable.create(model.termsArr);
             });
+        };
+
+
+        this.deleteSurveyById = function (id) {
+            if (confirm('Do you really want to delete this survey and all its data?')) {  //todo bootstrap
+                surveys.deleteSurvey(id);
+                if (id === model.surveyId) {
+                    that.tagsPresent = false;
+                }
+            }
         };
 
 
@@ -74,11 +92,15 @@
                             if (response === 2) {
                                 that.surveyId = surveyId;
                             }
+                            else {
+                                that.surveyId = undefined;
+                            }
                             model.initByExcel(workbook);
                             stepTwo();
                         });
                     }
                     else {
+                        that.surveyId = undefined;
                         model.initByExcel(workbook);
                         stepTwo();
                     }
@@ -163,11 +185,11 @@
             else if (to.table === 'tags-table') {
                 line = model.termsArr[from.index];
                 model.deleteTerm(from.index);
-                if (to.target === 'LI') {
+                if (to.target === 'TR') {
                     model.addSubTerm(to.index, line);
                 }
                 else {
-                    model.addTag(to.index, line);
+                    model.addTag(line);
                 }
             }
             else {
@@ -185,11 +207,18 @@
         
         
         this.save = function () {
-            if (this.surveyId) {      
-                this.overwriteSurvey(this.surveyId).success(this.navigate.bind(this, 'chart'));
+            this.sort();
+            if (this.surveyId) {
+                model.overwriteSurvey(this.surveyId).success(function () {
+                    that.navigate('chart');
+                });
             }
             else {
-                this.saveNewSurvey().success(this.navigate.bind(this, 'chart'));
+                model.saveNewSurvey().success(function () {
+                    that.surveyId = model.surveyId;
+                    surveys.addSurvey(model.surveyId, model.surveyData);
+                    that.navigate('chart');
+                });
             }
         }; 
 

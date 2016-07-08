@@ -75,8 +75,8 @@ function Table (container) {
         var starter, current, outline,
             table = container.children[0];
 
-        function getIndex (el) {
-            var tr = $(el).closest('tr')[0],
+        function getIndex (el, findTr) {
+            var tr = findTr ? $(el).closest('tr')[0] : el,
                 arr = Array.prototype.slice.call(tbody.children);
                 return arr.indexOf(tr);
         }
@@ -89,9 +89,11 @@ function Table (container) {
             if (!(target instanceof HTMLElement && target.draggable === true)) {
                 return false;
             }
-            dt.setData("index", getIndex(target));
+            dt.setData("index", getIndex(target, true));
             dt.setData("target", target.tagName);
-            dt.setData("html", target.innerHTML);
+            if (target.tagName === 'LI') {
+                dt.setData("html", target.innerHTML);
+            }
             dt.setData("table", container.id);
 
             starter = $(target).closest('[ondragover]')[0];
@@ -141,7 +143,7 @@ function Table (container) {
 
 
         table.addEventListener('drop', function (evt) {
-            var target = evt.target,
+            var target = $(target).closest('[ondragover]')[0],
                 dt = evt.dataTransfer,
                 from = {
                     index: +dt.getData('index'),
@@ -150,7 +152,7 @@ function Table (container) {
                     table: dt.getData('table')
                 },
                 to = {
-                    index: getIndex(target),
+                    index: target.tagName === 'TR' && getIndex(target),
                     target: target.tagName,
                     table: container.id
                 };
@@ -196,6 +198,15 @@ function Table (container) {
         tbody.innerHTML = '';
         this.addRows(tagsArr);
     };
+    
+    
+    this.makePinkRows = function (a, b) {
+        var children = tbody.children;
+        
+        for (var i = a; i < b; i++) {
+            children[i].style.background = 'repeating-linear-gradient(45deg,transparent,transparent 10px,#eee 10px,#eee 20px),linear-gradient(to bottom,#fff,#ddd)';
+        }    
+    };
 
 
     this.addRow = function (tag) {
@@ -223,7 +234,7 @@ function Table (container) {
 
 
     this.deleteSubTerm = function (index, pos) {
-        tbody.removeChild(tbody.children[index].children[1].children[pos]);
+        tbody.removeChild(tbody.children[index].children[0].children[1].children[pos]);
     };
 
 

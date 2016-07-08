@@ -4,7 +4,7 @@
 
     window.bootstrapAlert = function (message) {
         $('#modal-placeholder').html(modalStart +
-            message + '<br><br><button class="btn btn-sm center-block" data-dismiss=modal>&nbsp; Ok &nbsp;</button>' +
+            message + '<br><button class="btn btn-sm btn-primary center-block m-t-1" data-dismiss=modal> &nbsp; Ok &nbsp; </button>' +
             modalEnd);
         $('.modal').modal('show');
     };
@@ -12,11 +12,11 @@
 
     window.bootstrapConfirm = function (message, btnOne, btnTwo, callback) {
         $('#modal-placeholder').html(modalStart +
-            message + '<br><br><button class="btn btn-sm btn-primary pull-right m-r-2" data-dismiss=modal>&nbsp; ' +
+            message + '<br><button class="btn btn-sm btn-primary pull-xs-right m-l-2 m-y-1" data-dismiss=modal>&nbsp; ' +
             btnOne +
-            ' &nbsp;</button><button class="btn btn-sm btn-secondary pull-right" data-dismiss=modal>&nbsp; ' +
+            ' &nbsp;</button><button class="btn btn-sm btn-secondary pull-xs-right m-y-1" data-dismiss=modal>&nbsp; ' +
             btnTwo +
-            ' &nbsp;</button>' +
+            ' &nbsp;</button><br class="clearfix"><br>' +
             modalEnd);
 
         var modal = $('.modal');

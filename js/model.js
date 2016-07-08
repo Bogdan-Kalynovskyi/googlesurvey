@@ -5,10 +5,7 @@
         var that = this,
             api = 'api/tags.php';
 
-        var surveyGoogleId,
-            question;
         
-
         this.initByExcel = function (workbook) {
             try {
                 var raw = workbook.Sheets["Complete responses"],
@@ -36,8 +33,10 @@
                 this.tagsArr = objToArr(tagsObj);
                 this.sort(this.tagsArr);
 
-                surveyGoogleId = overview.A2.w;
-                question = overview.C2.w;
+                this.surveyData = {
+                    survey_google_id: overview.A2.w,
+                    question: overview.C2.w
+                };
             }
             catch (e) {
                 bootstrapAlert('Could not parse answers from Excel file');
@@ -54,14 +53,14 @@
 
         this.getTermsBySurveyId = function (surveyId) {
             return $http.get(api + '?terms&surveyId=' + surveyId).success(function (response) {
-                that.termsArr = objToArr(response);
+                that.termsArr = response;
             });
         };
 
 
         function packTags () {
             for (var i = 0, n = that.tagsArr.length; i < n; i++) {
-                var line = this.tagsArr[i];
+                var line = that.tagsArr[i];
                 if (line[2]) {
                     line[2] = line[2].join(',');
                 }
@@ -72,8 +71,8 @@
         this.saveNewSurvey = function () {
             packTags();
             return $http.post(api, {
-                surveyGoogleId: surveyGoogleId,
-                question: question,
+                surveyGoogleId: this.surveyData.surveyGoogleId,
+                question: this.surveyData.question,
                 tagsArr: this.tagsArr,
                 termsObj: this.termsArr
             })
@@ -88,8 +87,8 @@
             return this.truncateTags().success(function () {
                 return $http.put(api, {
                     surveyId: surveyId,
-                    tagsArr: this.tagsArr,
-                    termsObj: this.termsArr
+                    tagsArr: that.tagsArr,
+                    termsObj: that.termsArr
                 });
             });
         };
@@ -194,14 +193,6 @@
         }
 
 
-        this.arrToGoo = function (arr) {
-            arr.unshift(['', '']);
-            var tagsGoo = google.visualization.arrayToDataTable(arr);
-            arr.shift();
-            return tagsGoo;
-        };
-
-
         this.strToArr = function (src) {
             var arr = [];
 
@@ -229,33 +220,33 @@
         };
 
 
-        this.splitTags = function (maxLength, minRepeat) {
-            var i = 0,
-                n = this.tagsArr.length,
-                overflow = 0,
-                leftArr = [];
+        this.splitTags = function (maxTags, minRepeat) {
+            var arr = this.tagsArr.concat(this.termsArr),
+                i = 0,
+                n = arr.length,
+                overflow = 0;
 
-            this.termsArr = [];
-            
-            while (i < n && this.tagsArr[i] >= minRepeat) {
-                leftArr.push(this.tagsArr[i]);
+            while (i < n && arr[i][1] >= minRepeat) {
+                if (!overflow && i > maxTags) {
+                    overflow = arr[i][1];
+                }
                 i++;
-                if (i > maxLength) {
-                    overflow = this.tagsArr[i];
-                }
             }
 
-            this.overflowArr = [];
+            this.tagsArr = arr.slice(0, i);
+            this.termsArr = arr.slice(i);
+            this.tagsTable.create(this.tagsArr);
+            this.termsTable.create(this.termsArr);
+
             if (overflow) {
-                for (i = 0; i < this.leftArr.length; i++) {
-                    if (this.tagsArr[i] <= overflow) {
-                        this.overflowArr.push(this.tagsArr[i]);
-                    }
-                }
+                var j = i;
+                do {
+                    j--;
+                } while (j >= 0  && arr[j][1] <= overflow);
+
+                this.tagsTable.makePinkRows(j, i);
+                bootstrapAlert('The <b>number of filtered tags</b> is greater then <b>' + maxTags + '</b>, because too many tags have repeat count <b>' + overflow + '</b> and less, so I don\'t know what to do with them. Those tags are marked with stripes.');
             }
-            
-            this.termsArr = this.tagsArr.slice(i);
-            this.tagsArr = leftArr;
         };
         
     });
