@@ -15,7 +15,7 @@
                     row;
 
                 while (row = raw['K' + i]) {
-                    var words = row.w.trim().toLowerCase().split(/ and | or |\.|,|;|:|\?|!|&+/);
+                    var words = row.w.trim().toLowerCase().split(/ and | or | - | but |\.|,|;|:|\?|!|&+/);
                     for (var j = 0, len = words.length; j < len; j++) {
                         var word = words[j].trim();
                         if (word.length) {
@@ -31,6 +31,7 @@
                 }
 
                 this.tagsArr = objToArr(tagsObj);
+                this.termsArr = [];
                 this.sort(this.tagsArr);
 
                 this.surveyData = {
@@ -71,7 +72,7 @@
         this.saveNewSurvey = function () {
             packTags();
             return $http.post(api, {
-                surveyGoogleId: this.surveyData.surveyGoogleId,
+                survey_google_id: this.surveyData.survey_google_id,
                 question: this.surveyData.question,
                 tagsArr: this.tagsArr,
                 termsObj: this.termsArr
@@ -84,7 +85,7 @@
 
         this.overwriteSurvey = function (surveyId) {
             packTags();
-            return this.truncateTags().success(function () {
+            return this.truncateTags(surveyId).success(function () {
                 return $http.put(api, {
                     surveyId: surveyId,
                     tagsArr: that.tagsArr,
@@ -178,8 +179,8 @@
         };
 
 
-        this.truncateTags = function () {
-            return $http.delete(api + '?surveyId=' + this.surveyId);
+        this.truncateTags = function (surveyId) {
+            return $http.delete(api + '?surveyId=' + surveyId);
         };
 
 

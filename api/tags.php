@@ -64,7 +64,7 @@ function create () {
     global $db;
 
     $post = json_decode(file_get_contents('php://input'), true);
-    $surveyId = $db->query('INSERT INTO surveys (survey_google_id, user_google_id, question) VALUES ('.$db->a($post['surveyGoogleId']).', '.$db->a($_SESSION['userGoogleId']).', '.$db->a($post['question']).')');
+    $surveyId = $db->query('INSERT INTO surveys (survey_google_id, user_google_id, question) VALUES ('.$db->a($post['survey_google_id']).', '.$db->a($_SESSION['userGoogleId']).', '.$db->a($post['question']).')');
     appendTags($post['tagsArr'], $surveyId);
     appendTerms($post['termsObj'], $surveyId);
 
@@ -89,7 +89,8 @@ function appendTags ($tags, $surveyId) {
     $n = count($tags);
     for ($i = 0; $i < $n; $i++) {
         $line = $tags[$i];
-        $str .= '('.$surveyId.','.$db->a($line[0]).','.$db->b($line[1]).','.$db->a($line[2] || '').'),';
+        $synonyms = isset($line[2]) ? (','.$db->a($line[2])) : '';
+        $str .= '('.$surveyId.','.$db->a($line[0]).','.$db->b($line[1]).$synonyms.'),';
     }
 
     $str = substr($str, 0, -1);

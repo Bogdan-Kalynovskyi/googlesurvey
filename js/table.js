@@ -1,5 +1,6 @@
 function Table (container) {
     var tbody,
+        isTags = container.id === 'tags-table',
         isPacked = true;
 
     this.create = function (tagsArr) {
@@ -11,9 +12,11 @@ function Table (container) {
         container.innerHTML =   '<table class="table table-striped table-bordered table-hover">' +
                                 '<thead class="thead-default" ondragover="return false"><tr>' +
                                 '<th><input type=checkbox></th>' +
-                                '<th>Tag</th>' +
+                                '<th>' + (isTags ? 'Tag' : 'Term') + '</th>' +
                                 '<th>Repeat</th>' +
-                                '</tr><tr><th colspan=3>You can drag here</th></tr></thead>' +
+                                '</tr><tr><th colspan=3>' +
+                                (isTags ? 'Drop on header to create a tag, drop on tag to create synonym' : 'Drop here to remove tag or synonym from use') +
+                                '</th></tr></thead>' +
                                 '<tbody>' +
                                     fillTableBody(tagsArr) +
                                 '</tbody></table>';
@@ -29,15 +32,14 @@ function Table (container) {
 
 
     function fillTableBody (tagsArr) {
-        var str = '',
-            isTagsTable = container.id === 'tags-table';
+        var str = '';
 
         for (var i = 0, n = tagsArr.length; i < n; i++) {
             var line = tagsArr[i],
                 terms,
                 subTerms = '';
 
-            if (isTagsTable && (terms = line[2])) {
+            if (isTags && (terms = line[2])) {
                 if (isPacked) {
                     terms = terms.split(',');
                     line[2] = terms;
@@ -117,7 +119,7 @@ function Table (container) {
                         if (target.tagName === 'THEAD') {
                             outline = target.parentNode;
                         }
-                        else if (container.id === 'terms-table') {
+                        else if (!isTags) {
                             outline = target.parentNode.parentNode;
                         }
                         else {

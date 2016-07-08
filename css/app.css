@@ -35,7 +35,9 @@ big {
 }
 
 input[ng-model] {
-    width: 100px;
+    width: 60px;
+    padding: 0 4px;
+    line-height: 1.4;
 }
 
 #surveys,
@@ -45,7 +47,7 @@ input[ng-model] {
 }
 
 .tbl-row {
-    height: calc(100% - 80px);
+    height: calc(100% - 130px);
 }
 
 .overflow {
@@ -72,6 +74,11 @@ thead[ondragover] tr:first-child th {
 thead[ondragover] tr:last-child th {
     padding-top: 0;
     border-top: 0;
+}
+
+thead th[colspan] {
+    font-weight: normal;
+    font-size: 10px;
 }
 
 .table th:first-child,

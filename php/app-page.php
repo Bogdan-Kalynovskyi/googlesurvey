@@ -88,30 +88,28 @@
 
 
     <div id="tags" class="nav-body">
-        <div class="container">
+        <div class="row">
             <div class="col-xs-2">
-                <button class="btn btn-sm btn-primary" ng-click="ctrl.sort()">Sort</button>
+                <button class="btn btn-sm btn-primary" ng-click="ctrl.sort()">Sort tables</button>
             </div>
             <div class="col-xs-7">
-                <input ng-model="ctrl.bulkAdd" placeholder="Tags..."> <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk Add</button>
+                <input ng-model="ctrl.bulkAdd" placeholder="Comma separated tags list" style="width: calc(100% - 90px); line-height: 26px">
+                <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk add</button>
             </div>
-            <div class="col-xs-3">
-                <button class="btn btn-sm btn-danger" ng-click="ctrl.save()">Save & View Chart</button>
-            </div>
+            <div class="col-xs-3"><button class="btn btn-sm btn-danger pull-xs-right" ng-click="ctrl.save()">Save & view chart</button></div>
         </div>
-        <hr>
-        <div class="container">
+        <div class="row m-t-1">
+            <div class="col-xs-3"><small>Click tag to edit it</small></div>
             <label class="col-xs-4"><small>Maximum amount of tags:</small> <input ng-model="ctrl.maxTags" type="number"></label>
             <label class="col-xs-4"><small>Minimum repeat for a tag:</small> <input ng-model="ctrl.minRepeat" type="number"></label>
-            <div class="col-xs-2"><br><button class="btn btn-sm btn-primary" ng-click="ctrl.filterTags()">Filter tags</button></div>
+            <div class="col-xs-1"> <button class="btn btn-sm btn-primary pull-xs-right" ng-click="ctrl.filterTags()">Filter tags</button></div>
         </div>
-        <br>
-        <div class="row">
+        <div class="row m-t-1">
             <div class="col-sm-6">
-                <h6>Used tags and terms</h6>
+                <h6>Used tags and synonyms</h6>
             </div>
             <div class="col-sm-6">
-                <h6>Unused terms</h6>
+                <h6>Unused stuff</h6>
             </div>
         </div>
         <div class="row tbl-row">
@@ -123,7 +121,7 @@
 
     <div id="chart" class="nav-body">
         <div id="tags-chart"></div>
-        <button class="btn btn-sm btn-primary block-center m-t-3" ng-click="ctrl.navigate('surveys')">Go to surveys list</button>
+        <button class="btn btn-sm btn-primary block-center m-t-3 m-l-2 m-b-1" ng-click="ctrl.navigate('surveys')">Go to surveys list</button>
     </div>
 
 

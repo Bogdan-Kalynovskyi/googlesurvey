@@ -88,7 +88,7 @@
                         msg = 'Survey with this id has already been uploaded. Do you want to overwrite existing one or add as a new survey?';
 
                     if (surveyId !== -1) {
-                        bootstrapConfirm(msg, 'Create new', 'Overwrite', function (response) {
+                        bootstrapConfirm(msg, 'Add as new', 'Overwrite', function (response) {
                             if (response === 2) {
                                 that.surveyId = surveyId;
                             }
@@ -214,8 +214,8 @@
                 });
             }
             else {
-                model.saveNewSurvey().success(function () {
-                    that.surveyId = model.surveyId;
+                model.saveNewSurvey().then(function (id) {
+                    that.surveyId = id;
                     surveys.addSurvey(model.surveyId, model.surveyData);
                     that.navigate('chart');
                 });
