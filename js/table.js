@@ -112,7 +112,7 @@ function Table (container) {
                     current = undefined;
                 }
 
-                if (!starter || !starter.contains(target)) {
+                if ((!starter || !starter.contains(target)) && (isTags || !starter)) {
                     target = $(target).closest('[ondragover]')[0];
                     if (target) {
                         current = target;
@@ -206,7 +206,7 @@ function Table (container) {
         var children = tbody.children;
         
         for (var i = a; i < b; i++) {
-            children[i].style.background = 'repeating-linear-gradient(45deg,transparent,transparent 10px,#eee 10px,#eee 20px),linear-gradient(to bottom,#fff,#ddd)';
+            children[i].className = 'striped-bg';
         }    
     };
 

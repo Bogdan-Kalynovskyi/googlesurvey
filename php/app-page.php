@@ -81,13 +81,13 @@
                 <button class="btn btn-sm btn-primary" ng-click="ctrl.sort()">Sort tables</button>
             </div>
             <div class="col-xs-7">
-                <input ng-model="ctrl.bulkAdd" placeholder="Comma separated tags list" style="width: calc(100% - 90px); line-height: 26px">
+                <input ng-model="ctrl.bulkAdd" placeholder="Comma separated tags list" style="width: calc(100% - 90px); line-height: 27px">
                 <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk add</button>
             </div>
             <div class="col-xs-3"><button class="btn btn-sm btn-danger pull-xs-right" ng-click="ctrl.save()">Save & view chart</button></div>
         </div>
         <div class="row m-t-1">
-            <div class="col-xs-3"><small>Click tag to edit it</small></div>
+            <div class="col-xs-3"><small>Click on tag to edit it<br>Drag and drop items</small></div>
             <label class="col-xs-4"><small>Maximum amount of tags:</small> <input ng-model="ctrl.maxTags" type="number"></label>
             <label class="col-xs-4"><small>Minimum repeat for a tag:</small> <input ng-model="ctrl.minRepeat" type="number"></label>
             <div class="col-xs-1"> <button class="btn btn-sm btn-primary pull-xs-right" ng-click="ctrl.filterTags()">Filter tags</button></div>
