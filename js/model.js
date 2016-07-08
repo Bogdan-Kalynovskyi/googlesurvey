@@ -5,11 +5,11 @@
         var that = this,
             api = 'api/tags.php';
 
-        //this.surveyId;
-        //this.tagsArr;
+        var surveyGoogleId,
+            question;
+        
 
-
-        this.initByExcel = function (workbook, overwriteSurveyId) {
+        this.initByExcel = function (workbook) {
             try {
                 var raw = workbook.Sheets["Complete responses"],
                     overview = workbook.Sheets.Overview,
@@ -32,117 +32,156 @@
                     }
                     i++;
                 }
+
+                this.tagsArr = objToArr(tagsObj);
+                this.sort(this.tagsArr);
+
+                surveyGoogleId = overview.A2.w;
+                question = overview.C2.w;
             }
             catch (e) {
                 bootstrapAlert('Could not parse answers from Excel file');
-                var deferred = $q.defer();
-                deferred.reject();
-                return deferred.promise();
-            }
-
-            if (overwriteSurveyId) {
-                this.surveyId = overwriteSurveyId;
-                this.tagsArr = [];
-                return this.appendTags(objToArr(tagsObj));
-            }
-            else {
-                return this.saveNewSurvey(overview.A2.w, overview.C2.w, tagsObj).then(function () {
-                    return {
-                        survey_google_id: overview.A2.w,
-                        question: overview.C2.w
-                    }
-                });
             }
         };
 
 
-        this.initBySurveyId = function (surveyId) {
-            this.surveyId = surveyId;
-            return $http.get(api + '?surveyId=' + surveyId).success(function (response) {
-                google.charts.setOnLoadCallback(function () {
-                    that.tagsArr = objToArr(response);
-                    sortTags();
-                });
+        this.getTagsBySurveyId = function (surveyId) {
+            return $http.get(api + '?tags&surveyId=' + surveyId).success(function (response) {
+                that.tagsArr = response;
             });
         };
 
 
-        this.saveNewSurvey = function (surveyGoogleId, question, tagsObj) {
-            this.tagsArr = objToArr(tagsObj);
-            sortTags();
+        this.getTermsBySurveyId = function (surveyId) {
+            return $http.get(api + '?terms&surveyId=' + surveyId).success(function (response) {
+                that.termsArr = objToArr(response);
+            });
+        };
 
+
+        function packTags () {
+            for (var i = 0, n = that.tagsArr.length; i < n; i++) {
+                var line = this.tagsArr[i];
+                if (line[2]) {
+                    line[2] = line[2].join(',');
+                }
+            }
+        }
+
+
+        this.saveNewSurvey = function () {
+            packTags();
             return $http.post(api, {
                 surveyGoogleId: surveyGoogleId,
                 question: question,
-                tagsObj: tagsObj
+                tagsArr: this.tagsArr,
+                termsObj: this.termsArr
             })
             .then(function (response) {
-                // TODO: there is a moment when surveyId is undefined!!!!
                 return that.surveyId = response.data;
             });
         };
 
 
-        this.appendTags = function (tagsArr) {
-            this.tagsArr = this.tagsArr.concat(tagsArr);
-            sortTags();
-
-            return $http.put(api, {
-                surveyId: this.surveyId,
-                tagsObj: arrToObj(tagsArr)
+        this.overwriteSurvey = function (surveyId) {
+            packTags();
+            return this.truncateTags().success(function () {
+                return $http.put(api, {
+                    surveyId: surveyId,
+                    tagsArr: this.tagsArr,
+                    termsObj: this.termsArr
+                });
             });
         };
 
 
-        this.updateTag = function (index, name, oldName, count) {
-            var tag = this.tagsArr[index];
-            if (name) {
-                tag[0] = name;
+        this.addTag = function (tag) {
+            this.tagsArr.unshift(tag);
+            this.tagsTable.addRow(tag);
+        };
+        
+
+        this.addTags = function (tagsArr) {
+            this.tagsArr = tagsArr.concat(this.tagsArr);
+            this.tagsTable.addRows(tagsArr);
+        };
+        
+        
+        this.addSubTerm = function (index, term) {
+            var line = this.tagsArr[index];
+            if (!line[2]) {
+                line.push([term[0]]);
+                line.push([term[1]]);
             }
-            if (count) {
-                tag[1] = count;
-                sortTags();
+            else {
+                line[2].push(term[0]);
+                line[3].push(term[1]);
             }
-            return $http.patch(api, {
-                surveyId: this.surveyId,
-                name: tag[0],
-                old_name: oldName,
-                count: tag[1]
-            });
+            this.tagsTable.addSubTerm(index, term);
         };
 
 
-        // this.deleteTag = function (index) {
-        //     this.tagsArr.splice(index, 1);
-        //     return $http.delete(api, {
-        //         tag: this.tagsArr[index][0]
-        //     });
-        // };
+        this.addTerm = function (term) {
+            this.termsArr.unshift(term);
+            this.termsTable.addRow(term);
+        };
 
 
-        this.deleteTags = function (indexes) {
-            var tags = [];
-            
-            for (var i = 0, len = indexes.length; i < len; i++) {
-                var index = indexes[i] - i;
-                tags.push(this.tagsArr[index][0]);
-                this.tagsArr.splice(index, 1);
+        this.addTerms = function (termsArr) {
+            this.termsArr = termsArr.concat(this.termsArr);
+            this.termsTable.addRows(termsArr);
+        };
+
+
+        this.deleteTag = function (index) {
+            this.tagsArr.splice(index, 1);
+            this.tagsTable.deleteRow(index);
+        };
+
+
+        this.deleteSubTerm = function (index, termStr) {
+            var line = this.tagsArr[index],
+                terms = line[2],
+                pos = terms.indexOf(termStr),
+                result = [termStr, line[3][pos]];
+
+            terms.splice(pos, 1);
+            line[3].splice(pos, 1);
+
+            if (terms.length === 0) {
+                line.splice(2, 2);
             }
 
-            return $http({  // because by default $http.delete does not send post body
-                url: api,
-                method: 'DELETE',
-                data: {
-                    surveyId: this.surveyId,
-                    tags: tags
+            this.tagsTable.deleteSubTerm(index, pos);
+            return result;
+        };
+
+
+        this.deleteTerm = function (index) {
+            this.termsArr.splice(index, 1);
+            this.termsTable.deleteRow(index);
+        };
+
+
+        this.updateTag = function (tableId, index, tagName, name, oldName) {
+            if (tableId === 'tags-table') {
+                if (tagName === 'SPAN') {
+                    this.tagsArr[index][0] = name;
                 }
-            });
+                else {
+                    var arr = this.tagsArr[index][2];
+                    arr[arr.indexOf(oldName)] = name;
+                }
+            }
+            else {
+                this.termsArr[index][0] = name;
+            }
         };
 
 
-         this.truncateTags = function () {
-             return $http.delete(api + '?surveyId=' + this.surveyId);
-         };
+        this.truncateTags = function () {
+            return $http.delete(api + '?surveyId=' + this.surveyId);
+        };
 
 
         function objToArr (obj) {
@@ -150,18 +189,8 @@
             for (var i in obj) {
                 arr.push([i, obj[i]]);
             }
-            return arr;
-        }
-
-
-        function arrToObj (arr) {
-            var newObj = {},
-                el;
-            for (var i = 0, len = arr.length; i < len; i++) {
-                el = arr[i];
-                newObj[el[0]] = el[1];
-            }
-            return newObj;
+            
+            return that.sort(arr);
         }
 
 
@@ -173,7 +202,17 @@
         };
 
 
-        function sortTags () {
+        this.strToArr = function (src) {
+            var arr = [];
+
+            src[2].forEach(function (el, i) {
+                arr.push([el, src[3][i]]);
+            });
+            return arr;
+        };
+
+        
+        this.sort = function (arr) {
             function compare(a, b) {
                 if (a[1] > b[1]) {
                     return -1;
@@ -186,8 +225,38 @@
                 }
             }
 
-            that.tagsArr.sort(compare);
-        }
+            return arr.sort(compare);
+        };
 
+
+        this.splitTags = function (maxLength, minRepeat) {
+            var i = 0,
+                n = this.tagsArr.length,
+                overflow = 0,
+                leftArr = [];
+
+            this.termsArr = [];
+            
+            while (i < n && this.tagsArr[i] >= minRepeat) {
+                leftArr.push(this.tagsArr[i]);
+                i++;
+                if (i > maxLength) {
+                    overflow = this.tagsArr[i];
+                }
+            }
+
+            this.overflowArr = [];
+            if (overflow) {
+                for (i = 0; i < this.leftArr.length; i++) {
+                    if (this.tagsArr[i] <= overflow) {
+                        this.overflowArr.push(this.tagsArr[i]);
+                    }
+                }
+            }
+            
+            this.termsArr = this.tagsArr.slice(i);
+            this.tagsArr = leftArr;
+        };
+        
     });
 })();

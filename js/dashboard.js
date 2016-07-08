@@ -4,36 +4,62 @@
     google.charts.load('current', {'packages': ['bar']});
 
 
-    angular.module('app').controller('dashboard', function ($q, $state, model, surveys) {
-        var that = this,
-            waiting4Id = $q.defer(),
-            table = new Table(document.getElementById('tags-table')),
-            chart = new Chart(document.getElementById('tags-chart'));
+    angular.module('app').controller('dashboard', function ($q, model, surveys) {
+        var that = this;
 
+
+        model.tagsTable = new Table(document.getElementById('tags-table'));
+        model.termsTable = new Table(document.getElementById('terms-table'));
+        
 
         surveys.loadSurveys().success(function () {
+            that.state = 'surveys';
             that.surveys = surveys.surveys;
         });
 
-        
-        this.loadSurveyById = function (id) {
-            waiting4Id = $q.defer();
-            model.initBySurveyId(id).success(function () {
-                $state.go('tags');
-                waiting4Id.resolve();
-            });
-        };
 
-        
-        this.deleteSurveyById = function (id) {
-            if (confirm('Do you really want to delete this survey and all its data?')) {  //todo bootstrap
-                surveys.deleteSurvey(id);
+        this.navigate = function (state) {
+            this.state = state;
+
+            switch (state) {
+                case 'surveys':
+                    surveys.loadSurveys().success(function () {
+                        that.surveys = surveys.surveys;
+                    });
+                    break;
+                case 'chart':
+                    chart.create(model.arrToGoo(model.tagsArr));
+                    break;
             }
         };
 
 
+        function stepTwo () {
+            that.navigate('tags');
+            that.filterTags();
+        }
+
+        
+        this.filterTags = function () {
+            model.splitTags(that.maxTags, that.minRepeat);
+            model.tagsTable.create(model.tagsArr);
+            model.termsTable.create(model.termsArr);
+        };
+
+        
+        this.loadSurveyById = function (id) {
+            this.navigate('tags');
+            this.surveyId = id;
+            model.getTagsBySurveyId(id).success(function () {
+                model.tagsTable.create(model.tagsArr);
+            });
+            model.getTermsBySurveyId(id).success(function () {
+                model.termsTable.create(model.termsArr);
+            });
+        };
+
+
         this.uploadFile = function (event) {
-            waiting4Id = $q.defer();
             var file = event.target.files[0];
             if (file && !file.$error) {
                 var reader = new FileReader();
@@ -45,101 +71,132 @@
 
                     if (surveyId !== -1) {
                         bootstrapConfirm(msg, 'Create new', 'Overwrite', function (response) {
-                            if (response === 1) {
-                                model.initByExcel(workbook).then(function (surveyData) {
-                                    surveys.addSurvey(model.surveyId, surveyData);
-                                    waiting4Id.resolve();
-                                });
-                                $state.go('tags').success(function () {
-                                    table.create(model.tagsArr);
-                                });
+                            if (response === 2) {
+                                that.surveyId = surveyId;
                             }
-                            else {
-                                model.truncateTags().then(function () {
-                                    model.initByExcel(workbook, surveyId);
-                                    $state.go('tags').success(function () {
-                                        table.create(model.tagsArr);
-                                    });
-                                    waiting4Id.resolve();
-                                });
-                            }
+                            model.initByExcel(workbook);
+                            stepTwo();
                         });
                     }
                     else {
-                        model.initByExcel(workbook).then(function (surveyData) {
-                            surveys.addSurvey(model.surveyId, surveyData);
-                            waiting4Id.resolve();
-                        });
-                        $state.go('tags').success(function () {
-                            table.create(model.tagsArr);
-                        });
+                        model.initByExcel(workbook);
+                        stepTwo();
                     }
                 };
 
                 reader.readAsBinaryString(file);
             }
         };
-        
-        
-        this.deleteRows = function (index) {
-            waiting4Id.promise.then(function () {
-                var selected = index ? [index] : table.selectedIndexes();
-
-                for (var i = 0, len = selected.length; i < len; i++) {
-                    table.deleteRow(selected[i] - i);
-                }
-
-                model.deleteTags(selected);
-            });
-        };
-        
-        
-        this.mergeRows = function () {
-            waiting4Id.promise.then(function () {
-                var selected = table.selectedIndexes(),
-                    index,
-                    tag = '',
-                    count = 0;
-
-                if (selected.length === 0) {
-                    return;
-                }
-
-                for (var i = 0; i < selected.length; i++) {
-                    index = selected[i];
-                    tag += ', ' + model.tagsArr[index][0];
-                    count += model.tagsArr[index][1];
-                    table.deleteRow(index - i);
-                }
-                tag = tag.substr(2);
-
-                model.deleteTags(selected);
-                model.appendTags([[tag, count]]);
-                table.update(model.tagsArr);
-            });
-        };
 
 
         this.addTags = function (str) {
-            waiting4Id.promise.then(function () {
-                var arr = [];
-                str = str.toLowerCase().split(/ and | or |\.|,|;|:|\?|!|&+/);
-                for (var i = 0; i < str.length; i++) {
-                    var word = str[i].trim();
-                    if (word.length) {
-                        arr.push([word, 0]);
-                    }
+            var arr = [];
+            str.toLowerCase().split(/ and | or |\.|,|;|:|\?|!|&+/).forEach(function (el) {
+                var word = el.trim();
+                if (word.length) {
+                    arr.push([word, 0]);
                 }
-
-                model.appendTags(arr);
-                table.update(model.tagsArr);
             });
+
+            model.addTags(arr);
+            model.tagsTable.update(model.tagsArr);
         };
 
 
-        this.updateTag = function (index, name, oldName) {
-            if (name !== oldName) {
-                model.updateTag(index, name, oldName);
+        this.updateTag = function () {
+            model.updateTag.apply(model, arguments);
+        };
+
+
+        this.dragTag = function (from, to) {
+            var line;
+            
+            if (from.table === 'tags-table') {
+                if (to.table === 'tags-table') {
+                    if (from.index !== to.index) {
+                        if (to.target !== 'THEAD') {
+                            if (from.target === 'SPAN') {
+                                line = model.tagsArr[from.index];
+                                if (line[2]) {
+                                    model.strToArr(line).forEach(function (el) {
+                                        model.addSubTerm(to.index, el);
+                                    });
+                                    line.splice(2, 2);
+                                }
+                                model.addSubTerm(to.index, line);
+                                model.deleteTag(from.index);
+                            }
+                            else {
+                                line = model.deleteSubTerm(from.index, from.html);
+                                model.addSubTerm(to.index, line);
+                            }
+                        }
+                        else {
+                            if (from.target === 'LI') {
+                                line = model.deleteSubTerm(from.index, from.html);
+                                model.addTag(line);
+                            }
+                            else {
+                                return false;
+                            }
+                        }
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                else {
+                    if (from.target === 'SPAN') {
+                        line = model.tagsArr[from.index];
+                        if (line[2]) {
+                            model.addTerms(model.strToArr(line));
+                            line.splice(2, 2);
+                        }
+                        model.deleteTag(from.index);
+                    }
+                    else {
+                        line = model.deleteSubTerm(from.index, from.html);
+                    }
+                    model.addTerm(line);
+                }
+            }
+            else if (to.table === 'tags-table') {
+                line = model.termsArr[from.index];
+                model.deleteTerm(from.index);
+                if (to.target === 'LI') {
+                    model.addSubTerm(to.index, line);
+                }
+                else {
+                    model.addTag(to.index, line);
+                }
+            }
+            else {
+                return false;
+            }
+        };
+        
+        
+        this.sort = function () {
+            model.sort(model.tagsArr);
+            model.sort(model.termsArr);
+            model.tagsTable.update(model.tagsArr);
+            model.termsTable.update(model.termsArr);
+        };
+        
+        
+        this.save = function () {
+            if (this.surveyId) {      
+                this.overwriteSurvey(this.surveyId).success(this.navigate.bind(this, 'chart'));
+            }
+            else {
+                this.saveNewSurvey().success(this.navigate.bind(this, 'chart'));
+            }
+        }; 
+
+
+        this.deleteSurveyById = function (id) {
+            if (confirm('Do you really want to delete this survey and all its data?')) {  //todo bootstrap
+                surveys.deleteSurvey(id);
             }
         };
 

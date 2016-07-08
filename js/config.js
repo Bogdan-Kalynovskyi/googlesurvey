@@ -1,13 +1,7 @@
 (function () {
     "use strict";
 
-    angular.module('app', ['ui.router']).config(function ($locationProvider, $sceProvider, $httpProvider) {
-        $locationProvider.html5Mode(true);
-
-
-        //$sceProvider.enabled(false);
-
-
+    angular.module('app', []).config(function ($httpProvider) {
         var allowAlert = true,
             ua = navigator.userAgent,
             IEVersion = ua.indexOf("MSIE ");

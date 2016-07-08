@@ -5,7 +5,12 @@ include_once 'auth.php';
 try {
     switch ($_SERVER['REQUEST_METHOD']) {
         case 'GET':
-            get();
+            if (isset($_GET['tags'])) {
+                getTags();
+            }
+            elseif (isset($_GET['terms'])) {
+                getTerms();
+            }
             break;
         case 'POST':
             create();
@@ -27,13 +32,29 @@ catch (Exception $e) {
 }
 
 
-function get () {
+function getTags () {
     global $db;
 
-    $query = mysql_query('SELECT * FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']));
+    $query = mysql_query('SELECT tag, count, synonyms FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']));
     $result = array();
     while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
-        $result[$row[2]] = intval($row[3]);
+        $rrr = [$row[0], intval($row[1])];
+        if ($row[2]) {
+            $rrr[] = $row[2];
+        }
+        $result[] = $rrr;
+    }
+    echo json_encode($result);
+}
+
+
+function getTerms () {
+    global $db;
+
+    $query = mysql_query('SELECT term, count FROM terms WHERE survey_id = '.$db->b($_GET['surveyId']));
+    $result = array();
+    while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
+        $result[$row[0]] = intval($row[1]);
     }
     echo json_encode($result);
 }
@@ -44,7 +65,8 @@ function create () {
 
     $post = json_decode(file_get_contents('php://input'), true);
     $surveyId = $db->query('INSERT INTO surveys (survey_google_id, user_google_id, question) VALUES ('.$db->a($post['surveyGoogleId']).', '.$db->a($_SESSION['userGoogleId']).', '.$db->a($post['question']).')');
-    appendTags($post['tagsObj'], $surveyId);
+    appendTags($post['tagsArr'], $surveyId);
+    appendTerms($post['termsObj'], $surveyId);
 
     echo $surveyId;
 }
@@ -52,63 +74,47 @@ function create () {
 
 function append () {
     $post = json_decode(file_get_contents('php://input'), true);
-    appendTags($post['tagsObj'], $post['surveyId']);
+    $surveyId = $db->b($post['surveyId']);
+    appendTags($post['tagsArr'], $surveyId);
+    appendTerms($post['termsObj'], $surveyId);
 }
 
 
 function appendTags ($tags, $surveyId) {
     global $db;
 
-    $surveyId = $db->b($surveyId);
     $str = '';
-    foreach ($tags as $key => $val) {
-        $str .= '('.$db->a($key).','.$db->b($val).','.$surveyId.'),';
+    $n = count($tags);
+    for ($i = 0; $i < $n; $i++) {
+        $line = $tags[$i];
+        $str .= '('.$surveyId.','.$db->a($line[0]).','.$db->b($line[1]).','.$db->a($line[2] || '').'),';
     }
 
     $str = substr($str, 0, -1);
 
-    $db->query('INSERT INTO tags (tag, count, survey_id) VALUES '.$str);
+    $db->query('INSERT INTO tags (survey_id, tag, count, synonyms) VALUES '.$str);
 }
 
 
-function update () {
+function appendTerms ($terms, $surveyId) {
     global $db;
 
-    $post = json_decode(file_get_contents('php://input'), true);
-    $db->query('UPDATE tags SET tag = '.$db->a($post['name']).', count = '.$db->b($post['count']).' WHERE tag = '.$db->a($post['old_name']).' AND survey_id = '.$db->b($post['surveyId']));
+    $str = '';
+    $n = count($terms);
+    for ($i = 0; $i < $n; $i++) {
+        $line = $terms[$i];
+        $str .= '('.$surveyId.','.$db->a($line[0]).','.$db->b($line[1]).'),';
+    }
+
+    $str = substr($str, 0, -1);
+
+    $db->query('INSERT INTO terms (survey_id, term, count) VALUES '.$str);
 }
-//
-//
-//function update () {
-//    global $db;
-//
-//    $post = json_decode(file_get_contents('php://input'), true);
-//    if (!isset($post['surveyId']) || !isset($post['tagsObj']) || count($post['tagsObj']) === 0) {
-//        throw new Exception("Not enough parameters");
-//    }
-//
-//    $db->query('DELETE FROM tags WHERE survey_id = '.$db->b($post['surveyId']));
-//
-//    appendTags($post['tagsObj'], $post['surveyId']);
-//}
 
 
 function delete () {
     global $db;
 
-    if (isset($_GET['surveyId'])) {
-        $db->query('DELETE FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']));
-    }
-    else {
-        $post = json_decode(file_get_contents('php://input'), true);
-        $arr = [];
-        $tags = $post['tags'];
-        $c = count($tags);
-        for ($i = 0; $i < $c; $i++) {
-            $arr[$i] = 'tag = '.$db->a($tags[$i]);
-        }
-        $str = '('.implode(' OR ', $arr).')';
-
-        $db->query('DELETE FROM tags WHERE survey_id = '.$db->b($post['surveyId']).' AND '.$str);
-    }
+    $db->query('DELETE FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']));
+    $db->query('DELETE FROM terms WHERE survey_id = '.$db->b($_GET['surveyId']));
 }

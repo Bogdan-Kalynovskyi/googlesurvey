@@ -1,32 +1,57 @@
 body {
-    padding: 10px;
+    height: 100%;
+    padding: 0 10px 10px 10px;
+    box-sizing: border-box;
+}
+
+header {
+    height: 50px;
+}
+
+.bullet {
+    display: block;
+    float: left;
+    margin-top: 2px;
+    font-size: 13px;
+    line-height: 17px;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: white;
+    color: #0275d8;
+    margin-right: 9px;
+}
+
+big {
+    font-size: 30px;
+    line-height: 1.28;
+    vertical-align: bottom;
 }
 
 .logout {
+    font-size: 14px;
     float: right;
-    margin-right: 2px;
-    margin-top: 12px;
+    margin-top: 11px;
 }
 
-#tags-table th:first-child,
-#tags-table td:first-child {
-    text-align: center;
+
+#surveys, #tags {
+    height: calc(100% - 50px);
 }
 
-/*#tags-table tbody tr {*/
-    /*position: relative;*/
-/*}*/
+.tbl-row {
+    height: calc(100% - 80px);
+}
 
-/*#tags-table tbody tr:hover:after {*/
-    /*content: 'x';*/
-    /*position: absolute;*/
-    /*top: 4px;*/
-    /*right: 4px;*/
-/*}*/
+.overflow {
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
 
 
-#tags-chart {
-    margin-top: 33px;
+.table {
+    margin-top: 2px;
 }
 
 .table td,
@@ -35,79 +60,48 @@ body {
     padding: 3px;
 }
 
-#tags-table tbody td:nth-child(2) {
-    position: relative;
-    cursor: text;
+thead[ondragover] tr:first-child th {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+thead[ondragover] tr:last-child th {
+    padding-top: 0;
+    border-top: 0;
 }
 
-#tags-table tbody td:nth-child(2) > input {
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: calc(100% - 4px);
+.table th:first-child,
+.table td:first-child {
+    text-align: center;
 }
 
-
-.bullet {
-    display: block;
-    float: left;
-    margin-top: 2px;
-    font-size: 15px;
-    line-height: 21px;
-    width: 21px;
-    height: 21px;
-    border-radius: 50%;
-    background: white;
-    color: #0275d8;
-    margin-right: 9px;
+tbody span:hover,
+tbody li:hover {
+    background: #fcfcfc;
+    outline: 1px solid #eee;
+    cursor: move;
+    cursor: -webkit-grab;
 }
 
-big {
-    font-size: 44px;
-    line-height: 1;
-    vertical-align: bottom;
+tbody span,
+tbody li,
+tbody input {
+    display: inline-block;
+    padding: 0 4px;
+    width: 100%;
 }
 
-/* ANIMATION STYLINGS
-============================================================================= */
-#form-views {
-    width: auto;
+tbody input[type=checkbox] {
+    padding: 0;
 }
 
-/* left and right added to ensure full width */
-#form-views.ng-enter,
-#form-views.ng-leave {
-    position: absolute;
-    left: 30px;
-    right: 30px;
-    transition: 0.5s all ease;
-}
+/*#tags-table tbody tr {*/
+/*position: relative;*/
+/*}*/
 
-/* enter animation */
-#form-views.ng-enter {
-    animation: slideInRight 0.5s both ease;
-}
+/*#tags-table tbody tr:hover:after {*/
+/*content: 'x';*/
+/*position: absolute;*/
+/*top: 4px;*/
+/*right: 4px;*/
+/*}*/
 
-/* leave animation */
-#form-views.ng-leave {
-    animation: slideOutLeft 0.5s both ease;
-}
-
-/* ANIMATIONS
-============================================================================= */
-/* slide out to the left */
-@keyframes slideOutLeft {
-    to {
-        transform: translateX(-200%);
-    }
-}
-
-/* slide in from the right */
-@keyframes slideInRight {
-    from {
-        transform: translateX(200%);
-    }
-    to {
-        transform: translateX(0);
-    }
-}

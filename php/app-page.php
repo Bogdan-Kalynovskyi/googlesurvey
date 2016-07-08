@@ -9,28 +9,8 @@
     <meta name="google-signin-client_id" content="211499477101-d78crq8gs6sojr7grdlm9ebmoltiel71.apps.googleusercontent.com">
 </head>
 
-<body>
+<body ng-controller="dashboard as ctrl">
     <h3 id="_loading" style="position: absolute; top: 50%; text-align: center; width: 100%">Loading...</h3>
-
-    <header>
-        <button class="btn btn-primary" ui-sref-active="active" ui-sref="upload"><span class="bullet">1</span> Upload or select survey</button> <big>&raquo;</big>
-        <button class="btn btn-primary" ui-sref-active="active" ui-sref="tags"><span class="bullet">2</span> Manage tags and terms</button> <big>&raquo;</big>
-        <button class="btn btn-primary" ui-sref-active="active" ui-sref="chart"><span class="bullet">3</span> View chart</button>
-        <a href class="logout" onclick="logOut();return false;">Log out</a>
-        <script>
-            function logOut () {
-                var form = $('<form action=/ method=post><input type=hidden name=logout value=' + xsrfToken + '></form>');
-                $(document.body).append(form);
-                form.submit();
-            }
-        </script>
-    </header>
-
-    <br>
-
-    <div id="form-views" ng-controller="dashboard as ctrl" ui-view></div>
-
-    <div id="modal-placeholder"></div>
 
     <link rel=stylesheet href="node_modules/bootstrap/dist/css/bootstrap.css">
     <!--    <link rel=stylesheet href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">-->
@@ -61,9 +41,79 @@
     <script src="js/model.js"></script>
     <script src="js/surveys.js"></script>
     <script src="js/dashboard.js"></script>
-    <script src="js/routing.js"></script>
     <script>
-        $('#_loading').hide();
+        $('#_loading').remove();
     </script>
+
+    <header>
+        <button class="btn btn-sm btn-primary" ng-class="{active: ctrl.state === 'surveys'}" ng-click="ctrl.navigate('surveys')">
+            <span class="bullet">1</span> Upload or select survey
+        </button> <big>&raquo;</big>
+        <button class="btn btn-sm btn-primary" ng-class="{active: ctrl.state === 'tags'}" ng-click="ctrl.navigate('tags')">
+            <span class="bullet">2</span> Manage tags and terms
+        </button> <big>&raquo;</big>
+        <button class="btn btn-sm btn-primary" ng-class="{active: ctrl.state === 'chart'}" ng-click="ctrl.navigate('chart')">
+            <span class="bullet">3</span> View chart
+        </button>
+        <a href class="logout" onclick="logOut();return false;">Log out</a>
+        <script>
+            function logOut () {
+                var form = $('<form action=/ method=post><input type=hidden name=logout value=' + xsrfToken + '></form>');
+                $(document.body).append(form);
+                form.submit();
+            }
+        </script>
+    </header>
+
+
+    <div id="surveys" ng-show="ctrl.state === 'surveys'">
+        <h6>Surveys</h6>
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="thead-default" ng-show="ctrl.surveys.length !== 0"><tr>
+                <th></th><th></th><th>Google ID</th><th>Question</th>
+            </tr></thead>
+            <tr ng-repeat="(id, survey) in ctrl.surveys">
+                <td><a ng-click="ctrl.loadSurveyById(id)">load</a></td>
+                <td><a ng-click="ctrl.deleteSurveyById(id)">delete</a></td>
+                <td ng-bind="survey.survey_google_id"></td>
+                <td ng-bind="survey.question"></td>
+            </tr>
+        </table>
+        <br>
+        <hr>
+        <br>
+        Or upload new survey from Excel file
+        <input type="file" custom-on-change="ctrl.uploadFile" accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+    </div>
+
+
+    <div id="tags" ng-show="ctrl.state === 'tags'">
+        <div class="container">
+            <div class="col-xs-6">
+                <button class="btn btn-sm" ng-click="ctrl.sort()">Sort</button>
+            </div>
+            <div class="col-xs-6">
+                <input ng-model="ctrl.bulkAdd" placeholder="Tags..."> <button class="btn btn-sm" ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk Add</button>
+            </div>
+        </div>
+        <div class="container">
+            <label class="col-xs-5">Maximum amount of tags: <input ng-model="ctrl.maxTags" type="number"></label>
+            <label class="col-xs-5">Minimum repeat to become a tag: <input ng-model="ctrl.minRepeat" type="number"></label>
+            <div class="col-xs-2"><button class="btn btn-sm btn-primary" ng-click="ctrl.filterTags()">Filter tags</button></div>
+        </div>
+        <small>Click on tag title to edit it</small>
+        <br>
+        <div class="row tbl-row">
+            <div class="col-sm-6 overflow" id="tags-table">
+                <h3>Used tags and terms</h3>
+            </div>
+            <div class="col-sm-6 overflow" id="terms-table">
+                <h3>Unused terms</h3>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="modal-placeholder"></div>
 </body>
 </html>

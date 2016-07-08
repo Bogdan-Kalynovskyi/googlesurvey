@@ -42,8 +42,25 @@ CREATE TABLE IF NOT EXISTS `tags` (
   `survey_id` int NOT NULL,
   `tag` varchar(255) NOT NULL,
   `count` int NOT NULL,
+  `synonyms` text NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `tag` (`tag`)
+  INDEX `tag` (`tag`),
+  INDEX `survey_id` (`survey_id`)
+) DEFAULT CHARSET=utf8mb4;
+
+
+--
+-- Table structure for table `terms`
+--
+
+CREATE TABLE IF NOT EXISTS `terms` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `survey_id` int NOT NULL,
+  `term` varchar(255) NOT NULL,
+  `count` int NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `term` (`term`),
+  INDEX `survey_id` (`survey_id`)
 ) DEFAULT CHARSET=utf8mb4;
 
 

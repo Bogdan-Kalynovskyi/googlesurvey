@@ -5,13 +5,18 @@
         <div class="col-sm-3"><button ng-click="ctrl.deleteRows()" class="btn btn-sm btn-danger">Delete Selected</button></div>
     </div>
     <div class="container">
-        <label class="col-sm-6">Maximum amount of tags: <input ng-model="ctrl.max" type="number"></label>
-        <label class="col-sm-6">Minimum count to become a tag: <input ng-model="ctrl.min" type="number"></label>
+        <label class="col-sm-5">Maximum amount of tags: <input ng-model="ctrl.maxTags" type="number"></label>
+        <label class="col-sm-5">Minimum count to become a tag: <input ng-model="ctrl.minRepeat" type="number"></label>
+        <div class="col-sm-2"><button class="btn" ng-click="ctrl.filterTags()">Filter tags</button></div>
     </div>
     <small>Click on tag title to edit it</small>
     <br>
     <div class="row">
-        <div class="col-md-6" id="tags-table"></div>
-        <div class="col-md-6" id="tags-chart"></div>
+        <div class="col-md-6" id="tags-table">
+            <h3>Used tags and terms</h3>
+        </div>
+        <div class="col-md-6" id="terms-table">
+            <h3>Unused terms</h3>
+        </div>
     </div>
 </div>

@@ -1,5 +1,6 @@
 function Table (container) {
-    var tbody;
+    var tbody,
+        isPacked = true;
 
     this.create = function (tagsArr) {
         if (tbody) {
@@ -7,33 +8,58 @@ function Table (container) {
             return;
         }
 
-        var str = '<table class="table table-striped table-bordered table-hover">' +
-                    '<thead class="thead-default"><tr>' +
-                    '<th><input type=checkbox></th>' +
-                    '<th>Tag</th>' +
-                    '<th>Count</th>' +
-                    '</tr></thead>' +
-                    '<tbody>';
+        container.innerHTML =   '<table class="table table-striped table-bordered table-hover">' +
+                                '<thead class="thead-default" ondragover="return false"><tr>' +
+                                '<th><input type=checkbox></th>' +
+                                '<th>Tag</th>' +
+                                '<th>Repeat</th>' +
+                                '</tr><tr><th colspan=3>You can drag here</th></tr></thead>' +
+                                '<tbody>' +
+                                    fillTableBody(tagsArr) +
+                                '</tbody></table>';
 
-        for (var i = 0, len = tagsArr.length; i < len; i++) {
-            var line = tagsArr[i];
-            str +=
-                '<tr><td><input type=checkbox></td>' +
-                '<td>' + line[0] + '</td>' +
-                '<td>' + line[1] + '</td></tr>';
-        }
-
-        str += '</tbody></table>';
-
-        container.innerHTML = str;
         tbody = container.getElementsByTagName('tbody')[0];
 
-        addMasterCheckbox();
-        addDynamicInput();
+        assignMasterCheckbox();
+        assignDragNDrop();
+        assignDynamicInput();
+        
+        isPacked = false;
     };
 
 
-    function addMasterCheckbox () {
+    function fillTableBody (tagsArr) {
+        var str = '',
+            isTagsTable = container.id === 'tags-table';
+
+        for (var i = 0, n = tagsArr.length; i < n; i++) {
+            var line = tagsArr[i],
+                terms,
+                subTerms = '';
+
+            if (isTagsTable && (terms = line[2])) {
+                if (isPacked) {
+                    terms = terms.split(',');
+                    line[2] = terms;
+                }
+                
+                subTerms = '<ul>';
+                for (var j = 0, m = terms.length; j < m; j++) {
+                    subTerms += '<li draggable=true>' + terms[j] + '</li>';
+                }
+                subTerms += '</ul>';
+            }
+            str +=
+                '<tr ondragover="return false"><td><input type=checkbox></td>' +
+                '<td><span draggable=true>' + line[0] + '</span></td>' +
+                '<td>' + line[1] + subTerms + '</td></tr>';
+        }
+
+        return str;
+    }
+
+
+    function assignMasterCheckbox () {
         container.querySelector('thead input').onchange = function () {
             var checkboxes = tbody.getElementsByTagName('input'),
                 checked = this.checked;
@@ -45,24 +71,122 @@ function Table (container) {
     }
 
 
-    function addDynamicInput () {
+    function assignDragNDrop () {
+        var starter, current, outline,
+            table = container.children[0];
+
+        function getIndex (el) {
+            var tr = $(el).closest('tr')[0],
+                arr = Array.prototype.slice.call(tbody.children);
+                return arr.indexOf(tr);
+        }
+
+
+        tbody.addEventListener('dragstart', function (evt) {
+            var target = evt.target,
+                dt = evt.dataTransfer;
+
+            if (!(target instanceof HTMLElement && target.draggable === true)) {
+                return false;
+            }
+            dt.setData("index", getIndex(target));
+            dt.setData("target", target.tagName);
+            dt.setData("html", target.innerHTML);
+            dt.setData("table", container.id);
+
+            starter = $(target).closest('[ondragover]')[0];
+        });
+
+
+        table.addEventListener('dragenter', function (evt) {
+            var target = evt.target;
+
+            if (!current || !current.contains(target)) {
+                if (current) {
+                    current.style.background = '';
+                    outline.style.outline = '';
+                    current = undefined;
+                }
+
+                if (!starter || !starter.contains(target)) {
+                    target = $(target).closest('[ondragover]')[0];
+                    if (target) {
+                        current = target;
+                        if (target.tagName === 'THEAD') {
+                            outline = target.parentNode;
+                        }
+                        else if (container.id === 'terms-table') {
+                            outline = target.parentNode.parentNode;
+                        }
+                        else {
+                            outline = target;
+                            target.style.background = 'rgba(0, 0, 255, 0.15)';
+                        }
+                        outline.style.outline = '2px solid blue';
+                    }
+                }
+            }
+
+            evt.stopPropagation();
+        });
+
+
+        document.addEventListener('dragenter', function () {
+            if (current) {
+                current.style.background = '';
+                outline.style.outline = '';
+                current = undefined;
+            }
+        });
+
+
+        table.addEventListener('drop', function (evt) {
+            var target = evt.target,
+                dt = evt.dataTransfer,
+                from = {
+                    index: +dt.getData('index'),
+                    target: dt.getData('target'),
+                    html: dt.getData('html'),
+                    table: dt.getData('table')
+                },
+                to = {
+                    index: getIndex(target),
+                    target: target.tagName,
+                    table: container.id
+                };
+
+            if (current) {
+                current.style.background = '';
+                outline.style.outline = '';
+            }
+
+            if ($(target).closest('thead').length) {
+                to.target = 'THEAD';
+            }
+
+            angular.element(document.body).scope().ctrl.dragTag(from, to);
+        });
+    }
+
+
+    function assignDynamicInput () {
         tbody.addEventListener('click', function (evt) {
             var target = evt.target;
 
-            if (target.tagName === 'TD' && target.parentNode.children[1] === target) {
-                var input = $('<input>'),
-                    oldName = target.innerHTML;
-                
-                input.val(oldName);
-                $(target).append(input);
+            if (target.tagName === 'SPAN' || target.tagName === 'LI') {
+                var oldName = target.innerHTML;
+                target.innerHTML = '<input value="' + oldName + '">';
+                var input = target.children[0];
                 input.focus();
-                input.on('blur', function () {
-                    var arr = Array.prototype.slice.call(tbody.children),
-                        index = arr.indexOf(target.parentNode);
-                    
-                    target.innerHTML = input.val();
-                    angular.element(document.querySelector('[ui-view]')).scope().ctrl.updateTag(index, input.val(), oldName);
-                });
+                input.onblur = function () {
+                    if (input.value && oldName !== input.value) {
+                        var arr = Array.prototype.slice.call(tbody.children),
+                            index = arr.indexOf(target.parentNode.parentNode);
+
+                        angular.element(document.body).scope().ctrl.updateTag(container.id, index, target.tagName, input.value, oldName);
+                    }
+                    target.innerHTML = input.value;
+                };
             }
         });
     }
@@ -74,33 +198,37 @@ function Table (container) {
     };
 
 
+    this.addRow = function (tag) {
+        $(tbody).prepend(fillTableBody([tag]));
+    };
+
+
     this.addRows = function (tagsArr) {
-        var str = '';
-
-        for (var i = 0, len = tagsArr.length; i < len; i++) {
-            str +=
-                '<tr><td><input type=checkbox></td>' +
-                '<td>' + tagsArr[i][0] + '</td>' +
-                '<td>' + tagsArr[i][1] + '</td></tr>';
-        }
-        $(tbody).append(str);
+        $(tbody).prepend(fillTableBody(tagsArr));
     };
 
 
-    this.updateRow = function (i, tag, count) {
-        var row = tbody.children[i];
-        if (tag) {
-            row.children[1].innerHTML = tag;
+    this.addSubTerm = function (index, term) {
+        var td = $(tbody.children[index]),
+            ul = td.find('ul'),
+            str = '<li draggable=true>' + term[0] + '</li>';
+
+        if (ul.length) {
+            ul.append(str);
         }
-        if (count) {
-            row.children[2].innerHTML = count;
-            //this.update(); //after resort
+        else {
+            td.find('span').after('<ul>' + str + '</ul>');
         }
     };
 
 
-    this.deleteRow = function (i) {
-        tbody.removeChild(tbody.children[i]);
+    this.deleteSubTerm = function (index, pos) {
+        tbody.removeChild(tbody.children[index].children[1].children[pos]);
+    };
+
+
+    this.deleteRow = function (index) {
+        tbody.removeChild(tbody.children[index]);
     };
 
 
