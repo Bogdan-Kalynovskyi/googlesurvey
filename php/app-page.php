@@ -17,7 +17,7 @@
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
-    <script src="js/xls.core.min.js"></script>
+    <script src="lib/xls.min.js"></script>
     <script src="//www.gstatic.com/charts/loader.js"></script>
     <script>
         xsrfToken = '<?php echo $_SESSION['xsrfToken'] ?>';
