@@ -37,7 +37,7 @@ function Table (container) {
         for (var i = 0, n = tagsArr.length; i < n; i++) {
             var line = tagsArr[i],
                 terms,
-                subTerms = '';
+                subTerms;
 
             if (isTags && (terms = line[2])) {
                 if (isPacked) {
@@ -51,10 +51,13 @@ function Table (container) {
                 }
                 subTerms += '</ul>';
             }
+            else {
+                subTerms = '';
+            }
             str +=
                 '<tr ondragover="return false"><td><input type=checkbox></td>' +
-                '<td><span draggable=true>' + line[0] + '</span></td>' +
-                '<td>' + line[1] + subTerms + '</td></tr>';
+                '<td><span draggable=true>' + line[0] + subTerms + '</span></td>' +
+                '<td>' + line[1] + '</td></tr>';
         }
 
         return str;
@@ -74,7 +77,7 @@ function Table (container) {
 
 
     function assignDragNDrop () {
-        var current, outline,
+        var startElem, current, outline,
             table = container.children[0];
 
         function getIndex (el, findTr) {
@@ -88,7 +91,7 @@ function Table (container) {
             var target = evt.target,
                 dt = evt.dataTransfer;
 
-            if (!(target instanceof HTMLElement && target.draggable === true)) {
+            if (!(target instanceof HTMLElement && target.draggable)) {
                 return false;
             }
             dt.setData("index", getIndex(target, true));
@@ -98,7 +101,7 @@ function Table (container) {
             }
             dt.setData("table", container.id);
 
-            window._starter = $(target).closest('[ondragover]')[0];
+            startElem = $(target).closest('[ondragover]')[0];
         });
 
 
@@ -112,7 +115,7 @@ function Table (container) {
                     current = undefined;
                 }
 
-                if ((!window._starter || !window._starter.contains(target)) && (isTags || !container.contains(window._starter))) {
+                if ((!startElem || !startElem.contains(target)) && (isTags || !startElem)) {
                     target = $(target).closest('[ondragover]')[0];
                     if (target) {
                         current = target;
@@ -124,7 +127,7 @@ function Table (container) {
                         }
                         else {
                             outline = target;
-                            target.style.background = 'rgba(0, 0, 255, 0.15)';
+                            target.style.background = 'rgba(0, 0, 255, 0.12)';
                         }
                         outline.style.outline = '2px solid blue';
                     }
@@ -141,6 +144,11 @@ function Table (container) {
                 outline.style.outline = '';
                 current = undefined;
             }
+        });
+
+
+        table.addEventListener('dragend', function () {
+            startElem = undefined;
         });
 
 
@@ -236,7 +244,7 @@ function Table (container) {
 
 
     this.deleteSubTerm = function (index, pos) {
-        tbody.removeChild(tbody.children[index].children[0].children[1].children[pos]);
+        $(tbody.children[index].children[1].children[1].children[pos]).remove();
     };
 
 

@@ -60,21 +60,22 @@
 
 
         function packTags () {
-            for (var i = 0, n = that.tagsArr.length; i < n; i++) {
-                var line = that.tagsArr[i];
+            var arr = that.tagsArr.concat();
+            for (var i = 0, n = arr.length; i < n; i++) {
+                var line = arr[i];
                 if (line[2]) {
                     line[2] = line[2].join(',');
                 }
             }
+            return arr;
         }
 
 
         this.saveNewSurvey = function () {
-            packTags();
             return $http.post(api, {
                 survey_google_id: this.surveyData.survey_google_id,
                 question: this.surveyData.question,
-                tagsArr: this.tagsArr,
+                tagsArr: packTags(),    // todo: probably pack an unpack will be faster
                 termsObj: this.termsArr
             })
             .then(function (response) {
