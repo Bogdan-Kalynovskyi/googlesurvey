@@ -139,15 +139,17 @@
                         if (to.target !== 'THEAD') {
                             if (from.target === 'SPAN') {
                                 line = model.tagsArr[from.index];
+                                var sum = 0;
                                 if (line[2]) {
                                     var sub1 = line[2],
                                         sub2 = line[3];
                                     for (var i = 0, n = sub1.length; i < n; i++) {
+                                        sum += sub2[i];
                                         model.addSubTerm(to.index, sub1[i], sub2[i]);
                                     }
                                     line.splice(2, 2);
                                 }
-                                model.addSubTerm(to.index, line[0], line[1]);
+                                model.addSubTerm(to.index, line[0], line[1] - sum);
                                 model.deleteTag(from.index);
                             }
                             else {

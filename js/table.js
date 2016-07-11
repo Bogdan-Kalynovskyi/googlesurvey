@@ -55,7 +55,7 @@ function Table (container) {
             }
             str +=
                 '<tr ondragover="return false">' +
-                '<td><span draggable=true>' + line[0] + subTerms + '</span></td>' +
+                '<td><span draggable=true>' + line[0] + '</span>' + subTerms + '</td>' +
                 '<td>' + line[1] + '</td></tr>';
         }
 
