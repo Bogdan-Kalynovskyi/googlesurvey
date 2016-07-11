@@ -56,7 +56,7 @@
 
     <div id="surveys" class="nav-body">
         <h6>Surveys</h6>
-        <table class="table table-striped table-bordered table-hover">
+        <table ng-show="ctrl.surveys.length" class="table table-striped table-bordered table-hover">
             <thead class="thead-default" ng-show="ctrl.surveys.length !== 0"><tr>
                 <th></th><th></th><th>Google ID</th><th>Question</th>
             </tr></thead>
@@ -67,10 +67,11 @@
                 <td ng-bind="survey.question"></td>
             </tr>
         </table>
+        <b ng-show="!ctrl.surveys.length">No surveys yet. Please upload a spreadsheet below</b>
         <br>
         <hr>
         <br>
-        Or upload new survey from Excel file
+        Upload new survey as spreadsheet
         <input type="file" custom-on-change="ctrl.uploadFile" accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
     </div>
 

@@ -81,11 +81,6 @@ thead th[colspan] {
     font-size: 10px;
 }
 
-.table th:first-child,
-.table td:first-child {
-    text-align: center;
-}
-
 tbody span:hover,
 tbody li:hover {
     background: #fdfdfd;
@@ -104,7 +99,7 @@ tbody input:not([type=checkbox]) {
 }
 
 tbody ul {
-    margin: 4px 0;
+    margin: 1px 0;
 }
 
 .modal .close {

@@ -32,7 +32,6 @@
 
                 this.tagsArr = objToArr(tagsObj);
                 this.termsArr = [];
-                this.sort(this.tagsArr);
 
                 this.surveyData = {
                     survey_google_id: overview.A2.w,
@@ -75,7 +74,7 @@
             return $http.post(api, {
                 survey_google_id: this.surveyData.survey_google_id,
                 question: this.surveyData.question,
-                tagsArr: packTags(),    // todo: probably pack an unpack will be faster
+                tagsArr: packTags(),    // todo: probably pack and unpack will be faster // we also have pack in table for that (for unpacking)
                 termsObj: this.termsArr
             })
             .then(function (response) {
@@ -86,7 +85,7 @@
 
         this.overwriteSurvey = function (surveyId) {
             packTags();
-            return this.truncateTags(surveyId).success(function () {
+            return $http.delete(api + '?surveyId=' + surveyId).success(function () {
                 return $http.put(api, {
                     surveyId: surveyId,
                     tagsArr: that.tagsArr,
@@ -108,17 +107,18 @@
         };
         
         
-        this.addSubTerm = function (index, term) {
+        this.addSubTerm = function (index, name, repeat) {
             var line = this.tagsArr[index];
             if (!line[2]) {
-                line.push([term[0]]);
-                line.push([term[1]]);
+                line.push([name]);
+                line.push([repeat]);
             }
             else {
-                line[2].push(term[0]);
-                line[3].push(term[1]);
+                line[2].push(name);
+                line[3].push(repeat);
             }
-            this.tagsTable.addSubTerm(index, term);
+            line[1] += repeat;
+            this.tagsTable.addSubTerm(index, name, line[1]);
         };
 
 
@@ -128,32 +128,46 @@
         };
 
 
-        this.addTerms = function (termsArr) {
-            this.termsArr = termsArr.concat(this.termsArr);
-            this.termsTable.addRows(termsArr);
+        this.addTerms = function (line) {
+            var arr = [],
+                sub1 = line[2],
+                sub2 = line[3];
+
+            for (var i = 0, n = sub1.length; i < n; i++) {
+                arr.push([sub1[i], sub2[i]]);
+            }
+
+            this.termsArr = arr.concat(this.termsArr);
+            this.termsTable.addRows(arr);
         };
 
 
         this.deleteTag = function (index) {
+            var line = this.tagsArr[index],
+                terms = line[3];
+            
+            if (terms) {
+                for (var i = 0, n = terms.length; i < n; i++) {
+                    line[1] -= terms[i];
+                }
+            }
+
             this.tagsArr.splice(index, 1);
             this.tagsTable.deleteRow(index);
         };
 
 
-        this.deleteSubTerm = function (index, termStr) {
+        this.deleteSubTerm = function (index, name) {
             var line = this.tagsArr[index],
                 terms = line[2],
-                pos = terms.indexOf(termStr),
-                result = [termStr, line[3][pos]];
+                pos = terms.indexOf(name),
+                result = [name, line[3][pos]];
 
             terms.splice(pos, 1);
+            line[1] -= line[3][pos];
             line[3].splice(pos, 1);
 
-            if (terms.length === 0) {
-                line.splice(2, 2);
-            }
-
-            this.tagsTable.deleteSubTerm(index, pos);
+            this.tagsTable.deleteSubTerm(index, pos, line[1]);
             return result;
         };
 
@@ -180,11 +194,6 @@
         };
 
 
-        this.truncateTags = function (surveyId) {
-            return $http.delete(api + '?surveyId=' + surveyId);
-        };
-
-
         function objToArr (obj) {
             var arr = [];
             for (var i in obj) {
@@ -193,16 +202,6 @@
             
             return that.sort(arr);
         }
-
-
-        this.strToArr = function (src) {
-            var arr = [];
-
-            src[2].forEach(function (el, i) {
-                arr.push([el, src[3][i]]);
-            });
-            return arr;
-        };
 
         
         this.sort = function (arr) {
@@ -246,7 +245,7 @@
                     j--;
                 } while (j >= 0  && arr[j][1] <= overflow);
 
-                this.tagsTable.makePinkRows(j, i);
+                this.tagsTable.makeStripedRows(j, i);
                 bootstrapAlert('The <b>number of filtered tags</b> is greater then <b>' + maxTags + '</b>, because too many tags have repeat count <b>' + overflow + '</b> and less, so I don\'t know what to do with them. Those tags are marked with stripes.');
             }
         };

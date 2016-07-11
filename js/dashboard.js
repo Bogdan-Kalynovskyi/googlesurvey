@@ -140,17 +140,19 @@
                             if (from.target === 'SPAN') {
                                 line = model.tagsArr[from.index];
                                 if (line[2]) {
-                                    model.strToArr(line).forEach(function (el) {
-                                        model.addSubTerm(to.index, el);
-                                    });
+                                    var sub1 = line[2],
+                                        sub2 = line[3];
+                                    for (var i = 0, n = sub1.length; i < n; i++) {
+                                        model.addSubTerm(to.index, sub1[i], sub2[i]);
+                                    }
                                     line.splice(2, 2);
                                 }
-                                model.addSubTerm(to.index, line);
+                                model.addSubTerm(to.index, line[0], line[1]);
                                 model.deleteTag(from.index);
                             }
                             else {
                                 line = model.deleteSubTerm(from.index, from.html);
-                                model.addSubTerm(to.index, line);
+                                model.addSubTerm(to.index, line[0], line[1]);
                             }
                         }
                         else {
@@ -171,7 +173,7 @@
                     if (from.target === 'SPAN') {
                         line = model.tagsArr[from.index];
                         if (line[2]) {
-                            model.addTerms(model.strToArr(line));
+                            model.addTerms(line);
                             line.splice(2, 2);
                         }
                         model.deleteTag(from.index);
@@ -186,7 +188,7 @@
                 line = model.termsArr[from.index];
                 model.deleteTerm(from.index);
                 if (to.target === 'TR') {
-                    model.addSubTerm(to.index, line);
+                    model.addSubTerm(to.index, line[0], line[1]);
                 }
                 else {
                     model.addTag(line);

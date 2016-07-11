@@ -11,7 +11,6 @@ function Table (container) {
 
         container.innerHTML =   '<table class="table table-striped table-bordered table-hover">' +
                                 '<thead class="thead-default" ondragover="return false"><tr>' +
-                                '<th><input type=checkbox></th>' +
                                 '<th>' + (isTags ? 'Tag' : 'Term') + '</th>' +
                                 '<th>Repeat</th>' +
                                 '</tr><tr><th colspan=3>' +
@@ -23,7 +22,6 @@ function Table (container) {
 
         tbody = container.getElementsByTagName('tbody')[0];
 
-        assignMasterCheckbox();
         assignDragNDrop();
         assignDynamicInput();
         
@@ -55,24 +53,12 @@ function Table (container) {
                 subTerms = '';
             }
             str +=
-                '<tr ondragover="return false"><td><input type=checkbox></td>' +
+                '<tr ondragover="return false">' +
                 '<td><span draggable=true>' + line[0] + subTerms + '</span></td>' +
                 '<td>' + line[1] + '</td></tr>';
         }
 
         return str;
-    }
-
-
-    function assignMasterCheckbox () {
-        container.querySelector('thead input').onchange = function () {
-            var checkboxes = tbody.getElementsByTagName('input'),
-                checked = this.checked;
-
-            for (var i = 0, len = checkboxes.length; i < len; i++) {
-                checkboxes[i].checked = checked;
-            }
-        };
     }
 
 
@@ -210,7 +196,7 @@ function Table (container) {
     };
     
     
-    this.makePinkRows = function (a, b) {
+    this.makeStripedRows = function (a, b) {
         var children = tbody.children;
         
         for (var i = a; i < b; i++) {
@@ -229,39 +215,31 @@ function Table (container) {
     };
 
 
-    this.addSubTerm = function (index, term) {
-        var td = $(tbody.children[index]),
-            ul = td.find('ul'),
-            str = '<li draggable=true>' + term[0] + '</li>';
+    this.addSubTerm = function (index, name, repeat) {
+        var tr = tbody.children[index],
+            $tr = $(tr),
+            ul = $tr.find('ul'),
+            str = '<li draggable=true>' + name + '</li>';
 
         if (ul.length) {
             ul.append(str);
         }
         else {
-            td.find('span').after('<ul>' + str + '</ul>');
+            $tr.find('span').after('<ul>' + str + '</ul>');
         }
+        tr.children[1].innerHTML = repeat;
     };
 
 
-    this.deleteSubTerm = function (index, pos) {
-        $(tbody.children[index].children[1].children[1].children[pos]).remove();
+    this.deleteSubTerm = function (index, pos, repeat) {
+        var tr = tbody.children[index],
+            ul = tr.children[0].children[1];
+        ul.removeChild(ul.children[pos]);
+        tr.children[1].innerHTML = repeat;
     };
 
 
     this.deleteRow = function (index) {
         tbody.removeChild(tbody.children[index]);
-    };
-
-
-    this.selectedIndexes = function () {
-        var selected = [],
-            checkboxes = tbody.getElementsByTagName('input');
-
-        for (var i = 0, len = checkboxes.length; i < len; i++) {
-            if (checkboxes[i].checked) {
-                selected.push(i);
-            }
-        }
-        return selected;
     };
 }
