@@ -1,4 +1,5 @@
 body {
+    line-height: 1;
     height: 100%;
     padding: 0 10px 10px 10px;
     box-sizing: border-box;
@@ -31,13 +32,13 @@ big {
 .logout {
     font-size: 14px;
     float: right;
-    margin-top: 11px;
+    margin-top: 14px;
 }
 
 input[ng-model] {
     width: 60px;
     padding: 0 4px;
-    line-height: 1.4;
+    line-height: 27px;
 }
 
 #surveys,

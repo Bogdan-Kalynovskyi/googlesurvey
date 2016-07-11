@@ -14,6 +14,9 @@
 
 
         this.addSurvey = function  (id, survey) {
+            if (!this.surveys) {
+                this.surveys = {};
+            }
             this.surveys[id] = survey;
         };
 

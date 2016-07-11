@@ -64,6 +64,7 @@
                 var line = arr[i];
                 if (line[2]) {
                     line[2] = line[2].join(',');
+                    line[3] = line[3].join(',');
                 }
             }
             return arr;
@@ -75,7 +76,7 @@
                 survey_google_id: this.surveyData.survey_google_id,
                 question: this.surveyData.question,
                 tagsArr: packTags(),    // todo: probably pack and unpack will be faster // we also have pack in table for that (for unpacking)
-                termsObj: this.termsArr
+                termsArr: this.termsArr
             })
             .then(function (response) {
                 return that.surveyId = response.data;
@@ -89,7 +90,7 @@
                 return $http.put(api, {
                     surveyId: surveyId,
                     tagsArr: that.tagsArr,
-                    termsObj: that.termsArr
+                    termsArr: that.termsArr
                 });
             });
         };
@@ -130,12 +131,16 @@
 
         this.addTerms = function (line) {
             var arr = [],
+                sum = 0,
                 sub1 = line[2],
                 sub2 = line[3];
 
             for (var i = 0, n = sub1.length; i < n; i++) {
+                sum += sub2[i]; 
                 arr.push([sub1[i], sub2[i]]);
             }
+            
+            line[1] -= sum;
 
             this.termsArr = arr.concat(this.termsArr);
             this.termsTable.addRows(arr);
@@ -143,15 +148,6 @@
 
 
         this.deleteTag = function (index) {
-            var line = this.tagsArr[index],
-                terms = line[3];
-            
-            if (terms) {
-                for (var i = 0, n = terms.length; i < n; i++) {
-                    line[1] -= terms[i];
-                }
-            }
-
             this.tagsArr.splice(index, 1);
             this.tagsTable.deleteRow(index);
         };

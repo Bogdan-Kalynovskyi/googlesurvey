@@ -35,12 +35,13 @@ catch (Exception $e) {
 function getTags () {
     global $db;
 
-    $query = mysql_query('SELECT tag, count, synonyms FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']));
+    $query = mysql_query('SELECT tag, count, synonyms, syn_count FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']));
     $result = array();
     while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
         $rrr = [$row[0], intval($row[1])];
         if ($row[2]) {
             $rrr[] = $row[2];
+            $rrr[] = $row[3];
         }
         $result[] = $rrr;
     }
@@ -66,7 +67,7 @@ function create () {
     $post = json_decode(file_get_contents('php://input'), true);
     $surveyId = $db->query('INSERT INTO surveys (survey_google_id, user_google_id, question) VALUES ('.$db->a($post['survey_google_id']).', '.$db->a($_SESSION['userGoogleId']).', '.$db->a($post['question']).')');
     appendTags($post['tagsArr'], $surveyId);
-    appendTerms($post['termsObj'], $surveyId);
+    appendTerms($post['termsArr'], $surveyId);
 
     echo $surveyId;
 }
@@ -78,7 +79,7 @@ function append () {
     $post = json_decode(file_get_contents('php://input'), true);
     $surveyId = $db->b($post['surveyId']);
     appendTags($post['tagsArr'], $surveyId);
-    appendTerms($post['termsObj'], $surveyId);
+    appendTerms($post['termsArr'], $surveyId);
 }
 
 
@@ -89,13 +90,13 @@ function appendTags ($tags, $surveyId) {
     $n = count($tags);
     for ($i = 0; $i < $n; $i++) {
         $line = $tags[$i];
-        $synonyms = isset($line[2]) ? (','.$db->a($line[2])) : '';
-        $str .= '('.$surveyId.','.$db->a($line[0]).','.$db->b($line[1]).$synonyms.'),';
+        $synonyms = isset($line[2]) ? ($db->a($line[2]).','.$db->a($line[3])) : '"",""';
+        $str .= '('.$surveyId.','.$db->a($line[0]).','.$db->b($line[1]).','.$synonyms.'),';
     }
 
     $str = substr($str, 0, -1);
 
-    $db->query('INSERT INTO tags (survey_id, tag, count, synonyms) VALUES '.$str);
+    $db->query('INSERT INTO tags (survey_id, tag, count, synonyms, syn_count) VALUES '.$str);
 }
 
 

@@ -41,6 +41,7 @@ function Table (container) {
                 if (isPacked) {
                     terms = terms.split(',');
                     line[2] = terms;
+                    line[3] = line[3].split(',');
                 }
                 
                 subTerms = '<ul>';
@@ -74,6 +75,12 @@ function Table (container) {
 
 
         tbody.addEventListener('dragstart', function (evt) {
+            if (window.getSelection) {
+                window.getSelection().removeAllRanges();
+            } else if (document.selection) {
+                document.selection.empty();
+            }
+
             var target = evt.target,
                 dt = evt.dataTransfer;
 

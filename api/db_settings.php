@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS `tags` (
   `tag` varchar(255) NOT NULL,
   `count` int NOT NULL,
   `synonyms` text NOT NULL,
+  `syn_count` text NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `tag` (`tag`),
   INDEX `survey_id` (`survey_id`)

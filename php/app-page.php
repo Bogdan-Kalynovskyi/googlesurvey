@@ -56,7 +56,7 @@
 
     <div id="surveys" class="nav-body">
         <h6>Surveys</h6>
-        <table ng-show="ctrl.surveys.length" class="table table-striped table-bordered table-hover">
+        <table ng-show="ctrl.surveys" class="table table-striped table-bordered table-hover">
             <thead class="thead-default" ng-show="ctrl.surveys.length !== 0"><tr>
                 <th></th><th></th><th>Google ID</th><th>Question</th>
             </tr></thead>
@@ -67,7 +67,7 @@
                 <td ng-bind="survey.question"></td>
             </tr>
         </table>
-        <b ng-show="!ctrl.surveys.length">No surveys yet. Please upload a spreadsheet below</b>
+        <b ng-show="!ctrl.surveys">No surveys yet. Please upload a spreadsheet below</b>
         <br>
         <hr>
         <br>
@@ -82,7 +82,7 @@
                 <button class="btn btn-sm btn-primary" ng-click="ctrl.sort()">Sort tables</button>
             </div>
             <div class="col-xs-7">
-                <input ng-model="ctrl.bulkAdd" placeholder="Comma separated tags list" style="width: calc(100% - 90px); line-height: 27px">
+                <input ng-model="ctrl.bulkAdd" placeholder="Comma separated tags list" style="width: calc(100% - 90px)">
                 <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk add</button>
             </div>
             <div class="col-xs-3"><button class="btn btn-sm btn-danger pull-xs-right" ng-click="ctrl.save()">Save & view chart</button></div>
