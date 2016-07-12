@@ -83,7 +83,7 @@
 
 
         this.uploadFile = function (event) {
-            if (!isSaved && confirm('You have unsaved changes. Do you want to proceed?')) {
+            if (isSaved || confirm('You have unsaved changes. Do you want to proceed?')) {
                 var file = event.target.files[0];
                 if (file && !file.$error) {
                     var reader = new FileReader();
@@ -119,7 +119,9 @@
 
 
         window.onbeforeunload = function () {
-            return !isSaved && 'You have unsaved changes. Do you want to proceed?';
+            if (!isSaved) {
+                return 'You have unsaved changes. Do you want to proceed?';
+            }
         };
 
 

@@ -87,13 +87,13 @@ thead th[colspan] {
 }
 
 tr[ondragover] td:first-child {
-    width: 1rem;
-    margin-left: 1px;
+    width: 1.1rem;
     cursor: pointer;
 }
 
 tr[ondragover] td:first-child:after {
     content: 'x';
+    margin-left: 2px;
 }
 
 tbody span:hover,
