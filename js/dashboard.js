@@ -34,7 +34,7 @@
             switch (state) {
                 case 'chart':
                     if (model.tagsArr.length) {
-                        chart.create(model.packedTags);
+                        chart.create(model.gData);
                     }
                     else {
                         alert('Tags loaded already?');
@@ -46,12 +46,12 @@
 
         function stepTwo () {
             that.navigate('tags');
-            that.filterTags();
+            that.filterTags(true);
         }
 
         
-        this.filterTags = function () {
-            model.splitTags(this.maxTags, this.minRepeat);
+        this.filterTags = function (reset) {
+            model.splitTags(this.maxTags, this.minRepeat, reset);
         };
 
         
@@ -59,10 +59,10 @@
             this.navigate('tags');
             this.surveyId = id;
             model.getTagsBySurveyId(id).success(function () {
-                model.tagsTable.create(model.tagsArr);
+                model.tagsTable.create(model.tagsArr, true);
             });
             model.getTermsBySurveyId(id).success(function () {
-                model.termsTable.create(model.termsArr);
+                model.termsTable.create(model.termsArr, true);
             });
         };
 

@@ -1,13 +1,14 @@
-function Table (container) {
+function Table (container, reset) {
     var tbody,
-        isTags = container.id === 'tags-table',
-        isPacked = true;
+        isTags = container.id === 'tags-table';
 
     this.create = function (tagsArr) {
-        if (tbody) {
+        if (tbody && !reset) {
             this.update(tagsArr);
             return;
         }
+
+        tbody = null;
 
         container.innerHTML =   '<table class="table table-striped table-bordered table-hover">' +
                                 '<thead class="thead-default" ondragover="return false"><tr>' +
@@ -24,8 +25,6 @@ function Table (container) {
 
         assignDragNDrop();
         assignDynamicInput();
-        
-        isPacked = false;
     };
 
 
@@ -38,7 +37,7 @@ function Table (container) {
                 subTerms;
 
             if (isTags && (terms = line[2])) {
-                if (isPacked) {
+                if (!tbody) {
                     terms = terms.split(',');
                     line[2] = terms;
                     line[3] = line[3].split(',');

@@ -59,15 +59,26 @@
 
 
         function packTags () {
-            var arr = that.packedTags = that.tagsArr.concat();
-            for (var i = 0, n = arr.length; i < n; i++) {
-                var line = arr[i];
+            var i = 0,
+                src = that.tagsArr,
+                n = src.length,
+                arr = that.packedTags = new Array(n);
+
+            for (; i < n; i++) {
+                arr[i] = src[i].slice(0, 2);
+            }
+
+            arr.unshift(['', 'Tag repeat']);
+            that.gData = google.visualization.arrayToDataTable(arr);
+            arr.shift();
+
+            for (i = 0; i < n; i++) {
+                var line = src[i];
                 if (line[2]) {
-                    line[2] = line[2].join(',');
-                    line[3] = line[3].join(',');
+                    arr[i].push(line[2].join(','));
+                    arr[i].push(line[3].join(','));
                 }
             }
-            return arr;
         }
 
 
@@ -131,9 +142,9 @@
 
             this.addSubTerm(toIndex, lineFrom[0], lineFrom[1]);
             if (terms) {
-                lineTo[2].concat(terms);
-                lineTo[3].concat(lineFrom[3]);
-                this.tagsTable.addSubTerms(index, terms);
+                lineTo[2] = lineTo[2].concat(terms);
+                lineTo[3] = lineTo[3].concat(lineFrom[3]);
+                this.tagsTable.addSubTerms(toIndex, terms);
             }
         };
 
@@ -232,7 +243,7 @@
         };
 
 
-        this.splitTags = function (maxTags, minRepeat) {
+        this.splitTags = function (maxTags, minRepeat, reset) {
             var arr = this.tagsArr.concat(this.termsArr),
                 i = 0,
                 n = arr.length,
@@ -247,8 +258,8 @@
 
             this.tagsArr = arr.slice(0, i);
             this.termsArr = arr.slice(i);
-            this.tagsTable.create(this.tagsArr);
-            this.termsTable.create(this.termsArr);
+            this.tagsTable.create(this.tagsArr, reset);
+            this.termsTable.create(this.termsArr, reset);
 
             if (overflow) {
                 var j = i;

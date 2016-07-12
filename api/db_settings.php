@@ -46,7 +46,8 @@ CREATE TABLE IF NOT EXISTS `tags` (
   `syn_count` text NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `tag` (`tag`),
-  INDEX `survey_id` (`survey_id`)
+  INDEX `survey_id` (`survey_id`),
+  INDEX `count` (`count`)
 ) DEFAULT CHARSET=utf8mb4;
 
 
@@ -61,7 +62,8 @@ CREATE TABLE IF NOT EXISTS `terms` (
   `count` int NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `term` (`term`),
-  INDEX `survey_id` (`survey_id`)
+  INDEX `survey_id` (`survey_id`),
+  INDEX `count` (`count`)
 ) DEFAULT CHARSET=utf8mb4;
 
 
