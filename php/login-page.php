@@ -29,7 +29,7 @@
             z-index: 1000;
             box-shadow: 0 0 38px darkred;
             border-radius: 2px;
-            border: 1px dashed darkred;
+            border: 2px dashed darkred;
             padding: 16px;
             display: none;
             color: darkred;
@@ -65,7 +65,7 @@
         hidden.parentNode.submit();
     }
 
-    // check for 3d party cookies are enabeld code
+    // check for 3d party cookies are enabled
     window.addEventListener("message", function (evt) {
         if (evt.data === 'MM:3PCunsupported') {
             document.getElementById('test3dPartyCookies').style.display = 'block';
