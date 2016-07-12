@@ -6,8 +6,10 @@
 
     angular.module('app').controller('dashboard', function ($q, model, surveys) {
         var that = this,
+            surveyId,
             chart = new Chart(document.getElementById('tags-chart')),
-            oldState;
+            oldState,
+            isSaved = true;
 
         model.tagsTable = new Table(document.getElementById('tags-table'));
         model.termsTable = new Table(document.getElementById('terms-table'));
@@ -52,18 +54,21 @@
         
         this.filterTags = function (reset) {
             model.splitTags(this.maxTags, this.minRepeat, reset);
+            isSaved = false;
         };
 
         
         this.loadSurveyById = function (id) {
-            this.navigate('tags');
-            this.surveyId = id;
-            model.getTagsBySurveyId(id).success(function () {
-                model.tagsTable.create(model.tagsArr, true);
-            });
-            model.getTermsBySurveyId(id).success(function () {
-                model.termsTable.create(model.termsArr, true);
-            });
+            if (isSaved || confirm('You have unsaved changes. Do you want to proceed?')) {
+                this.navigate('tags');
+                surveyId = id;
+                model.getTagsBySurveyId(id).success(function () {
+                    model.tagsTable.create(model.tagsArr, true);
+                });
+                model.getTermsBySurveyId(id).success(function () {
+                    model.termsTable.create(model.termsArr, true);
+                });
+            }
         };
 
 
@@ -78,36 +83,43 @@
 
 
         this.uploadFile = function (event) {
-            var file = event.target.files[0];
-            if (file && !file.$error) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    var workbook = XLS.read(e.target.result, {type: 'binary'}),
-                        overview = workbook.Sheets.Overview,
-                        surveyId = surveys.findByGoogleId(overview.A2.w),
-                        msg = 'Survey with this id has already been uploaded. Do you want to overwrite existing one or add as a new survey?';
+            if (!isSaved && confirm('You have unsaved changes. Do you want to proceed?')) {
+                var file = event.target.files[0];
+                if (file && !file.$error) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var workbook = XLS.read(e.target.result, {type: 'binary'}),
+                            overview = workbook.Sheets.Overview,
+                            sId = surveys.findByGoogleId(overview.A2.w),
+                            msg = 'Survey with this id has already been uploaded. Do you want to overwrite existing one or add as a new survey?';
 
-                    if (surveyId !== -1) {
-                        bootstrapConfirm(msg, 'Add as new', 'Overwrite', function (response) {
-                            if (response === 2) {
-                                that.surveyId = surveyId;
-                            }
-                            else {
-                                that.surveyId = undefined;
-                            }
+                        if (sId !== -1) {
+                            bootstrapConfirm(msg, 'Add as new', 'Overwrite', function (response) {
+                                if (response === 2) {
+                                    surveyId = sId;
+                                }
+                                else {
+                                    surveyId = undefined;
+                                }
+                                model.initByExcel(workbook);
+                                stepTwo();
+                            });
+                        }
+                        else {
+                            surveyId = undefined;
                             model.initByExcel(workbook);
                             stepTwo();
-                        });
-                    }
-                    else {
-                        that.surveyId = undefined;
-                        model.initByExcel(workbook);
-                        stepTwo();
-                    }
-                };
+                        }
+                    };
 
-                reader.readAsBinaryString(file);
+                    reader.readAsBinaryString(file);
+                }
             }
+        };
+
+
+        window.onbeforeunload = function () {
+            return !isSaved && 'You have unsaved changes. Do you want to proceed?';
         };
 
 
@@ -127,6 +139,17 @@
 
         this.updateTag = function () {
             model.updateTag.apply(model, arguments);
+        };
+
+
+        this.deleteLine = function (index, isTags) {
+            if (isTags) {
+                model.deleteTag(index);
+            }
+            else {
+                model.deleteTerm(index);
+            }
+            isSaved = false;
         };
 
 
@@ -187,6 +210,7 @@
             else {
                 return false;
             }
+            isSaved = false;
         };
         
         
@@ -201,15 +225,15 @@
         
         
         this.save = function () {
-            //this.sort();
-            if (this.surveyId) {
-                model.overwriteSurvey(this.surveyId).success(function () {
+            isSaved = true;
+            if (surveyId) {
+                model.overwriteSurvey(surveyId).success(function () {
                     that.navigate('chart');
                 });
             }
             else {
                 model.saveNewSurvey().then(function (id) {
-                    that.surveyId = id;
+                    surveyId = id;
                     surveys.addSurvey(model.surveyId, model.surveyData);
                     that.navigate('chart');
                 });
@@ -220,6 +244,11 @@
         this.deleteSurveyById = function (id) {
             if (confirm('Do you really want to delete this survey and all its data?')) {  //todo bootstrap
                 surveys.deleteSurvey(id);
+                if (id === surveyId) {
+                    isSaved = true;
+                    $('tr[ondragover]').remove();
+                    $('#tags-chart').html('');
+                }
             }
         };
 

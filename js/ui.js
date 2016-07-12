@@ -1,6 +1,6 @@
 (function () {
     var modalStart = '<div class="modal fade"><div class=modal-dialog><div class=modal-content><div class=modal-body><button class=close data-dismiss=modal>&times;</button><br>',
-        modalEnd = '</div></div></div></div>';
+        modalEnd = '<br></div></div></div></div>';
 
     window.bootstrapAlert = function (message) {
         $('#modal-placeholder').append(modalStart +
@@ -16,7 +16,7 @@
             btnOne +
             ' &nbsp;</button><button class="btn btn-sm btn-secondary pull-xs-right m-y-1" data-dismiss=modal>&nbsp; ' +
             btnTwo +
-            ' &nbsp;</button><br class="clearfix"><br>' +
+            ' &nbsp;</button><br class="clearfix">' +
             modalEnd);
 
         var modal = $('.modal');

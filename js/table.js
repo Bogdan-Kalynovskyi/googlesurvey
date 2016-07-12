@@ -1,8 +1,8 @@
-function Table (container, reset) {
+function Table (container) {
     var tbody,
         isTags = container.id === 'tags-table';
 
-    this.create = function (tagsArr) {
+    this.create = function (tagsArr, reset) {
         if (tbody && !reset) {
             this.update(tagsArr);
             return;
@@ -11,7 +11,7 @@ function Table (container, reset) {
         tbody = null;
 
         container.innerHTML =   '<table class="table table-striped table-bordered table-hover">' +
-                                '<thead class="thead-default" ondragover="return false"><tr>' +
+                                '<thead class="thead-default" ondragover="return false"><tr><th></th>' +
                                 '<th>' + (isTags ? 'Tag' : 'Term') + '</th>' +
                                 '<th>Repeat</th>' +
                                 '</tr><tr><th colspan=3>' +
@@ -25,6 +25,7 @@ function Table (container, reset) {
 
         assignDragNDrop();
         assignDynamicInput();
+        assignLineDelete();
     };
 
 
@@ -53,7 +54,7 @@ function Table (container, reset) {
                 subTerms = '';
             }
             str +=
-                '<tr ondragover="return false">' +
+                '<tr ondragover="return false"><td></td>' +
                 '<td><span draggable=true>' + line[0] + '</span>' + subTerms + '</td>' +
                 '<td>' + line[1] + '</td></tr>';
         }
@@ -196,6 +197,18 @@ function Table (container, reset) {
     }
 
 
+    function assignLineDelete () {
+        container.addEventListener('click', function (evt) {
+            var target = evt.target.parentNode;
+            if (target.tagName === 'TR' && target.children[0] === evt.target) {
+                var arr = Array.prototype.slice.call(tbody.children),
+                    index = arr.indexOf(target);
+                angular.element(document.body).scope().ctrl.deleteLine(index, isTags);
+            }
+        });
+    }
+
+
     this.update = function (tagsArr) {
         tbody.innerHTML = '';
         this.addRows(tagsArr);
@@ -233,7 +246,7 @@ function Table (container, reset) {
         else {
             $tr.find('span').after('<ul>' + str + '</ul>');
         }
-        tr.children[1].innerHTML = repeat;
+        tr.children[2].innerHTML = repeat;
     };
 
 
@@ -247,9 +260,9 @@ function Table (container, reset) {
 
     this.deleteSubTerm = function (index, pos, repeat) {
         var tr = tbody.children[index],
-            ul = tr.children[0].children[1];
+            ul = tr.children[1].children[1];
         ul.removeChild(ul.children[pos]);
-        tr.children[1].innerHTML = repeat;
+        tr.children[2].innerHTML = repeat;
     };
 
 

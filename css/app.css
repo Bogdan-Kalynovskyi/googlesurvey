@@ -86,6 +86,16 @@ thead th[colspan] {
     font-size: 10px;
 }
 
+tr[ondragover] td:first-child {
+    width: 1rem;
+    margin-left: 1px;
+    cursor: pointer;
+}
+
+tr[ondragover] td:first-child:after {
+    content: 'x';
+}
+
 tbody span:hover,
 tbody li:hover {
     background: #fdfdfd;

@@ -57,7 +57,7 @@
     <div id="surveys" class="nav-body">
         <h6>Surveys</h6>
         <table ng-show="ctrl.surveys" class="table table-striped table-bordered table-hover">
-            <thead class="thead-default" ng-show="ctrl.surveys.length !== 0"><tr>
+            <thead class="thead-default" ng-show="ctrl.surveys"><tr>
                 <th></th><th></th><th>Google ID</th><th>Question</th>
             </tr></thead>
             <tr ng-repeat="(id, survey) in ctrl.surveys">

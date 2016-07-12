@@ -162,7 +162,7 @@
                 sub2 = line[3];
 
             for (var i = 0, n = sub1.length; i < n; i++) {
-                sum += sub2[i]; 
+                sum += +sub2[i];
                 arr.push([sub1[i], sub2[i]]);
             }
             
