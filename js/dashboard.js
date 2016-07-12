@@ -34,7 +34,7 @@
             switch (state) {
                 case 'chart':
                     if (model.tagsArr.length) {
-                        chart.create(model.tagsArr);
+                        chart.create(model.packedTags);
                     }
                     else {
                         alert('Tags loaded already?');
@@ -138,18 +138,7 @@
                     if (from.index !== to.index) {
                         if (to.target !== 'THEAD') {
                             if (from.target === 'SPAN') {
-                                line = model.tagsArr[from.index];
-                                var sum = 0;
-                                if (line[2]) {
-                                    var sub1 = line[2],
-                                        sub2 = line[3];
-                                    for (var i = 0, n = sub1.length; i < n; i++) {
-                                        sum += sub2[i];
-                                        model.addSubTerm(to.index, sub1[i], sub2[i]);
-                                    }
-                                    line.splice(2, 2);
-                                }
-                                model.addSubTerm(to.index, line[0], line[1] - sum);
+                                model.addSubTerms(from.index, to.index);
                                 model.deleteTag(from.index);
                             }
                             else {
@@ -176,7 +165,6 @@
                         line = model.tagsArr[from.index];
                         if (line[2]) {
                             model.addTerms(line);
-                            line.splice(2, 2);
                         }
                         model.deleteTag(from.index);
                     }
@@ -205,13 +193,15 @@
         this.sort = function () {
             model.sort(model.tagsArr);
             model.sort(model.termsArr);
-            model.tagsTable.update(model.tagsArr);
-            model.termsTable.update(model.termsArr);
+            setTimeout(function () {
+                model.tagsTable.update(model.tagsArr);
+                model.termsTable.update(model.termsArr);
+            }, 0);
         };
         
         
         this.save = function () {
-            this.sort();
+            //this.sort();
             if (this.surveyId) {
                 model.overwriteSurvey(this.surveyId).success(function () {
                     that.navigate('chart');

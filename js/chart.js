@@ -22,8 +22,10 @@ function Chart (container) {
 
 
     this.create = function (arr) {
-        arr.unshift(['', 'Tag repeat']);
+        arr = [['', 'Tag repeat']].concat(arr);
+        for (var i = 0, n = arr.length; i < n; i++) {
+            arr[i].splice(2, 2);
+        }
         draw(google.visualization.arrayToDataTable(arr));
-        arr.shift();
     };
 }

@@ -59,7 +59,7 @@
 
 
         function packTags () {
-            var arr = that.tagsArr.concat();
+            var arr = that.packedTags = that.tagsArr.concat();
             for (var i = 0, n = arr.length; i < n; i++) {
                 var line = arr[i];
                 if (line[2]) {
@@ -72,10 +72,11 @@
 
 
         this.saveNewSurvey = function () {
+            packTags();
             return $http.post(api, {
                 survey_google_id: this.surveyData.survey_google_id,
                 question: this.surveyData.question,
-                tagsArr: packTags(),    // todo: probably pack and unpack will be faster // we also have pack in table for that (for unpacking)
+                tagsArr: this.packedTags,    // todo: probably pack and unpack will be faster // we also have pack in table for that (for unpacking)
                 termsArr: this.termsArr
             })
             .then(function (response) {
@@ -89,7 +90,7 @@
             return $http.delete(api + '?surveyId=' + surveyId).success(function () {
                 return $http.put(api, {
                     surveyId: surveyId,
-                    tagsArr: that.tagsArr,
+                    tagsArr: that.packedTags,
                     termsArr: that.termsArr
                 });
             });
@@ -118,8 +119,22 @@
                 line[2].push(name);
                 line[3].push(repeat);
             }
-            line[1] += repeat;
+            line[1] += +repeat;
             this.tagsTable.addSubTerm(index, name, line[1]);
+        };
+
+
+        this.addSubTerms = function (fromIndex, toIndex) {
+            var lineFrom = this.tagsArr[fromIndex],
+                lineTo = this.tagsArr[toIndex],
+                terms = lineFrom[2];
+
+            this.addSubTerm(toIndex, lineFrom[0], lineFrom[1]);
+            if (terms) {
+                lineTo[2].concat(terms);
+                lineTo[3].concat(lineFrom[3]);
+                this.tagsTable.addSubTerms(index, terms);
+            }
         };
 
 

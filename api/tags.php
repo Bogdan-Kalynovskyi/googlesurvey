@@ -35,7 +35,7 @@ catch (Exception $e) {
 function getTags () {
     global $db;
 
-    $query = mysql_query('SELECT tag, count, synonyms, syn_count FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']));
+    $query = mysql_query('SELECT tag, count, synonyms, syn_count FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']).' ORDER BY count DESC');
     $result = array();
     while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
         $rrr = [$row[0], intval($row[1])];
@@ -52,7 +52,7 @@ function getTags () {
 function getTerms () {
     global $db;
 
-    $query = mysql_query('SELECT term, count FROM terms WHERE survey_id = '.$db->b($_GET['surveyId']));
+    $query = mysql_query('SELECT term, count FROM terms WHERE survey_id = '.$db->b($_GET['surveyId']).' ORDER BY count DESC');
     $result = array();
     while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
         $result[] = [$row[0], intval($row[1])];

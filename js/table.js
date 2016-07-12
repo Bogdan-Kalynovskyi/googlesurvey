@@ -238,6 +238,14 @@ function Table (container) {
     };
 
 
+    this.addSubTerms = function (index, arr) {
+        var ul = $(tbody.children[index]).find('ul'),
+            str = arr.join('</li><li draggable=true>');
+        
+        ul.append('<li draggable=true>' + str + '</li>');
+    };
+
+
     this.deleteSubTerm = function (index, pos, repeat) {
         var tr = tbody.children[index],
             ul = tr.children[0].children[1];
