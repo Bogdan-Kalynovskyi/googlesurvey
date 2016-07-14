@@ -127,7 +127,7 @@
 
         this.addTags = function (str) {
             var arr = [];
-            str.toLowerCase().split(/ and | or |\.|,|;|:|\?|!|&+/).forEach(function (el) {
+            str.toLowerCase().split(',').forEach(function (el) {
                 var word = el.trim();
                 if (word.length) {
                     arr.push([word, 0]);
@@ -144,8 +144,8 @@
         };
 
 
-        this.deleteLine = function (index, isTags) {
-            if (isTags) {
+        this.deleteLine = function (index, isTagsTable) {
+            if (isTagsTable) {
                 model.deleteTag(index);
             }
             else {
@@ -155,14 +155,14 @@
         };
 
 
-        this.dragTag = function (from, to) {
+        function calcDrop (from, to) {
             var line;
             
-            if (from.table === 'tags-table') {
-                if (to.table === 'tags-table') {
+            if (from.isTagsTable) {
+                if (to.isTagsTable) {
                     if (from.index !== to.index) {
-                        if (to.target !== 'THEAD') {
-                            if (from.target === 'SPAN') {
+                        if (to.isRow) {
+                            if (!from.isSynonym) {
                                 model.addSubTerms(from.index, to.index);
                                 model.deleteTag(from.index);
                             }
@@ -172,7 +172,7 @@
                             }
                         }
                         else {
-                            if (from.target === 'LI') {
+                            if (from.isSynonym) {
                                 line = model.deleteSubTerm(from.index, from.html);
                                 model.addTag(line);
                             }
@@ -186,7 +186,7 @@
                     }
                 }
                 else {
-                    if (from.target === 'SPAN') {
+                    if (!from.isSynonym) {
                         line = model.tagsArr[from.index];
                         if (line[2]) {
                             model.addTerms(line);
@@ -199,10 +199,10 @@
                     model.addTerm(line);
                 }
             }
-            else if (to.table === 'tags-table') {
+            else if (to.isTagsTable) {
                 line = model.termsArr[from.index];
                 model.deleteTerm(from.index);
-                if (to.target === 'TR') {
+                if (to.isRow) {
                     model.addSubTerm(to.index, line[0], line[1]);
                 }
                 else {
@@ -213,8 +213,31 @@
                 return false;
             }
             isSaved = false;
+        }
+
+
+        this.dragTag = function (from, to) {
+            var table = from.isTagsTable ? model.tagsTable : model.termsTable,
+                selected = table.selectedIndexes(),
+                n = selected.length;
+
+            if (n) {
+                var i = 0,
+                    newFrom = {
+                        isTagsTable: from.isTagsTable,
+                        isSynonym: false
+                    };
+
+                for (; i < n; i++) {
+                    newFrom.index = selected[i] - i;  // because I splice the array
+                    calcDrop(newFrom, to);
+                }
+            }
+            else {
+                calcDrop(from, to);
+            }
         };
-        
+
         
         this.sort = function () {
             model.sort(model.tagsArr);

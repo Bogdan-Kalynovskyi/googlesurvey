@@ -1,6 +1,6 @@
 function Table (container) {
     var tbody,
-        isTags = container.id === 'tags-table';
+        isTagsTable = container.id === 'tags-table';
 
     this.create = function (tagsArr, reset) {
         if (tbody && !reset) {
@@ -11,11 +11,12 @@ function Table (container) {
         tbody = null;
 
         container.innerHTML =   '<table class="table table-striped table-bordered table-hover">' +
-                                '<thead class="thead-default" ondragover="return false"><tr><th></th>' +
-                                '<th>' + (isTags ? 'Tag' : 'Term') + '</th>' +
-                                '<th>Repeat</th>' +
-                                '</tr><tr><th colspan=3>' +
-                                (isTags ? 'Drop on header to create a tag, drop on tag to create synonym' : 'Drop here to remove tag or synonym from use') +
+                                '<thead class="thead-default" ondragover="return false"><tr>' +
+                                '<th><input type=checkbox></th>' +
+                                '<th>' + (isTagsTable ? 'Tag' : 'Term') + '</th>' +
+                                '<th>Repeat</th><th></th>' +
+                                '</tr><tr><th colspan=4>' +
+                                (isTagsTable ? 'Drop on header to create a tag, drop on tag to create synonym' : 'Drop here to exclude tag. You can also check and drag multiple') +
                                 '</th></tr></thead>' +
                                 '<tbody>' +
                                     fillTableBody(tagsArr) +
@@ -23,6 +24,7 @@ function Table (container) {
 
         tbody = container.getElementsByTagName('tbody')[0];
 
+        addMasterCheckbox();
         assignDragNDrop();
         assignDynamicInput();
         assignLineDelete();
@@ -37,7 +39,7 @@ function Table (container) {
                 terms,
                 subTerms;
 
-            if (isTags && (terms = line[2])) {
+            if (isTagsTable && (terms = line[2])) {
                 if (!tbody) {
                     terms = terms.split(',');
                     line[2] = terms;
@@ -54,12 +56,25 @@ function Table (container) {
                 subTerms = '';
             }
             str +=
-                '<tr ondragover="return false"><td></td>' +
+                '<tr ondragover="return false">' +
+                '<td draggable=true><input type=checkbox></td>' +
                 '<td><span draggable=true>' + line[0] + '</span>' + subTerms + '</td>' +
-                '<td>' + line[1] + '</td></tr>';
+                '<td draggable=true>' + line[1] + '</td><td></td></tr>';
         }
 
         return str;
+    }
+
+
+    function addMasterCheckbox () {
+        container.querySelector('thead input').onchange = function () {
+            var checkboxes = tbody.getElementsByTagName('input'),
+                checked = this.checked;
+
+            for (var i = 0, len = checkboxes.length; i < len; i++) {
+                checkboxes[i].checked = checked;
+            }
+        };
     }
 
 
@@ -88,11 +103,13 @@ function Table (container) {
                 return false;
             }
             dt.setData("index", getIndex(target, true));
-            dt.setData("target", target.tagName);
             if (target.tagName === 'LI') {
                 dt.setData("html", target.innerHTML);
             }
-            dt.setData("table", container.id);
+            dt.setData("isSynonym", target.tagName === 'LI' ? '1' : '');
+            dt.setData("isTagsTable", isTagsTable ? '1' : '');
+
+            $(tbody).find('input:checked').css('outline', '3px solid rgba(0, 0, 255, 0.18)');
 
             startElem = $(target).closest('[ondragover]')[0];
         });
@@ -108,14 +125,14 @@ function Table (container) {
                     current = undefined;
                 }
 
-                if ((!startElem || !startElem.contains(target)) && (isTags || !startElem)) {
+                if ((!startElem || !startElem.contains(target)) && (isTagsTable || !startElem)) {
                     target = $(target).closest('[ondragover]')[0];
                     if (target) {
                         current = target;
                         if (target.tagName === 'THEAD') {
                             outline = target.parentNode;
                         }
-                        else if (!isTags) {
+                        else if (!isTagsTable) {
                             outline = target.parentNode.parentNode;
                         }
                         else {
@@ -142,6 +159,7 @@ function Table (container) {
 
         table.addEventListener('dragend', function () {
             startElem = undefined;
+            $(tbody).find('input:checked').css('outline', '');
         });
 
 
@@ -150,14 +168,14 @@ function Table (container) {
                 dt = evt.dataTransfer,
                 from = {
                     index: +dt.getData('index'),
-                    target: dt.getData('target'),
                     html: dt.getData('html'),
-                    table: dt.getData('table')
+                    isSynonym: dt.getData('isSynonym'),
+                    isTagsTable: dt.getData('isTagsTable')
                 },
                 to = {
                     index: target.tagName === 'TR' && getIndex(target),
-                    target: target.tagName,
-                    table: container.id
+                    isRow: target.tagName === 'TR',
+                    isTagsTable: isTagsTable
                 };
 
             if (current) {
@@ -200,13 +218,26 @@ function Table (container) {
     function assignLineDelete () {
         container.addEventListener('click', function (evt) {
             var target = evt.target.parentNode;
-            if (target.tagName === 'TR' && target.children[0] === evt.target) {
+            if (target.tagName === 'TR' && target.children[3] === evt.target) {
                 var arr = Array.prototype.slice.call(tbody.children),
                     index = arr.indexOf(target);
-                angular.element(document.body).scope().ctrl.deleteLine(index, isTags);
+                angular.element(document.body).scope().ctrl.deleteLine(index, isTagsTable);
             }
         });
     }
+
+
+    this.selectedIndexes = function () {
+        var selected = [],
+            checkboxes = tbody.getElementsByTagName('input');
+
+        for (var i = 0, len = checkboxes.length; i < len; i++) {
+            if (checkboxes[i].checked) {
+                selected.push(i);
+            }
+        }
+        return selected;
+    };
 
 
     this.update = function (tagsArr) {

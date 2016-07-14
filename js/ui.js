@@ -4,7 +4,7 @@
 
     window.bootstrapAlert = function (message) {
         $('#modal-placeholder').append(modalStart +
-            message + '<br><button class="btn btn-sm btn-primary center-block m-t-1" data-dismiss=modal> &nbsp; Ok &nbsp; </button>' +
+            message + '<br><button class="btn btn-sm btn-primary center-block m-t-1 p-x-3" data-dismiss=modal>Ok</button>' +
             modalEnd);
         var modal = $('.modal');
         modal.modal('show').find('.btn-primary').focus().click(function () {

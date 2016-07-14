@@ -29,7 +29,7 @@
             z-index: 1000;
             box-shadow: 0 0 38px darkred;
             border-radius: 2px;
-            border: 2px dashed darkred;
+            border: 1px dotted darkred;
             padding: 16px;
             display: none;
             color: darkred;
