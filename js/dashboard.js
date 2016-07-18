@@ -34,8 +34,10 @@
             oldState = state;
 
             if (state === 'chart') {
-                if (model.tagsArr.length) {
-                    chart.create(model.gData);
+                if (model.tagsArr && model.tagsArr.length) {
+                    chart.create(model.tagsArr, surveys.surveys[surveyId]);
+                    var table = new SimpleTable(document.getElementById('chart-table'));
+                    table.create(model.tagsArr);
                 }
                 else {
                     alert('Tags loaded already?');
@@ -60,6 +62,7 @@
             if (isSaved || confirm('You have unsaved changes. Do you want to proceed?')) {
                 this.navigate('tags');
                 surveyId = id;
+                window.total = surveys.surveys[id].total;
                 model.getTagsBySurveyId(id).success(function () {
                     model.tagsTable.create(model.tagsArr, true);
                 });
@@ -245,7 +248,7 @@
             isSaved = true;
             
             if (surveyId) {
-                surveys.updateTotal(total);
+                surveys.updateTotal(surveyId, total);
                 model.overwriteSurvey(surveyId).success(function () {
                     that.navigate('chart');
                 });

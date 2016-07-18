@@ -2,26 +2,32 @@ function Chart (container) {
     var chart;
 
 
-    function draw (tagsGoo) {
-        try {
-            container.style.height = 26.05 * tagsGoo.getNumberOfRows() + 'px';
+    this.create = function (data, survey) {
+        google.charts.setOnLoadCallback(function () {
+            var i = 0,
+                n = data.length,
+                arr = new Array(n + 1);
+
+            for (; i < n; i++) {
+                var line = data[i];
+                arr[i + 1] = [line[0], line[1] / total * 100];
+            }
+
+            arr[0] = ['', 'Tag %'];
+            var gData = google.visualization.arrayToDataTable(arr);
+
+            container.style.height = 26.05 * n + 'px';
             if (!chart) {
                 chart = new google.charts.Bar(container);
             }
-            chart.draw(tagsGoo, {
+            chart.draw(gData, {
                 chart: {},
                 bars: 'horizontal' // Required for Material Bar Charts.
             });
-        }
-        catch (e) {
-            setTimeout(function () {
-                draw(tagsGoo);
-            }, 1000);
-        }
-    }
 
-
-    this.create = function (data) {
-        draw(data);
+            $('#comment-chart').html(
+                '<br>Question: ' + survey.question +
+                '<br><br>Total answers: ' + survey.total)
+        });
     };
 }

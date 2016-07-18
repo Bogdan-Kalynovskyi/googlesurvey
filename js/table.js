@@ -3,8 +3,8 @@ function Table (container) {
         isTagsTable = container.id === 'tags-table';
 
 
-    function toPerc (data) {
-        return (100 * data / total).toFixed(2);
+    function toPerc (repeat) {
+        return (100 * repeat / total).toFixed(2);
     }
 
 
@@ -280,7 +280,7 @@ function Table (container) {
     };
 
 
-    this.addSubTerm = function (index, name, perc, repeat) {
+    this.addSubTerm = function (index, name, repeat) {
         var tr = tbody.children[index],
             $tr = $(tr),
             ul = $tr.find('ul'),
@@ -292,7 +292,7 @@ function Table (container) {
         else {
             $tr.find('span').after('<ul>' + str + '</ul>');
         }
-        tr.children[2].innerHTML = toPerc(perc) + '%';
+        tr.children[2].innerHTML = toPerc(repeat) + '%';
         tr.children[3].innerHTML = repeat;
     };
 
@@ -305,11 +305,11 @@ function Table (container) {
     };
 
 
-    this.deleteSubTerm = function (index, pos, perc, repeat) {
+    this.deleteSubTerm = function (index, pos, repeat) {
         var tr = tbody.children[index],
             ul = tr.children[1].children[1];
         ul.removeChild(ul.children[pos]);
-        tr.children[2].innerHTML = toPerc(perc) + '%';
+        tr.children[2].innerHTML = toPerc(repeat) + '%';
         tr.children[3].innerHTML = repeat;
     };
 

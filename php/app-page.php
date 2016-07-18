@@ -24,6 +24,7 @@
     <script src="js/ui.js"></script>
     <script src="js/config.js"></script>
     <script src="js/table.js"></script>
+    <script src="js/simple-table.js"></script>
     <script src="js/chart.js"></script>
     <script src="js/model.js"></script>
     <script src="js/surveys.js"></script>
@@ -110,6 +111,9 @@
 
     <div id="chart" class="nav-body">
         <div id="tags-chart"></div>
+        <br>
+        <div id="chart-table"></div>
+        <div id="comment-chart"></div>
         <button class="btn btn-sm btn-primary block-center m-t-2 m-l-2 m-b-1" ng-click="ctrl.navigate('tags')">Go to back to tags table</button>
     </div>
 

@@ -65,18 +65,11 @@
             var i = 0,
                 src = that.tagsArr,
                 n = src.length,
-                arr = that.packedTags = new Array(n);
+                arr = new Array(n);
 
             for (; i < n; i++) {
-                arr[i] = src[i].slice(0, 2);
-            }
-
-            arr.unshift(['', 'Tag repeat']);
-            that.gData = google.visualization.arrayToDataTable(arr);
-            arr.shift();
-
-            for (i = 0; i < n; i++) {
                 var line = src[i];
+                arr[i] = line.slice(0, 2);
                 if (line[2]) {
                     arr[i].push(line[2].join(','));
                     arr[i].push(line[3].join(','));
@@ -86,11 +79,10 @@
 
 
         this.saveNewSurvey = function () {
-            packTags();
             return $http.post(api, {
                 survey_google_id: this.surveyData.survey_google_id,
                 question: this.surveyData.question,
-                tagsArr: this.packedTags,    // todo: probably pack and unpack will be faster // we also have pack in table for that (for unpacking)
+                tagsArr: packTags(this.tagsArr),    // todo: probably pack and unpack will be faster // we also have pack in table for that (for unpacking)
                 termsArr: this.termsArr
             })
             .then(function (response) {
@@ -100,11 +92,10 @@
 
 
         this.overwriteSurvey = function (surveyId) {
-            packTags();
             return $http.delete(api + '?surveyId=' + surveyId).success(function () {
                 return $http.put(api, {
                     surveyId: surveyId,
-                    tagsArr: that.packedTags,
+                    tagsArr: packTags(this.tagsArr),
                     termsArr: that.termsArr
                 });
             });

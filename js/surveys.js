@@ -18,7 +18,7 @@
         };
 
 
-        this.updateTotal = function  (id) {
+        this.updateTotal = function  (id, total) {
             return $http.put(api + '?surveyId=' + id, {total: total}).success(function () {
                 that.surveys[id].total = total;
             });
