@@ -222,7 +222,7 @@ function Table (container) {
 
 
     function assignLineDelete () {
-        container.addEventListener('click', function (evt) {
+        container.children[0].addEventListener('click', function (evt) {
             var target = evt.target.parentNode;
             if (target.tagName === 'TR' && target.children[4] === evt.target) {
                 var arr = Array.prototype.slice.call(tbody.children),
@@ -250,7 +250,7 @@ function Table (container) {
         var children = tbody.children;
 
         for (var i = 0, n = children.length; i < n; i++) {
-            children[i][2].innerHTML = toPerc(arr[i][1]) + '%';
+            children[i].children[2].innerHTML = toPerc(arr[i][1]) + '%';
         }
     };
     

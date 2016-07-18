@@ -85,7 +85,7 @@ thead[ondragover] tr:last-child th {
     border-top: 0;
 }
 
-thead th[colspan] {
+thead th[colspan="5"] {
     font-weight: normal;
     font-size: 10px;
 }
