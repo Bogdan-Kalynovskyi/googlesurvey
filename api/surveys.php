@@ -7,9 +7,9 @@ try {
         case 'GET':
             get();
             break;
-//        case 'POST':
-//            create();
-//            break;
+        case 'PUT':
+            updateTotal();
+            break;
         case 'DELETE':
             delete();
             break;
@@ -29,6 +29,14 @@ function get () {
     if ($response) {
         echo json_encode($response);
     }
+}
+
+
+function updateTotal () {
+    global $db;
+
+    $post = json_decode(file_get_contents('php://input'), true);
+    $db->query('UPDATE surveys SET total = '.$db->b($post['total']).' WHERE id = '.$db->b($_GET['surveyId']));
 }
 
 

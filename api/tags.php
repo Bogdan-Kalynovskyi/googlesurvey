@@ -15,9 +15,6 @@ try {
         case 'POST':
             create();
             break;
-        case 'PATCH':
-            update();
-            break;
         case 'PUT':
             append();
             break;

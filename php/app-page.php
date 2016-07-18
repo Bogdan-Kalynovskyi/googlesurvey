@@ -55,18 +55,19 @@
 
     <div id="surveys" class="nav-body">
         <h6>Surveys</h6>
-        <table ng-show="ctrl.surveys" class="table table-striped table-bordered table-hover">
-            <thead class="thead-default" ng-show="ctrl.surveys"><tr>
-                <th></th><th></th><th>Google ID</th><th>Question</th>
+        <table ng-show="!angular.equals({}, ctrl.surveys)" class="table table-striped table-bordered table-hover">
+            <thead class="thead-default"><tr>
+                <th></th><th></th><th>Google ID</th><th>Question</th><th>Answers</th>
             </tr></thead>
             <tr ng-repeat="(id, survey) in ctrl.surveys">
                 <td><a ng-click="ctrl.loadSurveyById(id)">load</a></td>
                 <td><a ng-click="ctrl.deleteSurveyById(id)">delete</a></td>
                 <td ng-bind="survey.survey_google_id"></td>
                 <td ng-bind="survey.question"></td>
+                <td ng-bind="survey.total"></td>
             </tr>
         </table>
-        <b ng-show="!ctrl.surveys">No surveys yet. Please upload a spreadsheet below</b>
+        <b ng-show="angular.equals({}, ctrl.surveys)">No surveys yet. Please upload a spreadsheet below</b>
         <br>
         <hr>
         <br>
@@ -89,7 +90,7 @@
         <div class="row m-t-1">
             <div class="col-xs-3"><small>You can click tag for editing,<br>drag and drop items...</small></div>
             <label class="col-xs-4"><small>Maximum amount of tags:</small> <input ng-model="ctrl.maxTags" type="number"></label>
-            <label class="col-xs-4"><small>Minimum repeat for a tag:</small> <input ng-model="ctrl.minRepeat" type="number"></label>
+            <label class="col-xs-4"><small>Minimum answers for tag:</small> <input ng-model="ctrl.minRepeat" type="number"></label>
             <div class="col-xs-1"> <button class="btn btn-sm btn-primary pull-xs-right" ng-click="ctrl.filterTags()">Filter tags</button></div>
         </div>
         <div class="row m-t-1">

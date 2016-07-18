@@ -6,22 +6,26 @@
             api = 'api/surveys.php';
         
         
-        this.loadSurveys = function () {
+        this.load = function () {
             return $http.get(api).success(function (response) {
-                that.surveys = response;
+                that.surveys = response || {};
             });
         };
 
 
-        this.addSurvey = function  (id, survey) {
-            if (!this.surveys) {
-                this.surveys = {};
-            }
+        this.add = function  (id, survey) {
             this.surveys[id] = survey;
         };
 
 
-        this.deleteSurvey = function  (id) {
+        this.updateTotal = function  (id) {
+            return $http.put(api + '?surveyId=' + id, {total: total}).success(function () {
+                that.surveys[id].total = total;
+            });
+        };
+
+
+        this.delete = function  (id) {
             return $http.delete(api + '?surveyId=' + id).success(function () {
                 delete that.surveys[id];
             });

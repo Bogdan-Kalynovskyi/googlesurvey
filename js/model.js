@@ -35,8 +35,11 @@
 
                 this.surveyData = {
                     survey_google_id: overview.A2.w,
-                    question: overview.C2.w
+                    question: overview.C2.w,
+                    total: overview.E2.w
                 };
+
+                window.total = +overview.E2.w;
             }
             catch (e) {
                 bootstrapAlert('Could not parse answers from Excel file');
@@ -268,7 +271,7 @@
                 } while (j >= 0  && arr[j][1] <= overflow);
 
                 this.tagsTable.makeStripedRows(j, i);
-                bootstrapAlert('The <b>number of filtered tags</b> is greater then <b>' + maxTags + '</b>, because too many tags have repeat count <b>' + overflow + '</b> and less, so I don\'t know what to do with them. Those tags are marked with stripes.');
+                bootstrapAlert('The <b>number of filtered tags</b> is greater then <b>' + maxTags + '</b>, because too many tags have answers count <b>' + overflow + ' and less</b>, so I don\'t know what to do with them. Those tags are marked with stripes.');
             }
         };
         

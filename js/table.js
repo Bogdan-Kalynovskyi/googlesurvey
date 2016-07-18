@@ -2,6 +2,12 @@ function Table (container) {
     var tbody,
         isTagsTable = container.id === 'tags-table';
 
+
+    function toPerc (data) {
+        return (100 * data / total).toFixed(2);
+    }
+
+
     this.create = function (tagsArr, reset) {
         if (tbody && !reset) {
             this.update(tagsArr);
@@ -14,8 +20,8 @@ function Table (container) {
                                 '<thead class="thead-default" ondragover="return false"><tr>' +
                                 '<th><input type=checkbox></th>' +
                                 '<th>' + (isTagsTable ? 'Tag' : 'Term') + '</th>' +
-                                '<th>Repeat</th><th></th>' +
-                                '</tr><tr><th colspan=4>' +
+                                '<th colspan=3>Answers</th>' +
+                                '</tr><tr><th colspan=5>' +
                                 (isTagsTable ? 'Drop on header to create a tag, drop on tag to create synonym' : 'Drop here to exclude tag. You can also check and drag multiple') +
                                 '</th></tr></thead>' +
                                 '<tbody>' +
@@ -59,7 +65,7 @@ function Table (container) {
                 '<tr ondragover="return false">' +
                 '<td draggable=true><input type=checkbox></td>' +
                 '<td><span draggable=true>' + line[0] + '</span>' + subTerms + '</td>' +
-                '<td draggable=true>' + line[1] + '</td><td></td></tr>';
+                '<td draggable=true>' + toPerc(line[1]) + '%</td><td draggable=true>' + line[1] + '</td><td></td></tr>';
         }
 
         return str;
@@ -218,7 +224,7 @@ function Table (container) {
     function assignLineDelete () {
         container.addEventListener('click', function (evt) {
             var target = evt.target.parentNode;
-            if (target.tagName === 'TR' && target.children[3] === evt.target) {
+            if (target.tagName === 'TR' && target.children[4] === evt.target) {
                 var arr = Array.prototype.slice.call(tbody.children),
                     index = arr.indexOf(target);
                 angular.element(document.body).scope().ctrl.deleteLine(index, isTagsTable);
@@ -239,6 +245,15 @@ function Table (container) {
         return selected;
     };
 
+    
+    this.updatePerc = function (arr) {
+        var children = tbody.children;
+
+        for (var i = 0, n = children.length; i < n; i++) {
+            children[i][2].innerHTML = toPerc(arr[i][1]) + '%';
+        }
+    };
+    
 
     this.update = function (tagsArr) {
         tbody.innerHTML = '';
@@ -265,7 +280,7 @@ function Table (container) {
     };
 
 
-    this.addSubTerm = function (index, name, repeat) {
+    this.addSubTerm = function (index, name, perc, repeat) {
         var tr = tbody.children[index],
             $tr = $(tr),
             ul = $tr.find('ul'),
@@ -277,7 +292,8 @@ function Table (container) {
         else {
             $tr.find('span').after('<ul>' + str + '</ul>');
         }
-        tr.children[2].innerHTML = repeat;
+        tr.children[2].innerHTML = toPerc(perc) + '%';
+        tr.children[3].innerHTML = repeat;
     };
 
 
@@ -289,11 +305,12 @@ function Table (container) {
     };
 
 
-    this.deleteSubTerm = function (index, pos, repeat) {
+    this.deleteSubTerm = function (index, pos, perc, repeat) {
         var tr = tbody.children[index],
             ul = tr.children[1].children[1];
         ul.removeChild(ul.children[pos]);
-        tr.children[2].innerHTML = repeat;
+        tr.children[2].innerHTML = toPerc(perc) + '%';
+        tr.children[3].innerHTML = repeat;
     };
 
 
