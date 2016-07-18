@@ -33,15 +33,13 @@
             $('#' + state).show();
             oldState = state;
 
-            switch (state) {
-                case 'chart':
-                    if (model.tagsArr.length) {
-                        chart.create(model.gData);
-                    }
-                    else {
-                        alert('Tags loaded already?');
-                    }
-                    break;
+            if (state === 'chart') {
+                if (model.tagsArr.length) {
+                    chart.create(model.gData);
+                }
+                else {
+                    alert('Tags loaded already?');
+                }
             }
         };
 
@@ -68,16 +66,6 @@
                 model.getTermsBySurveyId(id).success(function () {
                     model.termsTable.create(model.termsArr, true);
                 });
-            }
-        };
-
-
-        this.deleteSurveyById = function (id) {
-            if (confirm('Do you really want to delete this survey and all its data?')) {  //todo bootstrap
-                surveys.deleteSurvey(id);
-                if (id === model.surveyId) {
-                    that.tagsPresent = false;
-                }
             }
         };
 
