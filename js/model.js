@@ -32,14 +32,15 @@
 
                 this.tagsArr = objToArr(tagsObj);
                 this.termsArr = [];
+                var t = +overview.E2.w;
 
                 this.surveyData = {
                     survey_google_id: overview.A2.w,
                     question: overview.C2.w,
-                    total: overview.E2.w
+                    total: t
                 };
 
-                window.total = +overview.E2.w;
+                window.total = t;
             }
             catch (e) {
                 bootstrapAlert('Could not parse answers from Excel file');
@@ -75,6 +76,8 @@
                     arr[i].push(line[3].join(','));
                 }
             }
+
+            return arr;
         }
 
 
@@ -95,7 +98,7 @@
             return $http.delete(api + '?surveyId=' + surveyId).success(function () {
                 return $http.put(api, {
                     surveyId: surveyId,
-                    tagsArr: packTags(this.tagsArr),
+                    tagsArr: packTags(that.tagsArr),
                     termsArr: that.termsArr
                 });
             });
