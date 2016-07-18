@@ -18,9 +18,6 @@ try {
         case 'PUT':
             append();
             break;
-        case 'DELETE':
-            delete();
-            break;
     }
 }
 catch (Exception $e) {
@@ -62,7 +59,7 @@ function create () {
     global $db;
 
     $post = json_decode(file_get_contents('php://input'), true);
-    $surveyId = $db->query('INSERT INTO surveys (survey_google_id, user_google_id, question) VALUES ('.$db->a($post['survey_google_id']).', '.$db->a($_SESSION['userGoogleId']).', '.$db->a($post['question']).')');
+    $surveyId = $db->query('INSERT INTO surveys (survey_google_id, user_google_id, question, total) VALUES ('.$db->a($post['survey_google_id']).', '.$db->a($_SESSION['userGoogleId']).', '.$db->a($post['question'].', '.$db->b($post['total']).')');
     appendTags($post['tagsArr'], $surveyId);
     appendTerms($post['termsArr'], $surveyId);
 
@@ -75,8 +72,13 @@ function append () {
 
     $post = json_decode(file_get_contents('php://input'), true);
     $surveyId = $db->b($post['surveyId']);
+
+    $db->query('DELETE FROM tags WHERE survey_id = '.$surveyId);
+    $db->query('DELETE FROM terms WHERE survey_id = '.$surveyId);
+
     appendTags($post['tagsArr'], $surveyId);
     appendTerms($post['termsArr'], $surveyId);
+    $db->query('UPDATE surveys SET total = '.$db->b($post['total']).' WHERE id = '.$surveyId);
 }
 
 
@@ -110,12 +112,4 @@ function appendTerms ($terms, $surveyId) {
     $str = substr($str, 0, -1);
 
     $db->query('INSERT INTO terms (survey_id, term, count) VALUES '.$str);
-}
-
-
-function delete () {
-    global $db;
-
-    $db->query('DELETE FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']));
-    $db->query('DELETE FROM terms WHERE survey_id = '.$db->b($_GET['surveyId']));
 }

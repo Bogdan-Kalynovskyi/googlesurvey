@@ -248,7 +248,7 @@
             isSaved = true;
             
             if (surveyId) {
-                surveys.updateTotal(surveyId, total);
+                this.surveys[surveyId].total = total;
                 model.overwriteSurvey(surveyId).success(function () {
                     that.navigate('chart');
                 });

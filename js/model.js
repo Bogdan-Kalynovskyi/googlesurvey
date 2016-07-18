@@ -86,7 +86,8 @@
                 survey_google_id: this.surveyData.survey_google_id,
                 question: this.surveyData.question,
                 tagsArr: packTags(this.tagsArr),    // todo: probably pack and unpack will be faster // we also have pack in table for that (for unpacking)
-                termsArr: this.termsArr
+                termsArr: this.termsArr,
+                total: total
             })
             .then(function (response) {
                 return that.surveyId = response.data;
@@ -95,12 +96,11 @@
 
 
         this.overwriteSurvey = function (surveyId) {
-            return $http.delete(api + '?surveyId=' + surveyId).success(function () {
-                return $http.put(api, {
-                    surveyId: surveyId,
-                    tagsArr: packTags(that.tagsArr),
-                    termsArr: that.termsArr
-                });
+            return $http.put(api, {
+                surveyId: surveyId,
+                tagsArr: packTags(that.tagsArr),
+                termsArr: this.termsArr,
+                total: total
             });
         };
 
