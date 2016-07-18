@@ -18,7 +18,7 @@
 
 
         $('.nav-body').hide();
-        surveys.loadSurveys().success(function () {
+        surveys.load().success(function () {
             that.navigate('surveys');
             that.surveys = surveys.surveys;
         });
@@ -134,11 +134,15 @@
 
         this.deleteLine = function (index, isTagsTable) {
             if (isTagsTable) {
+                window.total -= model.tagsArr[index][1];
                 model.deleteTag(index);
             }
             else {
+                window.total -= model.termsArr[index][1];
                 model.deleteTerm(index);
             }
+            model.tagsTable.updatePerc(model.tagsArr);//todo recalc %
+            model.termsTable.updatePerc(model.termsArr);
             isSaved = false;
         };
 
@@ -239,7 +243,9 @@
         
         this.save = function () {
             isSaved = true;
+            
             if (surveyId) {
+                surveys.updateTotal(total);
                 model.overwriteSurvey(surveyId).success(function () {
                     that.navigate('chart');
                 });
@@ -247,7 +253,7 @@
             else {
                 model.saveNewSurvey().then(function (id) {
                     surveyId = id;
-                    surveys.addSurvey(model.surveyId, model.surveyData);
+                    surveys.add(model.surveyId, model.surveyData);
                     that.navigate('chart');
                 });
             }
@@ -256,7 +262,7 @@
 
         this.deleteSurveyById = function (id) {
             if (confirm('Do you really want to delete this survey and all its data?')) {  //todo bootstrap
-                surveys.deleteSurvey(id);
+                surveys.delete(id);
                 if (id === surveyId) {
                     isSaved = true;
                     $('tr[ondragover]').remove();

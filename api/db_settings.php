@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS `surveys` (
   `survey_google_id` varchar(32) NOT NULL,
   `user_google_id` varchar(32) NOT NULL,
   `question` text NOT NULL,
+  `total` int NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `survey_google_id` (`survey_google_id`),
   INDEX `user_google_id` (`user_google_id`)
