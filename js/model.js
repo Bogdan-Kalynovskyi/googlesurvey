@@ -240,15 +240,38 @@
         };
 
 
-        this.splitTags = function (maxTags, reset) {
+        this.splitMax = function (maxTags, reset) {
             var arr = this.tagsArr.concat(this.termsArr);
 
-            this.sort(arr); // !!!!!!!!!!!!!!!!!!!!!!!!!!!
+            maxTags = Math.min(maxTags, arr.length);
+            this.sort(arr);
 
             this.tagsArr = arr.slice(0, maxTags);
             this.termsArr = arr.slice(maxTags);
             this.tagsTable.create(this.tagsArr, reset);
             this.termsTable.create(this.termsArr, reset);
+
+            return this.tagsArr[maxTags - 1][1];
+        };
+
+
+        this.splitMin = function (minRepeat) {
+            var arr = this.tagsArr.concat(this.termsArr),
+                i = 0,
+                n = arr.length;
+
+            this.sort(arr);
+
+            while (i < n && arr[i][1] >= minRepeat) {
+                i++;
+            }
+
+            this.tagsArr = arr.slice(0, i);
+            this.termsArr = arr.slice(i);
+            this.tagsTable.create(this.tagsArr);
+            this.termsTable.create(this.termsArr);
+
+            return i;
         };
         
     });

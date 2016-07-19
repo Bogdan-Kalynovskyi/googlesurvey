@@ -31,7 +31,7 @@
             $('#' + state).show();
             oldState = state;
 
-            if (state !== 'surveys' && !model.tagsArr) {
+            if (state !== 'surveys' && !(model.tagsArr || surveyId)) {
                 alert('Nothing to display, survey not loaded yet');
                 return;
             }
@@ -46,22 +46,29 @@
 
         function stepTwo () {
             that.navigate('tags');
-            that.filterTags(true);
+            that.filterMax(true);
         }
 
         
-        this.filterTags = function (reset) {
-            model.splitTags(this.maxTags, reset);
+        this.filterMax = function (reset) {
+            this.minRepeat = model.splitMax(this.maxTags, reset);
+            save();
+        };
+
+        this.filterMin = function () {
+            this.maxTags = model.splitMin(this.minRepeat);
             save();
         };
 
         
         this.loadSurveyById = function (id) {
-            this.navigate('tags');
             surveyId = id;
+            this.navigate('tags');
             window.total = +surveys.surveys[id].total;
             model.getTagsBySurveyId(id).success(function () {
                 model.tagsTable.create(model.tagsArr, true);
+                that.maxTags = model.tagsArr.length;
+                that.minRepeat = model.tagsArr[that.maxTags - 1][1];
             });
             model.getTermsBySurveyId(id).success(function () {
                 model.termsTable.create(model.termsArr, true);

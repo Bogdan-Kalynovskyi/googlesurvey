@@ -79,14 +79,21 @@
 
     <div id="tags" class="nav-body">
         <div class="row">
-            <div class="col-xs-2">
+            <div class="col-xs-3">
                 <button class="btn btn-sm btn-primary" ng-click="ctrl.sort()">Sort tables</button>
             </div>
-            <label class="col-xs-4"><small>Maximum amount of tags:</small> <input ng-model="ctrl.maxTags" ng-change="ctrl.filterTags()" type="number"></label>
-            <div class="col-xs-6">
+            <div class="col-xs-7">
                 <input ng-model="ctrl.bulkAdd" placeholder="Comma separated tags list" style="width: calc(100% - 90px)">
                 <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk add</button>
             </div>
+        </div>
+        <div class="row m-t-1">
+            <label class="col-xs-5"><small>Maximum amount of tags:</small>
+                <input ng-model="ctrl.maxTags" ng-change="ctrl.filterMax()" ng-model-options='{ debounce: 200 }' type="number">
+            </label>
+            <label class="col-xs-5"><small>Minimum repeat for tag:</small>
+                <input ng-model="ctrl.minRepeat" ng-change="ctrl.filterMin()" ng-model-options='{ debounce: 200 }' type="number">
+            </label>
         </div>
         <div class="row m-t-1">
             <div class="col-sm-6">

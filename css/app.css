@@ -52,7 +52,7 @@ input[ng-model] {
 }
 
 #scroll-tbl {
-    height: calc(100% - 80px);
+    height: calc(100% - 126px);
 }
 
 .overflow {
