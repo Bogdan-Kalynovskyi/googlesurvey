@@ -59,7 +59,7 @@ function create () {
     global $db;
 
     $post = json_decode(file_get_contents('php://input'), true);
-    $surveyId = $db->query('INSERT INTO surveys (survey_google_id, user_google_id, question, total) VALUES ('.$db->a($post['survey_google_id']).', '.$db->a($_SESSION['userGoogleId']).', '.$db->a($post['question'].', '.$db->b($post['total']).')');
+    $surveyId = $db->query('INSERT INTO surveys (survey_google_id, user_google_id, question, total) VALUES ('.$db->a($post['survey_google_id']).', '.$db->a($_SESSION['userGoogleId']).', '.$db->a($post['question']).', '.$db->b($post['total']).')');
     appendTags($post['tagsArr'], $surveyId);
     appendTerms($post['termsArr'], $surveyId);
 

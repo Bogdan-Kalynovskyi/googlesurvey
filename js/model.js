@@ -240,33 +240,15 @@
         };
 
 
-        this.splitTags = function (maxTags, minRepeat, reset) {
-            var arr = this.tagsArr.concat(this.termsArr),
-                i = 0,
-                n = arr.length,
-                overflow = 0;
+        this.splitTags = function (maxTags, reset) {
+            var arr = this.tagsArr.concat(this.termsArr);
 
-            while (i < n && arr[i][1] >= minRepeat) {
-                if (!overflow && i > maxTags) {
-                    overflow = arr[i][1];
-                }
-                i++;
-            }
+            this.sort(arr); // !!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-            this.tagsArr = arr.slice(0, i);
-            this.termsArr = arr.slice(i);
+            this.tagsArr = arr.slice(0, maxTags);
+            this.termsArr = arr.slice(maxTags);
             this.tagsTable.create(this.tagsArr, reset);
             this.termsTable.create(this.termsArr, reset);
-
-            if (overflow) {
-                var j = i;
-                do {
-                    j--;
-                } while (j >= 0  && arr[j][1] <= overflow);
-
-                this.tagsTable.makeStripedRows(j, i);
-                bootstrapAlert('The <b>number of filtered tags</b> is greater then <b>' + maxTags + '</b>, because too many tags have answers count <b>' + overflow + ' and less</b>, so I don\'t know what to do with them. Those tags are marked with stripes.');
-            }
         };
         
     });

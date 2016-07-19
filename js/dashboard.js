@@ -8,13 +8,11 @@
         var that = this,
             surveyId,
             chart = new Chart(document.getElementById('tags-chart')),
-            oldState,
-            isSaved = true;
+            oldState;
 
         model.tagsTable = new Table(document.getElementById('tags-table'));
         model.termsTable = new Table(document.getElementById('terms-table'));
         this.maxTags = 10;
-        this.minRepeat = 3;
 
 
         $('.nav-body').hide();
@@ -33,15 +31,15 @@
             $('#' + state).show();
             oldState = state;
 
+            if (state !== 'surveys' && !model.tagsArr) {
+                alert('Nothing to display, survey not loaded yet');
+                return;
+            }
+
             if (state === 'chart') {
-                if (model.tagsArr && model.tagsArr.length) {
-                    chart.create(model.tagsArr, surveys.surveys[surveyId]);
-                    var table = new SimpleTable(document.getElementById('chart-table'));
-                    table.create(model.tagsArr);
-                }
-                else {
-                    alert('Tags loaded already?');
-                }
+                chart.create(model.tagsArr, surveys.surveys[surveyId]);
+                var table = new SimpleTable(document.getElementById('chart-table'));
+                table.create(model.tagsArr);
             }
         };
 
@@ -53,65 +51,54 @@
 
         
         this.filterTags = function (reset) {
-            model.splitTags(this.maxTags, this.minRepeat, reset);
-            isSaved = false;
+            model.splitTags(this.maxTags, reset);
+            save();
         };
 
         
         this.loadSurveyById = function (id) {
-            if (isSaved || confirm('You have unsaved changes. Do you want to proceed?')) {
-                this.navigate('tags');
-                surveyId = id;
-                window.total = surveys.surveys[id].total;
-                model.getTagsBySurveyId(id).success(function () {
-                    model.tagsTable.create(model.tagsArr, true);
-                });
-                model.getTermsBySurveyId(id).success(function () {
-                    model.termsTable.create(model.termsArr, true);
-                });
-            }
+            this.navigate('tags');
+            surveyId = id;
+            window.total = +surveys.surveys[id].total;
+            model.getTagsBySurveyId(id).success(function () {
+                model.tagsTable.create(model.tagsArr, true);
+            });
+            model.getTermsBySurveyId(id).success(function () {
+                model.termsTable.create(model.termsArr, true);
+            });
         };
 
 
         this.uploadFile = function (event) {
-            if (isSaved || confirm('You have unsaved changes. Do you want to proceed?')) {
-                var file = event.target.files[0];
-                if (file && !file.$error) {
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                        var workbook = XLS.read(e.target.result, {type: 'binary'}),
-                            overview = workbook.Sheets.Overview,
-                            sId = surveys.findByGoogleId(overview.A2.w),
-                            msg = 'Survey with this id has already been uploaded. Do you want to overwrite existing one or add as a new survey?';
+            var file = event.target.files[0];
+            if (file && !file.$error) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var workbook = XLS.read(e.target.result, {type: 'binary'}),
+                        overview = workbook.Sheets.Overview,
+                        sId = surveys.findByGoogleId(overview.A2.w),
+                        msg = 'Survey with this id has already been uploaded. Do you want to overwrite existing one or add as a new survey?';
 
-                        if (sId !== -1) {
-                            bootstrapConfirm(msg, 'Add as new', 'Overwrite', function (response) {
-                                if (response === 2) {
-                                    surveyId = sId;
-                                }
-                                else {
-                                    surveyId = undefined;
-                                }
-                                model.initByExcel(workbook);
-                                stepTwo();
-                            });
-                        }
-                        else {
-                            surveyId = undefined;
+                    if (sId !== -1) {
+                        bootstrapConfirm(msg, 'Add as new', 'Overwrite', function (response) {
+                            if (response === 2) {
+                                surveyId = sId;
+                            }
+                            else {
+                                surveyId = undefined;
+                            }
                             model.initByExcel(workbook);
                             stepTwo();
-                        }
-                    };
+                        });
+                    }
+                    else {
+                        surveyId = undefined;
+                        model.initByExcel(workbook);
+                        stepTwo();
+                    }
+                };
 
-                    reader.readAsBinaryString(file);
-                }
-            }
-        };
-
-
-        window.onbeforeunload = function () {
-            if (!isSaved) {
-                return 'You have unsaved changes. Do you want to proceed?';
+                reader.readAsBinaryString(file);
             }
         };
 
@@ -127,11 +114,13 @@
 
             model.addTags(arr);
             model.tagsTable.update(model.tagsArr);
+            save(); /////////////////////////////
         };
 
 
         this.updateTag = function () {
             model.updateTag.apply(model, arguments);
+            save();//!!!!!!!!!!!!!!!!!!!!!!!
         };
 
 
@@ -144,9 +133,9 @@
                 window.total -= model.termsArr[index][1];
                 model.deleteTerm(index);
             }
-            model.tagsTable.updatePerc(model.tagsArr);//todo recalc %
+            model.tagsTable.updatePerc(model.tagsArr);
             model.termsTable.updatePerc(model.termsArr);
-            isSaved = false;
+            save();
         };
 
 
@@ -207,7 +196,7 @@
             else {
                 return false;
             }
-            isSaved = false;
+            save();
         }
 
 
@@ -243,31 +232,31 @@
             }, 0);
         };
         
-        
-        this.save = function () {
-            isSaved = true;
-            
-            if (surveyId) {
-                this.surveys[surveyId].total = total;
-                model.overwriteSurvey(surveyId).success(function () {
-                    that.navigate('chart');
-                });
-            }
-            else {
-                model.saveNewSurvey().then(function (id) {
-                    surveyId = id;
-                    surveys.add(model.surveyId, model.surveyData);
-                    that.navigate('chart');
-                });
-            }
-        }; 
+
+        var saveTimeout;
+
+        function save () {
+            clearTimeout(saveTimeout);
+
+            saveTimeout = setTimeout(function () {
+                if (surveyId) {
+                    that.surveys[surveyId].total = total;
+                    model.overwriteSurvey(surveyId);
+                }
+                else {
+                    model.saveNewSurvey().then(function (id) {
+                        surveyId = id;
+                        surveys.add(model.surveyId, model.surveyData);
+                    });
+                }
+            }, 1000);
+        }
 
 
         this.deleteSurveyById = function (id) {
             if (confirm('Do you really want to delete this survey and all its data?')) {  //todo bootstrap
                 surveys.delete(id);
                 if (id === surveyId) {
-                    isSaved = true;
                     $('tr[ondragover]').remove();
                     $('#tags-chart').html('');
                 }

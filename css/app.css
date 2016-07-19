@@ -48,11 +48,11 @@ input[ng-model] {
 #surveys,
 #tags,
 #chart {
-    height: calc(100% - 55px);
+    height: calc(100% - 57px);
 }
 
-.tbl-row {
-    height: calc(100% - 128px);
+#scroll-tbl {
+    height: calc(100% - 80px);
 }
 
 .overflow {
