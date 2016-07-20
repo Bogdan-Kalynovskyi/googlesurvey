@@ -79,11 +79,11 @@
 
     <div id="tags" class="nav-body">
         <div class="row">
-            <div class="col-xs-7 col-md-6 col-lg-5">
+            <div class="col-xs-9 col-sm-8 col-md-7 col-lg-5">
                 <input ng-model="ctrl.bulkAdd" placeholder="Comma separated tags list" style="width: calc(100% - 90px)">
                 <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk add</button>
             </div>
-            <div class="col-xs-4">
+            <div class="col-xs-3">
                 <button class="btn btn-sm btn-primary" ng-click="ctrl.sort()">Sort tables</button>
             </div>
         </div>

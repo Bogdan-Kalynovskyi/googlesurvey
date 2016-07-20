@@ -165,7 +165,6 @@ function Table (container) {
 
         table.addEventListener('dragend', function () {
             startElem = undefined;
-            $(tbody).find('input:checked').css('outline', '');
         });
 
 
@@ -193,6 +192,7 @@ function Table (container) {
                 to.target = 'THEAD';
             }
 
+            startElem = undefined;
             angular.element(document.body).scope().ctrl.dragTag(from, to);
         });
     }
