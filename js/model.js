@@ -240,6 +240,23 @@
         };
 
 
+        function unpackTerms () {
+            var terms = that.termsArr;
+            for (var i = 0, n = terms.length; i < n; i++) {
+                if (terms[i][2]) {
+                    var line = terms[i],
+                        name = line[2],
+                        repeat = line[3];
+
+                    for (var j = 0, m = name.length; j < m; j++) {
+                        that.termsArr.push([name[j], repeat[j]]);
+                    }
+                    line.splice(2, 2);
+                }
+            }
+        }
+
+
         this.splitMax = function (maxTags, reset) {
             var arr = this.tagsArr.concat(this.termsArr);
 
@@ -248,6 +265,7 @@
 
             this.tagsArr = arr.slice(0, maxTags);
             this.termsArr = arr.slice(maxTags);
+            unpackTerms();
             this.tagsTable.create(this.tagsArr, reset);
             this.termsTable.create(this.termsArr, reset);
 
@@ -268,6 +286,7 @@
 
             this.tagsArr = arr.slice(0, i);
             this.termsArr = arr.slice(i);
+            unpackTerms();
             this.tagsTable.create(this.tagsArr);
             this.termsTable.create(this.termsArr);
 
