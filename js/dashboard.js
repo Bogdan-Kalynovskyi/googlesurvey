@@ -23,6 +23,11 @@
 
 
         this.navigate = function (state) {
+            if (state !== 'surveys' && !(model.tagsArr || surveyId)) {
+                alert('Nothing to display, survey not loaded yet');
+                return;
+            }
+
             if (oldState) {
                 $('[data-active=' + oldState + ']').removeClass('active');
                 $('#' + oldState).hide();
@@ -30,11 +35,6 @@
             $('[data-active=' + state + ']').addClass('active');
             $('#' + state).show();
             oldState = state;
-
-            if (state !== 'surveys' && !(model.tagsArr || surveyId)) {
-                alert('Nothing to display, survey not loaded yet');
-                return;
-            }
 
             if (state === 'chart') {
                 chart.create(model.tagsArr, surveys.surveys[surveyId]);

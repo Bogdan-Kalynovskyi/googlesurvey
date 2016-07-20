@@ -95,6 +95,13 @@ thead th[colspan="5"] {
     text-align: center;
 }
 
+tbody a {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    cursor: pointer!important;
+}
+
 tr[ondragover] td:last-child {
     width: 1.2rem;
     cursor: pointer;
@@ -113,6 +120,8 @@ tbody li:hover {
     box-shadow: 0 0 5px #888;
     cursor: move;
     cursor: -webkit-grab;
+    cursor: -moz-grab;
+    cursor: grab;
 }
 
 tbody span,
