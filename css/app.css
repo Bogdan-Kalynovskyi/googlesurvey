@@ -113,15 +113,18 @@ tr[ondragover] td:last-child:after {
     color: #A66;
 }
 
+[draggable] {
+    cursor: move;
+    cursor: -webkit-grab;
+    cursor: -moz-grab;
+    cursor: grab;
+}
+
 tbody span:hover,
 tbody li:hover {
     background: #fdfdfd;
     outline: 1px solid #dadada;
     box-shadow: 0 0 5px #888;
-    cursor: move;
-    cursor: -webkit-grab;
-    cursor: -moz-grab;
-    cursor: grab;
 }
 
 tbody span,

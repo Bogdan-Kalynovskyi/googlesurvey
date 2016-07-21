@@ -18,8 +18,14 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
     <script src="lib/xls.min.js"></script>
     <script src="//www.gstatic.com/charts/loader.js"></script>
+    <script src="//apis.google.com/js/platform.js"></script>
     <script>
         xsrfToken = '<?php echo $_SESSION['xsrfToken'] ?>';
+        gapi.load('auth2', function () {
+            gapi.auth2.init({
+                client_id: '211499477101-d78crq8gs6sojr7grdlm9ebmoltiel71.apps.googleusercontent.com'
+            })
+        })
     </script>
     <script src="js/ui.js"></script>
     <script src="js/config.js"></script>
@@ -30,7 +36,7 @@
     <script src="js/surveys.js"></script>
     <script src="js/dashboard.js"></script>
     <script>
-        $('#_loading').remove();
+        $('#_loading').remove()
     </script>
 
     <header>
@@ -46,9 +52,11 @@
         <a href class="logout" onclick="logOut();return false;">Log out</a>
         <script>
             function logOut () {
-                var form = $('<form action=/ method=post><input type=hidden name=logout value=' + xsrfToken + '></form>');
-                $(document.body).append(form);
-                form.submit();
+                gapi.auth2.getAuthInstance().signOut().then(function () {
+                    var form = $('<form action=/ method=post><input type=hidden name=logout value=' + xsrfToken + '></form>');
+                    $(document.body).append(form);
+                    form.submit();
+                })
             }
         </script>
     </header>
@@ -88,10 +96,11 @@
             </div>
         </div>
         <div class="row m-t-1">
-            <label class="col-xs-6 col-sm-5 col-md-4"><small>Maximum amount of tags:</small>
+            <div class="col-xs-2 col-sm-4"><small>Click on tag name to edit it</small></div>
+            <label class="col-xs-5 col-sm-4 col-md-3"><small>Maximum amount of tags:</small>
                 <input ng-model="ctrl.maxTags" ng-change="ctrl.filterMax()" ng-model-options='{ debounce: 200 }' type="number">
             </label>
-            <label class="col-xs-6 col-sm-5 col-md-4"><small>Minimum repeat for tag:</small>
+            <label class="col-xs-5 col-sm-4 col-md-3"><small>Minimum repeat for tag:</small>
                 <input ng-model="ctrl.minRepeat" ng-change="ctrl.filterMin()" ng-model-options='{ debounce: 200 }' type="number">
             </label>
         </div>

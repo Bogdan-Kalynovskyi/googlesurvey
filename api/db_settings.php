@@ -4,6 +4,10 @@ if (!defined('AUTHORISED')) {
 }
 
 
+//@ini_set('session.cookie_lifetime', 1000000000);
+//@ini_set('session.gc_maxlifetime', 1000000000);
+//@ini_set('session.save_path', '../lib');
+
 error_reporting(E_ALL ^ E_DEPRECATED);
 
 

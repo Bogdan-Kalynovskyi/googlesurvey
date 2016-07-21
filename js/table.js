@@ -22,7 +22,7 @@ function Table (container) {
                                 '<th>' + (isTagsTable ? 'Tag' : 'Term') + '</th>' +
                                 '<th colspan=3>Answers</th>' +
                                 '</tr><tr><th colspan=5>' +
-                                (isTagsTable ? 'Drop on header to create a tag, drop on tag to create synonym' : 'Drop here to exclude tag. You can also check and drag multiple') +
+                                (isTagsTable ? 'Drop on header to create a tag, drop on tag to create synonym' : 'Drag here to exclude. You can drag multiple by selecting the checkboxes') +
                                 '</th></tr></thead>' +
                                 '<tbody>' +
                                     fillTableBody(tagsArr) +
