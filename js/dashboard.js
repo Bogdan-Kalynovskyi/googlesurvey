@@ -7,6 +7,7 @@
     angular.module('app').controller('dashboard', function ($q, model, surveys) {
         var that = this,
             surveyId,
+            dupe = false,
             chart = new Chart(document.getElementById('tags-chart')),
             oldState;
 
@@ -47,6 +48,7 @@
         function stepTwo () {
             that.navigate('tags');
             that.filterMax(true);
+            $('#tags-question').html(surveys.surveys[surveyId].question);
         }
 
         
@@ -61,9 +63,10 @@
         };
 
         
-        this.loadSurveyById = function (id) {
+        this.loadSurvey = function (id) {
             surveyId = id;
             this.navigate('tags');
+            $('#tags-question').html(surveys.surveys[surveyId].question);
             window.total = +surveys.surveys[id].total;
             model.getTagsBySurveyId(id).success(function () {
                 model.tagsTable.create(model.tagsArr, true);
@@ -73,6 +76,13 @@
             model.getTermsBySurveyId(id).success(function () {
                 model.termsTable.create(model.termsArr, true);
             });
+        };
+
+
+        this.duplicateSurvey = function (id) {
+            this.loadSurvey(id);
+            model.surveyData = surveys.surveys[id];
+            dupe = true;
         };
 
 
@@ -246,17 +256,18 @@
             clearTimeout(saveTimeout);
 
             saveTimeout = setTimeout(function () {
-                if (surveyId) {
+                if (surveyId && !dupe) {
                     that.surveys[surveyId].total = total;
                     model.overwriteSurvey(surveyId);
                 }
                 else {
+                    dupe = false;
                     model.saveNewSurvey().then(function (id) {
                         surveyId = id;
                         surveys.add(model.surveyId, model.surveyData);
                     });
                 }
-            }, 1000);
+            }, 900);
         }
 
 

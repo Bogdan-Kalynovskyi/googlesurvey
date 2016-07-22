@@ -21,10 +21,13 @@ catch (Exception $e) {
 function get () {
     global $db;
 
-    $response = $db->query('SELECT * FROM surveys WHERE user_google_id = '.$db->a($_SESSION['userGoogleId']), true, true);
+    $response = $db->query('SELECT * FROM surveys WHERE user_google_id = '.$db->a($_SESSION['userGoogleId']).' ORDER BY id', true, true);
 
     if ($response) {
         echo json_encode($response);
+    }
+    else {
+        echo '{}';
     }
 }
 

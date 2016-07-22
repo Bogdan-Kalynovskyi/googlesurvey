@@ -18,6 +18,7 @@ function Table (container) {
 
         container.innerHTML =   '<table class="table table-striped table-bordered table-hover">' +
                                 '<thead class="thead-default" ondragover="return false"><tr>' +
+                                '<th colspan=5><b>' + (isTagsTable ? 'Used tags and synonyms' : 'Unused stuff') + '</b></th></tr><tr>' +
                                 '<th><input type=checkbox></th>' +
                                 '<th>' + (isTagsTable ? 'Tag' : 'Term') + '</th>' +
                                 '<th colspan=3>Answers</th>' +
@@ -85,7 +86,7 @@ function Table (container) {
 
 
     function assignDragNDrop () {
-        var startElem, current, outline,
+        var outline, lastTarget,
             table = container.children[0];
 
         function getIndex (el, findTr) {
@@ -115,26 +116,26 @@ function Table (container) {
             dt.setData("isSynonym", target.tagName === 'LI' ? '1' : '');
             dt.setData("isTagsTable", isTagsTable ? '1' : '');
 
-            $(tbody).find('input:checked').css('outline', '3px solid rgba(0, 0, 255, 0.18)');
+            $(tbody).find('input:checked').css('outline', '4px solid rgba(0, 0, 255, 0.2)');
 
-            startElem = $(target).closest('[ondragover]')[0];
+            Table.startElem = $(target).closest('[ondragover]')[0];
         });
 
 
         table.addEventListener('dragenter', function (evt) {
             var target = evt.target;
 
-            if (!current || !current.contains(target)) {
-                if (current) {
-                    current.style.background = '';
+            if (!lastTarget || !lastTarget.contains(target)) {
+                if (lastTarget) {
+                    outline.style.background = '';
                     outline.style.outline = '';
-                    current = undefined;
+                    lastTarget = undefined;
                 }
 
-                if ((!startElem || !startElem.contains(target)) && (isTagsTable || !startElem)) {
+                if (!Table.startElem.contains(target)) {
                     target = $(target).closest('[ondragover]')[0];
                     if (target) {
-                        current = target;
+                        lastTarget = target;
                         if (target.tagName === 'THEAD') {
                             outline = target.parentNode;
                         }
@@ -143,8 +144,8 @@ function Table (container) {
                         }
                         else {
                             outline = target;
-                            target.style.background = 'rgba(0, 0, 255, 0.12)';
                         }
+                        outline.style.background = 'rgba(0, 0, 255, 0.1)';
                         outline.style.outline = '2px solid blue';
                     }
                 }
@@ -155,16 +156,11 @@ function Table (container) {
 
 
         document.addEventListener('dragenter', function () {
-            if (current) {
-                current.style.background = '';
+            if (lastTarget) {
+                outline.style.background = '';
                 outline.style.outline = '';
-                current = undefined;
+                lastTarget = undefined;
             }
-        });
-
-
-        table.addEventListener('dragend', function () {
-            startElem = undefined;
         });
 
 
@@ -183,8 +179,8 @@ function Table (container) {
                     isTagsTable: isTagsTable
                 };
 
-            if (current) {
-                current.style.background = '';
+            if (lastTarget) {
+                outline.style.background = '';
                 outline.style.outline = '';
             }
 
@@ -192,7 +188,6 @@ function Table (container) {
                 to.target = 'THEAD';
             }
 
-            startElem = undefined;
             angular.element(document.body).scope().ctrl.dragTag(from, to);
         });
     }
@@ -210,7 +205,7 @@ function Table (container) {
                 input.onblur = function () {
                     if (input.value && oldName !== input.value) {
                         var arr = Array.prototype.slice.call(tbody.children),
-                            index = arr.indexOf(target.parentNode.parentNode);
+                            index = arr.indexOf($(target).closest('tr')[0]);
 
                         angular.element(document.body).scope().ctrl.updateTag(container.id, index, target.tagName, input.value, oldName);
                     }
@@ -261,14 +256,14 @@ function Table (container) {
     };
     
     
-    this.makeStripedRows = function (a, b) {
-        var children = tbody.children;
-        
-        for (var i = a; i < b; i++) {
-            children[i].className = 'striped-bg';
-        }    
-    };
-
+    // this.makeStripedRows = function (a, b) {
+    //     var children = tbody.children;
+    //
+    //     for (var i = a; i < b; i++) {
+    //         children[i].className = 'striped-bg';
+    //     }
+    // };
+    //
 
     this.addRow = function (tag) {
         $(tbody).prepend(fillTableBody([tag]));

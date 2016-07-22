@@ -16,7 +16,7 @@ function Chart (container) {
             arr[0] = ['', 'Tag %'];
             var gData = google.visualization.arrayToDataTable(arr);
 
-            container.style.height = 26.05 * n + 'px';
+            container.style.height = 28 * n + 'px';
             if (!chart) {
                 chart = new google.charts.Bar(container);
             }

@@ -40,3 +40,12 @@
         });
     };
 })();
+
+
+function logOut () {
+    gapi.auth2.getAuthInstance().signOut().then(function () {
+        var form = $('<form action=/ method=post><input type=hidden name=logout value=' + xsrfToken + '></form>');
+        $(document.body).append(form);
+        form.submit();
+    })
+}

@@ -8,7 +8,7 @@
         
         this.load = function () {
             return $http.get(api).success(function (response) {
-                that.surveys = response || {};
+                that.surveys = response;
             });
         };
 
@@ -33,6 +33,6 @@
             }
             return -1;
         };
-        
+
     });
 })();

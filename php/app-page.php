@@ -17,7 +17,7 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
     <script src="lib/xls.min.js"></script>
-    <script src="//www.gstatic.com/charts/loader.js"></script>
+    <script src="//gstatic.com/charts/loader.js"></script>
     <script src="//apis.google.com/js/platform.js"></script>
     <script>
         xsrfToken = '<?php echo $_SESSION['xsrfToken'] ?>';
@@ -25,7 +25,8 @@
             gapi.auth2.init({
                 client_id: '211499477101-d78crq8gs6sojr7grdlm9ebmoltiel71.apps.googleusercontent.com'
             })
-        })
+        });
+        $('#_loading').remove()
     </script>
     <script src="js/ui.js"></script>
     <script src="js/config.js"></script>
@@ -35,9 +36,6 @@
     <script src="js/model.js"></script>
     <script src="js/surveys.js"></script>
     <script src="js/dashboard.js"></script>
-    <script>
-        $('#_loading').remove()
-    </script>
 
     <header>
         <button class="btn btn-sm btn-primary" data-active="surveys" ng-click="ctrl.navigate('surveys')">
@@ -50,26 +48,17 @@
             <span class="bullet">3</span> View chart
         </button>
         <a href class="logout" onclick="logOut();return false;">Log out</a>
-        <script>
-            function logOut () {
-                gapi.auth2.getAuthInstance().signOut().then(function () {
-                    var form = $('<form action=/ method=post><input type=hidden name=logout value=' + xsrfToken + '></form>');
-                    $(document.body).append(form);
-                    form.submit();
-                })
-            }
-        </script>
     </header>
 
 
     <div id="surveys" class="nav-body">
-        <h6>Surveys</h6>
         <table ng-show="!angular.equals({}, ctrl.surveys)" class="table table-striped table-bordered table-hover">
             <thead class="thead-default"><tr>
-                <th></th><th></th><th>Google ID</th><th>Question</th><th>Answers</th>
+                <th colspan=3>Survey</th><th>Google ID</th><th>Question</th><th>Answers</th>
             </tr></thead>
             <tr ng-repeat="(id, survey) in ctrl.surveys">
-                <td><a ng-click="ctrl.loadSurveyById(id)">load</a></td>
+                <td><a ng-click="ctrl.loadSurvey(id)">&nbsp;edit&nbsp;</a></td>
+                <td><a ng-click="ctrl.duplicateSurvey(id)">duplicate & edit</a></td>
                 <td><a ng-click="ctrl.deleteSurveyById(id)">delete</a></td>
                 <td ng-bind="survey.survey_google_id"></td>
                 <td ng-bind="survey.question"></td>
@@ -86,6 +75,7 @@
 
 
     <div id="tags" class="nav-body">
+        <div id="tags-question"></div>
         <div class="row">
             <div class="col-xs-9 col-sm-8 col-md-7 col-lg-5">
                 <input ng-model="ctrl.bulkAdd" placeholder="Comma separated tags list" style="width: calc(100% - 90px)">
@@ -96,21 +86,13 @@
             </div>
         </div>
         <div class="row m-t-1">
-            <div class="col-xs-2 col-sm-4"><small>Click on tag name to edit it</small></div>
-            <label class="col-xs-5 col-sm-4 col-md-3"><small>Maximum amount of tags:</small>
-                <input ng-model="ctrl.maxTags" ng-change="ctrl.filterMax()" ng-model-options='{ debounce: 200 }' type="number">
+            <!--<div class="col-xs-2"><small style="line-height:33px;">Click on tag name to edit</small></div>-->
+            <label class="col-xs-6 col-sm-5 col-md-4"><small>Maximum number of tags:</small>
+                <input ng-model="ctrl.maxTags" ng-change="ctrl.filterMax()" ng-model-options='{ debounce: 110 }' type="number">
             </label>
-            <label class="col-xs-5 col-sm-4 col-md-3"><small>Minimum repeat for tag:</small>
-                <input ng-model="ctrl.minRepeat" ng-change="ctrl.filterMin()" ng-model-options='{ debounce: 200 }' type="number">
+            <label class="col-xs-6 col-sm-5 col-md-4"><small>Minimum repeat for tag:</small>
+                <input ng-model="ctrl.minRepeat" ng-change="ctrl.filterMin()" ng-model-options='{ debounce: 110 }' type="number">
             </label>
-        </div>
-        <div class="row m-t-1">
-            <div class="col-sm-6">
-                <h6>Used tags and synonyms</h6>
-            </div>
-            <div class="col-sm-6">
-                <h6>Unused stuff</h6>
-            </div>
         </div>
         <div class="row" id="scroll-tbl">
             <div class="col-sm-6 overflow" id="tags-table"></div>
@@ -124,9 +106,8 @@
         <br>
         <div id="chart-table"></div>
         <div id="comment-chart"></div>
-        <button class="btn btn-sm btn-primary block-center m-t-2 m-l-2 m-b-1" ng-click="ctrl.navigate('tags')">Go to back to tags table</button>
+        <button class="btn btn-sm btn-primary block-center m-t-2 m-l-2 m-b-1 p-x" ng-click="ctrl.navigate('tags')">Back to tables</button>
     </div>
-
 
 
     <div id="modal-placeholder"></div>
