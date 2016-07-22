@@ -6,12 +6,12 @@
 // compare header with xsrf token to cookie-based session
 
     session_start();
-    if (isset($_SERVER['HTTP_AUTHORIZATION']) && $_SERVER['HTTP_AUTHORIZATION'] === $_SESSION['xsrfToken']) {
+    if (isset($_SERVER['HTTP_AUTHORIZATION']) && isset($_SESSION['xsrfToken']) && $_SERVER['HTTP_AUTHORIZATION'] === $_SESSION['xsrfToken']) {
         define('AUTHORISED', true);
     }
     else {
         header("HTTP/1.0 401 Unauthorized", true, 401);
-        echo 'Our fuckup! Somebody restarted PHP so your session vanished. Please reload the page to log in again.';
+        echo 'Oh no! Somebody restarted our server or you logged out from other browser tab. Please reload the page to start again.';
         die;
     }
 

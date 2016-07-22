@@ -218,10 +218,10 @@ function Table (container) {
 
     function assignLineDelete () {
         container.children[0].addEventListener('click', function (evt) {
-            var target = evt.target.parentNode;
-            if (target.tagName === 'TR' && target.children[4] === evt.target) {
+            var tr = evt.target.parentNode;
+            if (tr.tagName === 'TR' && tr.children[4] === evt.target) {
                 var arr = Array.prototype.slice.call(tbody.children),
-                    index = arr.indexOf(target);
+                    index = arr.indexOf(tr);
                 angular.element(document.body).scope().ctrl.deleteLine(index, isTagsTable);
             }
         });

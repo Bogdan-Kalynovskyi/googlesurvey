@@ -1,7 +1,5 @@
-(function () {
-    "use strict";
 
-    angular.module('app').service('model', function ($http) {
+    app.service('model', ['$http', function ($http) {
         var that = this,
             api = 'api/tags.php';
 
@@ -293,5 +291,4 @@
             return i;
         };
         
-    });
-})();
+    }]);

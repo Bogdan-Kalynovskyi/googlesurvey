@@ -18,24 +18,19 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
     <script src="lib/xls.min.js"></script>
     <script src="//gstatic.com/charts/loader.js"></script>
-    <script src="//apis.google.com/js/platform.js"></script>
+    <script src="//apis.google.com/js/auth2:signin2.js?onload=googleAPILoaded"></script>
     <script>
         xsrfToken = '<?php echo $_SESSION['xsrfToken'] ?>';
-        gapi.load('auth2', function () {
-            gapi.auth2.init({
-                client_id: '211499477101-d78crq8gs6sojr7grdlm9ebmoltiel71.apps.googleusercontent.com'
-            })
-        });
         $('#_loading').remove()
     </script>
-    <script src="js/ui.js"></script>
-    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/dashboard.js"></script>
     <script src="js/table.js"></script>
     <script src="js/simple-table.js"></script>
-    <script src="js/chart.js"></script>
     <script src="js/model.js"></script>
     <script src="js/surveys.js"></script>
-    <script src="js/dashboard.js"></script>
+    <script src="js/ui.js"></script>
 
     <header>
         <button class="btn btn-sm btn-primary" data-active="surveys" ng-click="ctrl.navigate('surveys')">

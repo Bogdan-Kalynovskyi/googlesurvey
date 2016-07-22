@@ -1,10 +1,8 @@
-(function () {
-    'use strict';
 
     google.charts.load('current', {'packages': ['bar']});
 
 
-    angular.module('app').controller('dashboard', function ($q, model, surveys) {
+    app.controller('dashboard', ['model', 'surveys', function (model, surveys) {
         var that = this,
             surveyId,
             dupe = false,
@@ -281,5 +279,4 @@
             }
         };
 
-    });
-})();
+    }]);

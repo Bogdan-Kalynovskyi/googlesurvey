@@ -7,7 +7,8 @@ var uglify = require('gulp-uglify');
 var jsFiles = 'js/*.js',
     jsDest = '';
 
-gulp.task('scripts', function() {
+
+gulp.task('default', function() {
     return gulp.src(jsFiles)
         .pipe(concat('app.min.js'))
         .pipe(uglify())

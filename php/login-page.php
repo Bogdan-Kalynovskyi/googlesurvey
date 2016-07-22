@@ -6,19 +6,32 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>Sign in using Google account</title>
     <meta name="google-signin-client_id" content="211499477101-d78crq8gs6sojr7grdlm9ebmoltiel71.apps.googleusercontent.com">
-    <link rel=stylesheet href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
     <script src="//apis.google.com/js/platform.js" async defer></script>
     <style>
         body {
-            height: 100%;;
+            font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #373a3c;
         }
+        h5 {
+             font-size: 1.25rem;
+             margin-bottom: .5rem;
+             font-weight: 500;
+             line-height: 1.1;
+             margin-top: 0;
+         }
         .center {
             position: absolute;
-            max-width: 320px;
+            width: 440px;
             left: 50%;
             top: 50%;
-            margin-left: -160px;
-            transform: translateY(-50%);
+            margin-left: -220px;
+            margin-top: -100px;
+        }
+        .col-half {
+            float: left;
+            width: 220px;
         }
         #test3dPartyCookies {
             position: absolute;
@@ -46,9 +59,9 @@
 </head>
 
 <body>
-<div class="row center">
-    <div class="col-sm-3">Logo</div>
-    <div class="col-sm-9">
+<div class="center">
+    <div class="col-half">Logo</div>
+    <div class="col-half">
         <h5>Sign in using your Google account</h5><br>
         <div class="g-signin2" data-onsuccess="onSignIn"></div>
     </div>
@@ -60,9 +73,9 @@
 
 <script>
     function onSignIn (googleUser) {
-        var hidden = document.getElementsByName('authGoogleToken')[0];
-        hidden.value = googleUser.getAuthResponse().id_token;
-        hidden.parentNode.submit();
+        var h = document.getElementsByName('authGoogleToken')[0];
+        h.value = googleUser.getAuthResponse().id_token;
+        h.parentNode.submit();
     }
 
     // check for 3d party cookies are enabled
@@ -89,5 +102,6 @@
 <script>
     google.charts.load('current', {'packages': ['bar']});
 </script>
+<link rel=stylesheet href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
 </body>
 </html>

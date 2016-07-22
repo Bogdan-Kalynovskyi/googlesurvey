@@ -1,7 +1,6 @@
-(function () {
     "use strict";
 
-    angular.module('app', []).config(function ($httpProvider) {
+    var app = angular.module('app', []).config(['$httpProvider', function ($httpProvider) {
         var allowAlert = true,
             ua = navigator.userAgent,
             IEVersion = ua.indexOf("MSIE ");
@@ -36,7 +35,7 @@
         $httpProvider.defaults.headers.common.Authorization = xsrfToken;
 
 
-        $httpProvider.interceptors.push(function ($q, $injector) {
+        $httpProvider.interceptors.push(['$q', '$injector', function ($q, $injector) {
             var retries = 0;
 
             function retryRequest (httpConfig, status) {
@@ -91,12 +90,12 @@
                     return $q.reject(response);
                 }
             };
-        });
-    });
+        }]);
+    }]);
 
 
 
-    angular.module('app').directive('customOnChange', function() {
+    app.directive('customOnChange', function() {
         return {
             restrict: 'A',
             link: function (scope, element, attrs) {
@@ -105,6 +104,3 @@
             }
         };
     });
-
-    
-})();

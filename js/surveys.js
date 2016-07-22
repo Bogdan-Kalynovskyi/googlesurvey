@@ -1,7 +1,5 @@
-(function () {
-    'use strict';
 
-    angular.module('app').service('surveys', function ($http) {
+    app.service('surveys', ['$http', function ($http) {
         var that = this,
             api = 'api/surveys.php';
         
@@ -34,5 +32,4 @@
             return -1;
         };
 
-    });
-})();
+    }]);
