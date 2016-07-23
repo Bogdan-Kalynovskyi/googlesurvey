@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>Google surveys</title>
-    <meta name="google-signin-client_id" content="211499477101-d78crq8gs6sojr7grdlm9ebmoltiel71.apps.googleusercontent.com">
+    <meta name="google-signin-client_id" content="<?php echo $google_API_id ?>">
 </head>
 
 <body ng-controller="dashboard as ctrl">
@@ -18,19 +18,19 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
     <script src="lib/xls.min.js"></script>
     <script src="//gstatic.com/charts/loader.js"></script>
-    <script src="//apis.google.com/js/auth2:signin2.js?onload=googleAPILoaded"></script>
+    <script src="//apis.google.com/js/platform.js"></script>
     <script>
         xsrfToken = '<?php echo $_SESSION['xsrfToken'] ?>';
-        $('#_loading').remove()
+
+        $('#_loading').remove();
+
+        gapi.load('auth2', function () {
+            gapi.auth2.init({
+                client_id: '<?php echo $google_API_id ?>'
+            })
+        });
     </script>
-    <script src="js/app.js"></script>
-    <script src="js/chart.js"></script>
-    <script src="js/dashboard.js"></script>
-    <script src="js/table.js"></script>
-    <script src="js/simple-table.js"></script>
-    <script src="js/model.js"></script>
-    <script src="js/surveys.js"></script>
-    <script src="js/ui.js"></script>
+    <script src="app.min.js"></script>
 
     <header>
         <button class="btn btn-sm btn-primary" data-active="surveys" ng-click="ctrl.navigate('surveys')">
@@ -49,10 +49,10 @@
     <div id="surveys" class="nav-body">
         <table ng-show="!angular.equals({}, ctrl.surveys)" class="table table-striped table-bordered table-hover">
             <thead class="thead-default"><tr>
-                <th colspan=3>Survey</th><th>Google ID</th><th>Question</th><th>Answers</th>
+                <th colspan=3>&nbsp; Survey</th><th>Google ID</th><th>Question</th><th>Answers</th>
             </tr></thead>
             <tr ng-repeat="(id, survey) in ctrl.surveys">
-                <td><a ng-click="ctrl.loadSurvey(id)">&nbsp;edit&nbsp;</a></td>
+                <td><a ng-click="ctrl.loadSurvey(id)" class="p-x-1">edit</a></td>
                 <td><a ng-click="ctrl.duplicateSurvey(id)">duplicate & edit</a></td>
                 <td><a ng-click="ctrl.deleteSurveyById(id)">delete</a></td>
                 <td ng-bind="survey.survey_google_id"></td>

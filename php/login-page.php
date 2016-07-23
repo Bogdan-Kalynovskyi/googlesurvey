@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>Sign in using Google account</title>
-    <meta name="google-signin-client_id" content="211499477101-d78crq8gs6sojr7grdlm9ebmoltiel71.apps.googleusercontent.com">
+    <meta name="google-signin-client_id" content="<?php echo $google_API_id ?>">
     <script src="//apis.google.com/js/platform.js" async defer></script>
     <style>
         body {
@@ -27,7 +27,7 @@
             left: 50%;
             top: 50%;
             margin-left: -220px;
-            margin-top: -100px;
+            margin-top: -110px;
         }
         .col-half {
             float: left;

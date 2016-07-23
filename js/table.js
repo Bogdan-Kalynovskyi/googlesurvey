@@ -211,6 +211,11 @@ function Table (container) {
                     }
                     target.innerHTML = input.value;
                 };
+                input.onkeyup = function (e) {
+                    if (e.keyCode == 13 || e.keyCode == 27) {
+                        this.blur();
+                    }
+                };
             }
         });
     }

@@ -42,11 +42,6 @@
 })();
 
 
-function googleAPILoaded () {
-    gapi.auth2.init();
-}
-
-
 function logOut () {
     gapi.auth2.getAuthInstance().signOut().then(function () {
         var form = $('<form action=/ method=post><input type=hidden name=logout value=' + xsrfToken + '></form>');

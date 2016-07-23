@@ -53,7 +53,7 @@ input[ng-model] {
 }
 
 #scroll-tbl {
-    height: calc(100% - 115px);
+    height: calc(100% - 112px);
 }
 
 .overflow {
@@ -132,7 +132,7 @@ tbody li:hover {
 }
 
 tbody tr:hover {
-    background: #fafafd!important;
+    background: #f8f8ff!important;
     /*outline: 1px solid white; todo gradient bg */
 }
 
@@ -158,4 +158,16 @@ tbody ul {
 
 .modal .close {
     margin-top: -9px;
+}
+
+::-webkit-input-placeholder {
+    color: #bbb;
+}
+
+::-moz-placeholder {
+    color: #bbb;
+}
+
+:-ms-input-placeholder {
+    color: #bbb;
 }
