@@ -2,16 +2,26 @@
     var modalStart = '<div class="modal fade"><div class=modal-dialog><div class=modal-content><div class=modal-body><button class=close data-dismiss=modal>&times;</button><br>',
         modalEnd = '</div></div></div></div>';
 
+
+    function open (modal) {
+        modal.addClass('in');
+        //todo 13 27
+        modal.find('button').on('click', function () {
+            modal.removeClass('in');
+            setTimeout(function () {
+                modal.remove();
+            }, 300);
+        });
+    }
+
+
     window.bootstrapAlert = function (message) {
         $('#modal-placeholder').append(modalStart +
             message + '<br><button class="btn btn-sm btn-primary center-block m-t-1 p-x-3" data-dismiss=modal>Ok</button>' +
             modalEnd);
         var modal = $('.modal');
-        modal.modal('show').find('.btn-primary').focus().click(function () {
-            setTimeout(function () {
-                modal.remove();
-            }, 300);
-        });
+        open(modal);
+        modal.find('.btn-primary').focus();
     };
 
 
@@ -25,27 +35,30 @@
             modalEnd);
 
         var modal = $('.modal');
-        modal.modal('show');
+        open(modal);
         modal.find('.btn-primary').on('click', function () {
             callback(1);
-            setTimeout(function () {
-                modal.remove();
-            }, 300);
         }).focus();
         modal.find('.btn-secondary').on('click', function () {
             callback(2);
-            setTimeout(function () {
-                modal.remove();
-            }, 300);
         });
     };
 })();
 
 
-function logOut () {
-    gapi.auth2.getAuthInstance().signOut().then(function () {
-        var form = $('<form action=/ method=post><input type=hidden name=logout value=' + xsrfToken + '></form>');
-        $(document.body).append(form);
-        form.submit();
-    })
+
+
+function alreadyLoggedIn () {
+    $('#logged-out').hide();
+    var root = $('#logged-in').show();
+    angular.bootstrap(root[0], ['app']);
+}
+
+
+$('#loading').remove();
+if (window.googleUser) {
+    logIn(googleUser);
+}
+if (window.xsrfToken) {
+    alreadyLoggedIn();
 }

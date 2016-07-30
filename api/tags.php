@@ -1,5 +1,7 @@
 <?php
-include_once 'auth.php';
+include 'auth.php';
+
+include 'db_mysql.php';
 
 
 try {

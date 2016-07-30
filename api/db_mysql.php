@@ -39,7 +39,7 @@ class bDb {
 
         $this->result = mysql_query($query_str, $this->link);
         
-        return @mysql_result($this->result, 0, 0); // or trigger_error(var_dump...);
+        return mysql_result($this->result, 0, 0); // or trigger_error(var_dump...);
     }
 
 
@@ -103,7 +103,5 @@ class bDb {
 
 } // End class
 
-
-include "db_settings.php";
 
 $db = new bDb($db_host, $db_user, $db_pass, $db_name, $db_charset);

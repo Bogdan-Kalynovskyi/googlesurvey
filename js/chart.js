@@ -26,8 +26,8 @@ function Chart (container) {
             });
 
             $('#comment-chart').html(
-                '<br>Question: ' + survey.question +
-                '<br><br>Total answers: ' + survey.total)
+                '<br>Question: <b>' + survey.question +
+                '</b><br><br><b>Total answers: ' + survey.total)
         });
     };
 }

@@ -1,14 +1,13 @@
 <?php
-if (!defined('AUTHORISED')) {
-    die();
-}
-
-
-//@ini_set('session.cookie_lifetime', 1000000000);
-//@ini_set('session.gc_maxlifetime', 1000000000);
-//@ini_set('session.save_path', '../lib');
 
 error_reporting(E_ALL ^ E_DEPRECATED);
+
+/***************************************************************
+**    TODO: uncoment following line in production version!    **/
+//    error_reporting(0);
+
+
+$google_api_id = '211499477101-d78crq8gs6sojr7grdlm9ebmoltiel71.apps.googleusercontent.com';
 
 
 $db_host = '127.0.0.1';
@@ -18,7 +17,23 @@ $db_name = 'surveydata';
 $db_charset = 'utf8';
 
 
-// SQL TO CREATE REQUIRED TABLES
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// APPENDIX:  SQL TO CREATE REQUIRED TABLES
 
 /*
 

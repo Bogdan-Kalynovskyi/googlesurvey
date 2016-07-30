@@ -1,9 +1,9 @@
-html {
+html, body {
     height: 100%;
     overflow-x: hidden;
 }
 
-body {
+#logged-in {
     line-height: 1;
     height: 100%;
     overflow-x: hidden;
@@ -27,13 +27,27 @@ header {
     background: white;
     color: #0275d8;
     margin-right: 9px;
+    box-shadow: 0 0 1px rgba(255, 255, 255, .2);
+}
+
+.active {
+    box-shadow: 0 0 4px #014682;
+}
+
+.active .bullet {
+    background: #ffffcc;
 }
 
 big {
+    color: #676767;
     margin: 0 1px;
     font-size: 30px;
     line-height: 37px;
     vertical-align: bottom;
+}
+
+.button.active {
+    background: red;
 }
 
 .logout {
@@ -112,8 +126,8 @@ tbody a {
 }
 
 #tags tr td:last-child:after {
-    content: 'x';
-    margin-left: 3px;
+    content: '×';
+    margin-left: 2px;
     color: #C66;
 }
 

@@ -1,5 +1,7 @@
 function Table (container) {
     var tbody,
+        masterCheckbox,
+        root = document.getElementById('logged-in'),
         isTagsTable = container.id === 'tags-table';
 
 
@@ -74,7 +76,8 @@ function Table (container) {
 
 
     function addMasterCheckbox () {
-        container.querySelector('thead input').onchange = function () {
+        masterCheckbox = container.querySelector('thead input');
+        masterCheckbox.onchange = function () {
             var checkboxes = tbody.getElementsByTagName('input'),
                 checked = this.checked;
 
@@ -188,7 +191,7 @@ function Table (container) {
                 to.target = 'THEAD';
             }
 
-            angular.element(document.body).scope().ctrl.dragTag(from, to);
+            angular.element(root).scope().ctrl.dragTag(from, to);
         });
     }
 
@@ -207,7 +210,7 @@ function Table (container) {
                         var arr = Array.prototype.slice.call(tbody.children),
                             index = arr.indexOf($(target).closest('tr')[0]);
 
-                        angular.element(document.body).scope().ctrl.updateTag(container.id, index, target.tagName, input.value, oldName);
+                        angular.element(root).scope().ctrl.updateTag(container.id, index, target.tagName, input.value, oldName);
                     }
                     target.innerHTML = input.value;
                 };
@@ -227,7 +230,7 @@ function Table (container) {
             if (tr.tagName === 'TR' && tr.children[4] === evt.target) {
                 var arr = Array.prototype.slice.call(tbody.children),
                     index = arr.indexOf(tr);
-                angular.element(document.body).scope().ctrl.deleteLine(index, isTagsTable);
+                angular.element(root).scope().ctrl.deleteLine(index, isTagsTable);
             }
         });
     }
@@ -245,6 +248,20 @@ function Table (container) {
         return selected;
     };
 
+
+    this.filter = function (arr, word) {
+        if (word) {
+            var children = tbody.children;
+
+            for (var i = 0, n = arr.length; i < n; i++) {
+                children[i].style.display = (arr[i][0].indexOf(word) === -1) ? 'table-row' : 'none';
+                children[i].children[0].children[0].checked = false;
+            }
+
+            masterCheckbox.checked = false;
+        }
+    };
+
     
     this.updatePerc = function (arr) {
         var children = tbody.children;
@@ -260,15 +277,6 @@ function Table (container) {
         this.addRows(tagsArr);
     };
     
-    
-    // this.makeStripedRows = function (a, b) {
-    //     var children = tbody.children;
-    //
-    //     for (var i = a; i < b; i++) {
-    //         children[i].className = 'striped-bg';
-    //     }
-    // };
-    //
 
     this.addRow = function (tag) {
         $(tbody).prepend(fillTableBody([tag]));

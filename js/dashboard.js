@@ -1,8 +1,8 @@
 
-    google.charts.load('current', {'packages': ['bar']});
+    //google.charts.load('current', {'packages': ['bar']});
 
 
-    app.controller('dashboard', ['model', 'surveys', function (model, surveys) {
+    app.controller('dashboard', ['model', 'surveys', '$rootScope', '$q', function (model, surveys, $rootScope, $q) {
         var that = this,
             surveyId,
             dupe = false,
@@ -129,13 +129,13 @@
 
             model.addTags(arr);
             model.tagsTable.update(model.tagsArr);
-            save(); /////////////////////////////
+            save();
         };
 
 
         this.updateTag = function () {
             model.updateTag.apply(model, arguments);
-            save();//!!!!!!!!!!!!!!!!!!!!!!!
+            save();
         };
 
 
@@ -221,14 +221,13 @@
                 n = selected.length;
 
             if (n) {
-                var i = 0,
-                    newFrom = {
+                var newFrom = {
                         isTagsTable: from.isTagsTable,
                         isSynonym: false
                     };
 
-                for (; i < n; i++) {
-                    newFrom.index = selected[i] - i;  // because I splice the array
+                while (n--) {
+                    newFrom.index = selected[n];
                     calcDrop(newFrom, to);
                 }
             }
@@ -245,6 +244,11 @@
                 model.tagsTable.update(model.tagsArr);
                 model.termsTable.update(model.termsArr);
             }, 0);
+        };
+
+
+        this.filterTerms = function () {
+            model.filterTerms(this.filterTerm);
         };
         
 
@@ -279,4 +283,10 @@
             }
         };
 
+
+        this.logOut = function () {
+            $q.all([model.logOut(), gapi.auth2.getAuthInstance().signOut()]).then(function () {
+                location.reload();
+            });
+        }
     }]);

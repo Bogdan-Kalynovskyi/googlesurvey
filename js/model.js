@@ -290,5 +290,17 @@
 
             return i;
         };
+
+
+        this.filterTerms = function (word) {
+            this.termsTable.filter(this.termsArr, word);
+        };
+
+
+        this.logOut = function () {
+            return $http.post('api/login.php', {
+                logout: xsrfToken
+            });
+        }
         
     }]);
