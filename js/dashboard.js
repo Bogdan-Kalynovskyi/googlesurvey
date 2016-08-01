@@ -1,5 +1,5 @@
 
-    //google.charts.load('current', {'packages': ['bar']});
+    google.charts.load('44', {'packages': ['bar']});
 
 
     app.controller('dashboard', ['model', 'surveys', '$rootScope', '$q', function (model, surveys, $rootScope, $q) {
@@ -271,6 +271,34 @@
                 }
             }, 900);
         }
+
+
+        this.downloadCsv = function () {
+            var fileName = surveys.surveys[surveyId].survey_google_id + '.csv';
+
+            if (navigator.msSaveBlob) { // IE 10+
+                navigator.msSaveBlob(chart.csvBlob, fileName);
+            }
+            else {
+                var link = document.createElement("a");
+                if (link.download !== undefined) { // feature detection
+                    var url = URL.createObjectURL(chart.csvBlob);
+                    link.setAttribute('href', url);
+                    link.setAttribute('download', fileName);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    setTimeout(function () {
+                        document.body.removeChild(link);
+                    }, 10000);
+                }
+                else {
+                    var csvWin = window.open('', '', '');
+                    csvWin.document.write('<meta name=content-type content=text/csv><meta name=content-disposition content="attachment;  filename=' + fileName + '">  ');
+                    csvWin.document.write(chart.csvStr);
+                }
+            }
+        };
 
 
         this.deleteSurveyById = function (id) {

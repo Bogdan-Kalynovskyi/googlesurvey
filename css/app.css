@@ -35,7 +35,7 @@ header {
 }
 
 .active .bullet {
-    background: #ffffcc;
+    background: #ffffbb;
 }
 
 big {
@@ -175,13 +175,13 @@ tbody ul {
 }
 
 ::-webkit-input-placeholder {
-    color: #bbb;
+    color: #ccc;
 }
 
 ::-moz-placeholder {
-    color: #bbb;
+    color: #ccc;
 }
 
 :-ms-input-placeholder {
-    color: #bbb;
+    color: #ccc;
 }

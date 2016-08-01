@@ -24,6 +24,9 @@
 
     // prevent api from recognising this client
 
-    else if (isset($_POST['logout']) && $_POST['logout'] === $_SESSION['xsrfToken']) {
-        session_destroy();
+    else {
+        $post = json_decode(file_get_contents('php://input'), true);
+        if (isset($post['logout']) && $post['logout'] === $_SESSION['xsrfToken']) {
+            session_destroy();
+        }
     }

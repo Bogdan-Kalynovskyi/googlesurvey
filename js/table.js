@@ -250,7 +250,7 @@ function Table (container) {
 
 
     this.filter = function (arr, word) {
-        if (word) {
+        if (word.length > 1) {
             var children = tbody.children;
 
             for (var i = 0, n = arr.length; i < n; i++) {

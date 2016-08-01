@@ -12,24 +12,6 @@
     <title>Google Surveys</title>
     <meta name="google-signin-client_id" content="<?php echo $google_api_id ?>">
     <script src="//apis.google.com/js/platform.js" async defer onload="onPlatformLoad()"></script>
-    <link rel="stylesheet" href="css/login.css">
-    <style>
-        <?php echo ($token ? '#logged-out' : '#logged-in') ?> {
-            display: none;
-        }
-    </style>
-</head>
-
-<body>
-<div id="logged-out">
-    <div id="login-form">
-        <div class="col-half">Logo placeholder</div>
-        <div class="col-half">
-            <h5>Sign in using your Google account</h5><br>
-            <div class="g-signin2" data-onsuccess="onLogIn"></div>
-        </div>
-    </div>
-
     <script>
         function logIn (g) {
             $.post('api/login.php', {
@@ -50,10 +32,14 @@
                 window.googleUser = g;
             }
         }
-        
+
         function onPlatformLoad() {
             <?php if ($token) { ?>
-                gapi.load('auth2');
+                gapi.load('auth2', function () {
+                    gapi.auth2.init({
+                        client_id: '<?php echo $google_api_id ?>'
+                    });
+                });
             <?php } ?>
         }
 
@@ -68,14 +54,93 @@
             });
         <?php } ?>
     </script>
-    <?php if ($token) { ?>
+
+    <?php if (!$token) { ?>
+    <style>
+    /* two selectors below should be exact Bootstrap equivalent */
+    body {
+        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: #373a3c;
+    }
+    h5 {
+        font-size: 1.25rem;
+        margin-bottom: .5rem;
+        font-weight: 500;
+        line-height: 1.1;
+        margin-top: 0;
+    }
+    #login-form {
+        position: absolute;
+        width: 440px;
+        left: 50%;
+        top: 50%;
+        margin-left: -220px;
+        margin-top: -110px;
+    }
+    .col-half {
+        float: left;
+        width: 220px;
+    }
+    #test3dPartyCookies {
+        position: absolute;
+        max-width: 500px;
+        left: 50%;
+        margin-left: -250px;
+        top: 30px;
+        z-index: 1000;
+        box-shadow: 0 0 28px darkred;
+        border-radius: 2px;
+        border: 1px dotted darkred;
+        padding: 16px;
+        display: none;
+        color: darkred;
+    }
+    a[target="_blank"] {
+        display: block;
+        padding-top: 9px;
+    }
+    a[target="_blank"]:after {
+        content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAVklEQVR4Xn3PgQkAMQhDUXfqTu7kTtkpd5RA8AInfArtQ2iRXFWT2QedAfttj2FsPIOE1eCOlEuoWWjgzYaB/IkeGOrxXhqB+uA9Bfcm0lAZuh+YIeAD+cAqSz4kCMUAAAAASUVORK5CYII=");
+        margin: 0 0 0 7px;
+    }
+    #loading {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, .9);
+    }
+    #loading > h5 {
+        position: absolute;
+        top: calc(50% - 15px);
+        text-align: center;
+        width: 100%;
+    }
+    #logged-in {
+        display: none;
+    }
+    </style>
+    <?php } ?>
+</head>
+
+<body>
+<?php if (!$token) { ?>
+    <div id="logged-out">
+        <div id="login-form">
+            <div class="col-half">Logo placeholder</div>
+            <div class="col-half">
+                <h5>Sign in using your Google account</h5><br>
+                <div class="g-signin2" data-onsuccess="onLogIn"></div>
+            </div>
+        </div>
         <div id="test3dPartyCookies"><strong>Third party cookies are disabled in your browser.</strong><br>
             You cannot sign in using Google unless you enable them.<br>
             <a target=_blank href="https://www.google.com/search?q=how+do+I+enable+3rd+party+cookies+in+my+browser"><big>Search Google how to fix this in your browser</big></a>
         </div>
         <iframe src="//mindmup.github.io/3rdpartycookiecheck/start.html" style="display:none"></iframe>
-    <?php } ?>
-</div>
+    </div>
+<?php } ?>
 
 <div id="logged-in" ng-controller="dashboard as ctrl">
     <div id="loading"><h5>Loading...</h5></div>
@@ -95,7 +160,7 @@
 
 
     <div id="surveys" class="nav-body">
-        <table ng-show="!angular.equals({}, ctrl.surveys)" class="table table-striped table-bordered table-hover">
+        <table ng-show="!angular.equals({}, ctrl.surveys)" class="table table-striped table-bordered table-hover m-t-1">
             <thead class="thead-default"><tr>
                 <th colspan=3>&nbsp; Survey</th><th>Google ID</th><th>Question</th><th>Answers</th>
             </tr></thead>
@@ -129,14 +194,14 @@
             </div>
         </div>
         <div class="row m-t-1">
-            <label class="col-xs-6 col-sm-5 col-md-4"><small>Maximum number of tags:</small>
+            <label class="col-xs-6 col-sm-4"><small>Maximum number of tags:</small>
                 <input ng-model="ctrl.maxTags" ng-change="ctrl.filterMax()" ng-model-options='{ debounce: 110 }' type="number">
             </label>
-            <label class="col-xs-6 col-sm-5 col-md-4"><small>Minimum repeat for tag:</small>
+            <label class="col-xs-6 col-sm-4"><small>Minimum repeat for tag:</small>
                 <input ng-model="ctrl.minRepeat" ng-change="ctrl.filterMin()" ng-model-options='{ debounce: 110 }' type="number">
             </label>
-            <label class="col-xs-6 col-sm-5 col-md-4"><small>Filter:</small>
-                <input ng-model="ctrl.filterTerm" ng-change="ctrl.filterTerms()" ng-model-options='{ debounce: 110 }' placeholder="Tags except" style="width: calc(100% - 100px)">
+            <label class="col-xs-6 col-sm-4"><small>Filter:</small>
+                <input ng-model="ctrl.filterTerm" ng-change="ctrl.filterTerms()" ng-model-options='{ debounce: 110 }' placeholder="Tags except" style="width: 83%">
             </label>
         </div>
         <div class="row" id="scroll-tbl">
@@ -147,11 +212,11 @@
 
 
     <div id="chart" class="nav-body"> <!-- todo scrollable -->
-        <div id="tags-chart"></div>
-        <br>
-        <div id="chart-table"></div>
         <div id="comment-chart"></div>
-        <button class="btn btn-sm btn-primary block-center m-t-2 m-l-2 m-b-1 p-x" ng-click="ctrl.downloadCsv()">Download results as CSV</button>
+        <div id="tags-chart"></div>
+        <button class="btn btn-sm btn-primary block-center m-y-1 m-l-1 m-b-1 p-x" ng-click="ctrl.downloadCsv()">Download tags as CSV</button>
+        <div id="chart-table"></div>
+        <button class="btn btn-sm btn-primary block-center m-y-1 m-l-1 m-b-1 p-x" ng-click="ctrl.downloadCsv()">Download tags as CSV</button>
     </div>
 
     <div id="modal-placeholder"></div>
@@ -162,14 +227,7 @@
     <script src="node_modules/angular/angular.js"></script>
     <script src="lib/xls.min.js"></script>
     <script src="//gstatic.com/charts/loader.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/chart.js"></script>
-    <script src="js/dashboard.js"></script>
-    <script src="js/table.js"></script>
-    <script src="js/simple-table.js"></script>
-    <script src="js/model.js"></script>
-    <script src="js/surveys.js"></script>
-    <script src="js/ui.js"></script>
+    <script src="app.min.js"></script>
 </div>
 </body>
 </html>

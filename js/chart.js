@@ -1,17 +1,41 @@
 function Chart (container) {
-    var chart;
+    var that = this,
+        chart;
 
 
     this.create = function (data, survey) {
         google.charts.setOnLoadCallback(function () {
-            var i = 0,
+
+            function encodeRow(row) {
+                var str = 'Tag,%\n';
+                for (var j = 0; j < row.length; j++) {
+                    var cell = row[j].toString().replace(/"/g, '""');
+                    if (cell.search(/("|,|\n)/g) >= 0) {
+                        cell = '"' + cell + '"';
+                    }
+
+                    str += (j > 0) ? (',' + cell) : cell;
+                }
+                return str + '\n';
+            }
+
+
+            var csvStr = '',
+                i = 0,
                 n = data.length,
                 arr = new Array(n + 1);
 
             for (; i < n; i++) {
-                var line = data[i];
-                arr[i + 1] = [line[0], line[1] / total * 100];
+                var line = data[i],
+                    row = [line[0], line[1] / total * 100];
+
+                arr[i + 1] = row;
+                csvStr += encodeRow(row);
             }
+
+            that.csvStr = csvStr;
+            that.csvBlob = new Blob([csvStr], { type: 'text/csv;charset=utf-8;' });
+
 
             arr[0] = ['', 'Tag %'];
             var gData = google.visualization.arrayToDataTable(arr);
@@ -26,8 +50,8 @@ function Chart (container) {
             });
 
             $('#comment-chart').html(
-                '<br>Question: <b>' + survey.question +
-                '</b><br><br><b>Total answers: ' + survey.total)
+                '<small>Question: ' + survey.question +
+                '<br>Total answers: ' + survey.total + '</small><br><br>');
         });
     };
 }
