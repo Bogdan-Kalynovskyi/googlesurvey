@@ -19,8 +19,8 @@
         this.maxTags = 10;
 
 
-        $('.nav-body').hide();
         surveys.load().success(function () {
+            $('#loading').remove();
             that.navigate('surveys');
             that.surveys = surveys.surveys;
         });

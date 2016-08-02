@@ -55,22 +55,28 @@
         <?php } ?>
     </script>
 
+    <style>
+        #loading {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+        }
+        #loading > h5 {
+            font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+            color: #373a3c;
+            font-size: 1.25rem;
+            font-weight: 500;
+            line-height: 1.1;
+            margin-top: 0;
+            position: absolute;
+            top: calc(50% - 17px);
+            text-align: center;
+            width: 100%;
+        }
+    </style>
     <?php if (!$token) { ?>
     <style>
-    /* two selectors below should be exact Bootstrap equivalent */
-    body {
-        font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-        font-size: 1rem;
-        line-height: 1.5;
-        color: #373a3c;
-    }
-    h5 {
-        font-size: 1.25rem;
-        margin-bottom: .5rem;
-        font-weight: 500;
-        line-height: 1.1;
-        margin-top: 0;
-    }
     #login-form {
         position: absolute;
         width: 440px;
@@ -104,18 +110,6 @@
     a[target="_blank"]:after {
         content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAVklEQVR4Xn3PgQkAMQhDUXfqTu7kTtkpd5RA8AInfArtQ2iRXFWT2QedAfttj2FsPIOE1eCOlEuoWWjgzYaB/IkeGOrxXhqB+uA9Bfcm0lAZuh+YIeAD+cAqSz4kCMUAAAAASUVORK5CYII=");
         margin: 0 0 0 7px;
-    }
-    #loading {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, .9);
-    }
-    #loading > h5 {
-        position: absolute;
-        top: calc(50% - 15px);
-        text-align: center;
-        width: 100%;
     }
     #logged-in {
         display: none;
@@ -221,10 +215,10 @@
 
     <div id="modal-placeholder"></div>
 
-    <link rel=stylesheet href="node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel=stylesheet href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
     <link rel=stylesheet href="css/app.css">
-    <script src="node_modules/jquery/dist/jquery.js"></script>
-    <script src="node_modules/angular/angular.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
     <script src="lib/xls.min.js"></script>
     <script src="//gstatic.com/charts/loader.js"></script>
     <script src="app.min.js"></script>

@@ -55,7 +55,6 @@ function alreadyLoggedIn () {
 }
 
 
-$('#loading').remove();
 if (window.googleUser) {
     logIn(googleUser);
 }

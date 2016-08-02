@@ -72,6 +72,7 @@ input[ng-model] {
 }
 
 .nav-body {
+    display: none;
     height: calc(100% - 71px);
 }
 
