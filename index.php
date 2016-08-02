@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html>
 <?php
     include 'api/settings.php';
     session_start();
     $token = isset($_SESSION['xsrfToken']) && $_SESSION['xsrfToken'];
 ?>
+<!DOCTYPE html>
+<html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -221,7 +221,14 @@
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
     <script src="lib/xls.min.js"></script>
     <script src="//gstatic.com/charts/loader.js"></script>
-    <script src="app.min.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/table.js"></script>
+    <script src="js/simple-table.js"></script>
+    <script src="js/model.js"></script>
+    <script src="js/surveys.js"></script>
+    <script src="js/ui.js"></script>
 </div>
 </body>
 </html>

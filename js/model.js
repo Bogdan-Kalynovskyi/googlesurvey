@@ -1,3 +1,5 @@
+var total,
+    visibleTerms;
 
     app.service('model', ['$http', function ($http) {
         var that = this,
@@ -38,7 +40,8 @@
                     total: t
                 };
 
-                window.total = t;
+                total = t;
+                visibleTerms = new Array(total).fill(true);
             }
             catch (e) {
                 bootstrapAlert('Could not parse answers from Excel file');
@@ -56,6 +59,7 @@
         this.getTermsBySurveyId = function (surveyId) {
             return $http.get(api + '?terms&surveyId=' + surveyId).success(function (response) {
                 that.termsArr = response;
+                visibleTerms = new Array(total).fill(true);
             });
         };
 
@@ -110,6 +114,7 @@
         
 
         this.addTags = function (tagsArr) {
+            total += tagsArr.length;
             this.tagsArr = tagsArr.concat(this.tagsArr);
             this.tagsTable.addRows(tagsArr);
         };

@@ -1,6 +1,7 @@
 function Table (container) {
     var tbody,
         masterCheckbox,
+        isNotFiltered = true,
         root = document.getElementById('logged-in'),
         isTagsTable = container.id === 'tags-table';
 
@@ -78,11 +79,13 @@ function Table (container) {
     function addMasterCheckbox () {
         masterCheckbox = container.querySelector('thead input');
         masterCheckbox.onchange = function () {
-            var checkboxes = tbody.getElementsByTagName('input'),
+            var rows = tbody.children,
                 checked = this.checked;
 
-            for (var i = 0, len = checkboxes.length; i < len; i++) {
-                checkboxes[i].checked = checked;
+            for (var i = 0, n = rows.length; i < n; i++) {
+                if (visibleTerms[i]) {
+                    rows[i].children[0].children[0].checked = checked;
+                }
             }
         };
     }
@@ -238,10 +241,10 @@ function Table (container) {
 
     this.selectedIndexes = function () {
         var selected = [],
-            checkboxes = tbody.getElementsByTagName('input');
+            rows = tbody.children;
 
-        for (var i = 0, len = checkboxes.length; i < len; i++) {
-            if (checkboxes[i].checked) {
+        for (var i = 0, len = rows.length; i < len; i++) {
+            if (visibleTerms[i] && rows[i].children[0].children[0].checked) {
                 selected.push(i);
             }
         }
@@ -250,15 +253,34 @@ function Table (container) {
 
 
     this.filter = function (arr, word) {
-        if (word.length > 1) {
-            var children = tbody.children;
+        var rows = tbody.children,
+            tr,
+            fil;
 
+        if (word.length > 1) {
             for (var i = 0, n = arr.length; i < n; i++) {
-                children[i].style.display = (arr[i][0].indexOf(word) === -1) ? 'table-row' : 'none';
-                children[i].children[0].children[0].checked = false;
+                fil = arr[i][0].indexOf(word) !== -1;
+                if (fil != visibleTerms[i]) {
+                    tr = rows[i];
+                    tr.style.display = fil ? 'table-row' : 'none';
+                    visibleTerms[i] = fil;
+                }
+                if (isNotFiltered) {
+                    tr.children[0].children[0].checked = false;
+                }
             }
 
             masterCheckbox.checked = false;
+            isNotFiltered = false;
+        }
+        else {
+            for (i = 0, n = arr.length; i < n; i++) {
+                if (!visibleTerms[i]) {
+                    rows[i].style.display = 'table-row';
+                }
+            }
+            visibleTerms = new Array(total).fill(true);
+            isNotFiltered = true;
         }
     };
 

@@ -50,6 +50,7 @@
 
         function stepTwo () {
             that.navigate('tags');
+            that.filterTerm = '';
             that.filterMax(true);
             $('#tags-question').html(surveys.surveys[surveyId].question);
         }
@@ -68,6 +69,7 @@
         
         this.loadSurvey = function (id) {
             surveyId = id;
+            this.filterTerm = '';
             this.navigate('tags');
             $('#tags-question').html(surveys.surveys[surveyId].question);
             window.total = +surveys.surveys[id].total;
@@ -274,7 +276,7 @@
                         surveys.add(model.surveyId, model.surveyData);
                     });
                 }
-            }, 900);
+            }, 600);
         }
 
 
