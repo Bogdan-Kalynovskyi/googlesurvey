@@ -279,7 +279,7 @@
 
 
         this.downloadCsv = function () {
-            var fileName = surveys.surveys[surveyId].survey_google_id + '.csv';
+            var fileName = 'tags_' + surveys.surveys[surveyId].survey_google_id + '.csv';
 
             if (navigator.msSaveBlob) { // IE 10+
                 navigator.msSaveBlob(chart.csvBlob, fileName);

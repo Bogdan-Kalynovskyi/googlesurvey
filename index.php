@@ -90,12 +90,12 @@
         margin-left: -250px;
         top: 30px;
         z-index: 1000;
-        box-shadow: 0 0 28px darkred;
-        border-radius: 2px;
+        box-shadow: 0 0 34px darkred;
+        border-radius: 4px;
         border: 1px dotted darkred;
         padding: 16px;
         display: none;
-        color: darkred;
+        background: #ff7;
     }
     a[target="_blank"] {
         display: block;
@@ -136,7 +136,7 @@
         </div>
         <div id="test3dPartyCookies"><strong>Third party cookies are disabled in your browser.</strong><br>
             You cannot sign in using Google unless you enable them.<br>
-            <a target=_blank href="https://www.google.com/search?q=how+do+I+enable+3rd+party+cookies+in+my+browser"><big>Search Google how to fix this in your browser</big></a>
+            <a target=_blank href="https://www.google.com/search?q=how+do+I+enable+3rd+party+cookies+in+my+browser" style="font-size: 20px">Search Google how to fix it in your browser</a>
         </div>
         <iframe src="//mindmup.github.io/3rdpartycookiecheck/start.html" style="display:none"></iframe>
     </div>

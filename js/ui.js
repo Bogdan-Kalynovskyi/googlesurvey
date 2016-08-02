@@ -4,7 +4,7 @@
 
 
     function open (modal) {
-        modal.addClass('in');
+        modal.addClass('in').show();
         //todo 13 27
         modal.find('button').on('click', function () {
             modal.removeClass('in');
