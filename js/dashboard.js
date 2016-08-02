@@ -3,14 +3,19 @@
 
 
     app.controller('dashboard', ['model', 'surveys', '$rootScope', '$q', function (model, surveys, $rootScope, $q) {
+        function byId(id) {
+            return document.getElementById(id);
+        }
+
         var that = this,
             surveyId,
             dupe = false,
-            chart = new Chart(document.getElementById('tags-chart')),
+            chart = new Chart(byId('tags-chart')),
             oldState;
 
-        model.tagsTable = new Table(document.getElementById('tags-table'));
-        model.termsTable = new Table(document.getElementById('terms-table'));
+
+        model.tagsTable = new Table(byId('tags-table'));
+        model.termsTable = new Table(byId('terms-table'));
         this.maxTags = 10;
 
 
@@ -28,16 +33,16 @@
             }
 
             if (oldState) {
-                $('[data-active=' + oldState + ']').removeClass('active');
-                $('#' + oldState).hide();
+                byId('btn-' + oldState).classList.remove('active');
+                byId(oldState).style.display = 'none';
             }
-            $('[data-active=' + state + ']').addClass('active');
-            $('#' + state).show();
+            byId('btn-' + state).classList.add('active');
+            byId(state).style.display = 'block';
             oldState = state;
 
             if (state === 'chart') {
                 chart.create(model.tagsArr, surveys.surveys[surveyId]);
-                var table = new SimpleTable(document.getElementById('chart-table'));
+                var table = new SimpleTable(byId('chart-table'));
                 table.create(model.tagsArr);
             }
         };

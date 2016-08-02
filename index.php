@@ -146,16 +146,16 @@
     <div id="loading"><h5>Loading...</h5></div>
 
     <header>
-        <button class="btn btn-sm btn-primary" data-active="surveys" ng-click="ctrl.navigate('surveys')">
+        <a href class="logout" ng-click="ctrl.logOut()">Log out</a>
+        <button class="btn btn-sm btn-primary" id="btn-surveys" ng-click="ctrl.navigate('surveys')">
             <span class="bullet">1</span> Upload or select survey
         </button> <big>&raquo;</big>
-        <button class="btn btn-sm btn-primary" data-active="tags" ng-click="ctrl.navigate('tags')">
+        <button class="btn btn-sm btn-primary" id="btn-tags" ng-click="ctrl.navigate('tags')">
             <span class="bullet">2</span> Manage tags and terms
         </button> <big>&raquo;</big>
-        <button class="btn btn-sm btn-primary" data-active="chart" ng-click="ctrl.navigate('chart')">
+        <button class="btn btn-sm btn-primary" id="btn-chart" ng-click="ctrl.navigate('chart')">
             <span class="bullet">3</span> View chart
         </button>
-        <a href class="logout" ng-click="ctrl.logOut()">Log out</a>
     </header>
 
 
@@ -168,7 +168,7 @@
                 <td><a ng-click="ctrl.loadSurvey(id)" class="p-x-1">edit</a></td>
                 <td><a ng-click="ctrl.duplicateSurvey(id)">duplicate & edit</a></td>
                 <td><a ng-click="ctrl.deleteSurveyById(id)">delete</a></td>
-                <td ng-bind="survey.survey_google_id"></td>
+                <td ng-bind="survey.survey_google_id" style="font-size: 75%"></td>
                 <td ng-bind="survey.question"></td>
                 <td ng-bind="survey.total"></td>
             </tr>
@@ -185,23 +185,23 @@
     <div id="tags" class="nav-body">
         <div id="tags-question"></div>
         <div class="row">
-            <div class="col-xs-9 col-sm-8 col-md-7 col-lg-5">
+            <div class="col-xs-9 col-lg-6">
                 <input ng-model="ctrl.bulkAdd" placeholder="Comma separated tags list" style="width: calc(100% - 90px)">
                 <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk add</button>
             </div>
             <div class="col-xs-3">
-                <button class="btn btn-sm btn-primary" ng-click="ctrl.sort()">Sort tables</button>
+                <button class="btn btn-sm btn-primary pull-xs-right" ng-click="ctrl.sort()">Sort tables</button>
             </div>
         </div>
         <div class="row m-t-1">
-            <label class="col-xs-6 col-sm-4"><small>Maximum number of tags:</small>
+            <label class="col-xs-6 col-sm-4 col-lg-3"><small>Maximum number of tags:</small>
                 <input ng-model="ctrl.maxTags" ng-change="ctrl.filterMax()" ng-model-options='{ debounce: 110 }' type="number">
             </label>
-            <label class="col-xs-6 col-sm-4"><small>Minimum repeat for tag:</small>
+            <label class="col-xs-6 col-sm-4 col-lg-3"><small>Minimum repeat for tag:</small>
                 <input ng-model="ctrl.minRepeat" ng-change="ctrl.filterMin()" ng-model-options='{ debounce: 110 }' type="number">
             </label>
-            <label class="col-xs-6 col-sm-4"><small>Filter:</small>
-                <input ng-model="ctrl.filterTerm" ng-change="ctrl.filterTerms()" ng-model-options='{ debounce: 110 }' placeholder="Tags except" style="width: 83%">
+            <label class="col-xs-6 col-sm-4 col-lg-3"><small>Filter:</small>
+                <input ng-model="ctrl.filterTerm" ng-change="ctrl.filterTerms()" ng-model-options='{ debounce: 110 }' placeholder="Tags except" id="tags-filter">
             </label>
         </div>
         <div class="row" id="scroll-tbl">

@@ -7,7 +7,7 @@ function Chart (container) {
         google.charts.setOnLoadCallback(function () {
 
             function encodeRow(row) {
-                var str = 'Tag,%\n';
+                var str = '';
                 for (var j = 0; j < row.length; j++) {
                     var cell = row[j].toString().replace(/"/g, '""');
                     if (cell.search(/("|,|\n)/g) >= 0) {
@@ -27,10 +27,12 @@ function Chart (container) {
 
             for (; i < n; i++) {
                 var line = data[i],
-                    row = [line[0], line[1] / total * 100];
+                    perc = line[1] / total * 100,
+                    row1 = [line[0], perc],
+                    row2 = [line[0], perc, line[1]];
 
-                arr[i + 1] = row;
-                csvStr += encodeRow(row);
+                arr[i + 1] = row1;
+                csvStr += encodeRow(row2);
             }
 
             that.csvStr = csvStr;

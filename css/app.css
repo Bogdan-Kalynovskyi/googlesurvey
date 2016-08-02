@@ -54,12 +54,17 @@ big {
     font-size: 14px;
     float: right;
     margin-top: 13px;
+    padding-left: 1em;
 }
 
 input[ng-model] {
     width: 60px;
     padding: 0 4px;
     line-height: 27px;
+}
+
+#tags-filter {
+    width: calc(100% - 37px);
 }
 
 .nav-body {
@@ -158,7 +163,6 @@ tbody input:not([type=checkbox]) {
     width: 100%;
 }
 
-
 tbody input {
     -webkit-user-select: text;
     -moz-user-select: text;
@@ -184,4 +188,51 @@ tbody ul {
 
 :-ms-input-placeholder {
     color: #ccc;
+}
+
+
+@media (max-width: 724px) {
+    #scroll-tbl {
+        height: calc(100% - 128px);
+    }
+
+    #tags-filter {
+        width: 100%;
+    }
+
+    #terms-table {
+        padding: 0!important;
+    }
+
+    tbody span {
+        max-width: 188px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+@media (max-width: 640px) {
+    header {
+        height: 95px;
+    }
+
+    #btn-chart {
+        margin-top: 10px;
+    }
+
+    tbody span {
+        max-width: 178px;
+    }
+}
+
+@media (max-width: 590px) {
+    tbody span {
+        max-width: 168px;
+    }
+}
+
+@media (max-width: 370px) {
+    .bullet {
+        display: none;
+    }
 }
