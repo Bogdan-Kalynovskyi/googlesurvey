@@ -168,7 +168,7 @@
                 <td><a ng-click="ctrl.loadSurvey(id)" class="p-x-1">edit</a></td>
                 <td><a ng-click="ctrl.duplicateSurvey(id)">duplicate & edit</a></td>
                 <td><a ng-click="ctrl.deleteSurveyById(id)">delete</a></td>
-                <td ng-bind="survey.survey_google_id" style="font-size: 75%"></td>
+                <td ng-bind="survey.survey_google_id" style="font-size: 11px"></td>
                 <td ng-bind="survey.question"></td>
                 <td ng-bind="survey.total"></td>
             </tr>
