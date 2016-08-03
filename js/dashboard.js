@@ -1,5 +1,5 @@
 
-    google.charts.load('44', {'packages': ['bar']});
+    window.google.charts.load('44', {'packages': ['bar']});
 
 
     app.controller('dashboard', ['model', 'surveys', '$rootScope', '$q', function (model, surveys, $rootScope, $q) {
@@ -48,11 +48,11 @@
         };
 
 
-        function stepTwo () {
+        function stepTwo (question) {
             that.navigate('tags');
             that.filterTerm = '';
             that.filterMax(true);
-            $('#tags-question').html(surveys.surveys[surveyId].question);
+            $('#tags-question').html(question);
         }
 
         
@@ -72,7 +72,7 @@
             this.filterTerm = '';
             this.navigate('tags');
             $('#tags-question').html(surveys.surveys[surveyId].question);
-            window.total = +surveys.surveys[id].total;
+            total = +surveys.surveys[id].total;
             model.getTagsBySurveyId(id).success(function () {
                 model.tagsTable.create(model.tagsArr, true);
                 that.maxTags = model.tagsArr.length;
@@ -109,14 +109,12 @@
                             else {
                                 surveyId = undefined;
                             }
-                            model.initByExcel(workbook);
-                            stepTwo();
+                            stepTwo(model.initByExcel(workbook));
                         });
                     }
                     else {
                         surveyId = undefined;
-                        model.initByExcel(workbook);
-                        stepTwo();
+                        stepTwo(model.initByExcel(workbook));
                     }
                 };
 
@@ -149,11 +147,11 @@
 
         this.deleteLine = function (index, isTagsTable) {
             if (isTagsTable) {
-                window.total -= model.tagsArr[index][1];
+                total -= model.tagsArr[index][1];
                 model.deleteTag(index);
             }
             else {
-                window.total -= model.termsArr[index][1];
+                total -= model.termsArr[index][1];
                 model.deleteTerm(index);
             }
             model.tagsTable.updatePerc(model.tagsArr);

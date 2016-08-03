@@ -32,11 +32,12 @@ var total,
 
                 this.tagsArr = objToArr(tagsObj);
                 this.termsArr = [];
-                var t = +overview.E2.w;
+                var question = overview.C2.w,
+                    t = +overview.E2.w;
 
                 this.surveyData = {
                     survey_google_id: overview.A2.w,
-                    question: overview.C2.w,
+                    question: question,
                     total: t
                 };
 
@@ -46,6 +47,8 @@ var total,
             catch (e) {
                 bootstrapAlert('Could not parse answers from Excel file');
             }
+
+            return question;
         };
 
 

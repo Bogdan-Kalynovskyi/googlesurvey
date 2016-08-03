@@ -34,7 +34,7 @@ function getTags () {
     $query = mysql_query('SELECT tag, count, synonyms, syn_count FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']).' ORDER BY count DESC');
     $result = array();
     while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
-        $rrr = [$row[0], intval($row[1])];
+        $rrr = array($row[0], intval($row[1]));
         if ($row[2]) {
             $rrr[] = $row[2];
             $rrr[] = $row[3];
@@ -51,7 +51,7 @@ function getTerms () {
     $query = mysql_query('SELECT term, count FROM terms WHERE survey_id = '.$db->b($_GET['surveyId']).' ORDER BY count DESC');
     $result = array();
     while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
-        $result[] = [$row[0], intval($row[1])];
+        $result[] = array($row[0], intval($row[1]));
     }
     echo json_encode($result);
 }

@@ -264,8 +264,8 @@ function Table (container) {
                 tr = rows[i];
                 if (fil != visibleTerms[i]) {
                     tr.style.display = fil ? 'table-row' : 'none';
-                    visibleTerms[i] = fil;
                 }
+                visibleTerms[i] = fil;
                 if (isNotFiltered) {
                     tr.children[0].children[0].checked = false;
                 }
