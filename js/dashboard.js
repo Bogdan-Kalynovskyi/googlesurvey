@@ -125,14 +125,15 @@
         };
 
 
-        this.addTags = function (str) {
+        this.addTags = function () {
             var arr = [];
-            str.toLowerCase().split(',').forEach(function (el) {
+            this.bulkAdd.toLowerCase().split(',').forEach(function (el) {
                 var word = el.trim();
                 if (word.length) {
                     arr.push([word, 0]);
                 }
             });
+            this.bulkAdd = '';
 
             model.addTags(arr);
             model.tagsTable.update(model.tagsArr);

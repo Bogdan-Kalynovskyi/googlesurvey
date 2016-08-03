@@ -157,6 +157,7 @@ function Table (container) {
                 }
             }
 
+            masterCheckbox.checked = false;
             evt.stopPropagation();
         });
 
@@ -260,8 +261,8 @@ function Table (container) {
         if (word.length > 1) {
             for (var i = 0, n = arr.length; i < n; i++) {
                 fil = arr[i][0].indexOf(word) !== -1;
+                tr = rows[i];
                 if (fil != visibleTerms[i]) {
-                    tr = rows[i];
                     tr.style.display = fil ? 'table-row' : 'none';
                     visibleTerms[i] = fil;
                 }

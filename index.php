@@ -180,8 +180,8 @@
         <div id="tags-question"></div>
         <div class="row">
             <div class="col-xs-9 col-lg-6">
-                <input ng-model="ctrl.bulkAdd" placeholder="Comma separated tags list" style="width: calc(100% - 90px)">
-                <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags(ctrl.bulkAdd)">Bulk add</button>
+                <input ng-model="ctrl.bulkAdd" placeholder="Comma separated tags list" ng-keyup="$event.keyCode == 13 && ctrl.addTags()" style="width: calc(100% - 90px)">
+                <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags()">Bulk add</button>
             </div>
             <div class="col-xs-3">
                 <button class="btn btn-sm btn-primary pull-xs-right" ng-click="ctrl.sort()">Sort tables</button>
