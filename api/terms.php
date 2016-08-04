@@ -52,17 +52,16 @@ function add () {
 
     $post = json_decode(file_get_contents('php://input'), true);
     $surveyId = intval($_POST['surveyId']);
-    $tags = $post['tags'];
+    $terms = $post['terms'];
 
     $str = '';
-    $n = count($tags);
+    $n = count($terms);
     for ($i = 0; $i < $n; $i++) {
-        $line = $tags[$i];
-        $synonyms = isset($line[2]) ? ($db->a($line[2]).','.$db->a($line[3])) : '"",""';
-        $str .= '('.$surveyId.','.$db->a($line[0]).','.$db->b($line[1]).','.$synonyms.'),';
+        $line = $terms[$i];
+        $str .= '('.$surveyId.','.$db->a($line[0]).','.$db->b($line[1]).'),';
     }
 
     $str = substr($str, 0, -1);
 
-    $db->query('INSERT INTO tags (survey_id, tag, count, synonyms, syn_count) VALUES '.$str);
+    $db->query('INSERT INTO terms (survey_id, term, count) VALUES '.$str);
 }

@@ -65,12 +65,12 @@
         
         this.filterMax = function (reset) {
             this.minRepeat = model.splitMax(this.maxTags, reset);
-            save();
+            saveAll();
         };
 
         this.filterMin = function () {
             this.maxTags = model.splitMin(this.minRepeat);
-            save();
+            saveAll();
         };
 
         
@@ -142,13 +142,13 @@
 
             model.addTags(arr);
             model.tagsTable.update(model.tagsArr);
-            save();
+            saveAll();
         };
 
 
         this.updateTag = function () {
             model.updateTag.apply(model, arguments);
-            save();
+            saveAll();
         };
 
 
@@ -163,7 +163,7 @@
             }
             model.tagsTable.updatePerc(model.tagsArr);
             model.termsTable.updatePerc(model.termsArr);
-            save();
+            saveAll();
         };
 
 
@@ -224,7 +224,7 @@
             else {
                 return false;
             }
-            save();
+            saveAll();
         }
 
 
@@ -265,7 +265,7 @@
 
         var saveTimeout;
 
-        function save () {
+        function saveAll () {
             clearTimeout(saveTimeout);
 
             saveTimeout = setTimeout(function () {

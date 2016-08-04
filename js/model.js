@@ -2,8 +2,7 @@ var total,
     visibleTerms;
 
     app.service('model', ['$http', function ($http) {
-        var that = this,
-            api = 'api/tags.php';
+        var that = this;
 
         
         this.initByExcel = function (workbook) {
@@ -53,14 +52,14 @@ var total,
 
 
         this.getTagsBySurveyId = function (surveyId) {
-            return $http.get(api + '?tags&surveyId=' + surveyId).success(function (response) {
+            return $http.get('api/tags.php?surveyId=' + surveyId).success(function (response) {
                 that.tagsArr = response;
             });
         };
 
 
         this.getTermsBySurveyId = function (surveyId) {
-            return $http.get(api + '?terms&surveyId=' + surveyId).success(function (response) {
+            return $http.get('api/terms.php?surveyId=' + surveyId).success(function (response) {
                 that.termsArr = response;
                 visibleTerms = new Array(total).fill(true);
             });
@@ -87,7 +86,7 @@ var total,
 
 
         this.saveNewSurvey = function () {
-            return $http.post(api, {
+            return $http.post('api/surveys.php', {
                 survey_google_id: this.surveyData.survey_google_id,
                 question: this.surveyData.question,
                 tagsArr: packTags(this.tagsArr),    // todo: probably pack and unpack will be faster // we also have pack in table for that (for unpacking)
@@ -101,7 +100,7 @@ var total,
 
 
         this.overwriteSurvey = function (surveyId) {
-            return $http.put(api, {
+            return $http.put('api/surveys.php', {
                 surveyId: surveyId,
                 tagsArr: packTags(that.tagsArr),
                 termsArr: this.termsArr,

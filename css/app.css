@@ -88,6 +88,7 @@ input[ng-model] {
     border-radius: 50%;
     background: #ddd;
     color: #fff;
+    cursor: pointer;
 }
 
 .nav-body {
