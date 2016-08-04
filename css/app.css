@@ -67,8 +67,27 @@ input[ng-model] {
     line-height: 27px;
 }
 
-#tags-filter {
+#tags-f-input {
     width: calc(100% - 37px);
+    float: right;
+}
+
+#tags-f-span {
+    position: relative;
+    top: 7px;
+}
+
+.cross {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    line-height: 13px;
+    text-align: center;
+    bottom: 8px;
+    right: 22px;
+    border-radius: 50%;
+    background: #ddd;
+    color: #fff;
 }
 
 .nav-body {
@@ -201,8 +220,12 @@ tbody ul {
         height: calc(100% - 112px);
     }
 
-    #tags-filter {
+    #tags-f-input {
         width: 100%;
+    }
+
+    #tags-f-span {
+        top: 0;
     }
 
     #terms-table {

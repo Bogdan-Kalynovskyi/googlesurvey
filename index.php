@@ -184,7 +184,7 @@
                 <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags()">Bulk add</button>
             </div>
             <div class="col-xs-3">
-                <button class="btn btn-sm btn-primary pull-xs-right" ng-click="ctrl.sort()">Sort tables</button>
+                <button class="btn btn-sm btn-primary pull-xs-right" ng-click="ctrl.sort()">Sort terms</button>
             </div>
         </div>
         <div class="row m-t-1">
@@ -194,8 +194,9 @@
             <label class="col-xs-6 col-sm-4 col-lg-3"><small>Minimum repeat for tag:</small>
                 <input ng-model="ctrl.minRepeat" ng-change="ctrl.filterMin()" ng-model-options='{ debounce: 110 }' type="number">
             </label>
-            <label class="col-xs-6 col-sm-4 col-lg-3"><small>Filter:</small>
-                <input ng-model="ctrl.filterTerm" ng-change="ctrl.filterTerms()" ng-model-options='{ debounce: 110 }' placeholder="Tags except" id="tags-filter">
+            <label class="col-xs-6 col-sm-4 col-lg-3"><small id="tags-f-span">Filter:</small>
+                <input ng-model="ctrl.filterTerm" ng-change="ctrl.filterTerms()" ng-model-options='{ debounce: 110 }' placeholder="Tags except" id="tags-f-input">
+                <span class="cross" ng-click="ctrl.filterTerm = ''">×</span>
             </label>
         </div>
         <div class="row" id="scroll-tbl">
@@ -221,7 +222,7 @@
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
     <script src="lib/xls.min.js"></script>
     <script src="//gstatic.com/charts/loader.js"></script>
-    <script src="app.min.js"></script>
+    <script src="app.js"></script>
 </div>
 </body>
 </html>
