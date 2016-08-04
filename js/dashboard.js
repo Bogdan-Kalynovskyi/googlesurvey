@@ -26,6 +26,13 @@
         });
 
 
+        window.addEventListener('resize', function () {
+            if (oldState === 'chart') {
+                chart.update();
+            }
+        }, 100);
+
+
         this.navigate = function (state) {
             if (state !== 'surveys' && !(model.tagsArr || surveyId)) {
                 alert('Nothing to display, survey not loaded yet');
@@ -244,10 +251,8 @@
 
         
         this.sort = function () {
-            model.sort(model.tagsArr);
             model.sort(model.termsArr);
             setTimeout(function () {
-                model.tagsTable.update(model.tagsArr);
                 model.termsTable.update(model.termsArr);
             }, 0);
         };

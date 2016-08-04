@@ -1,3 +1,15 @@
+AllowOverride None
+ServerSignature Off
+
+<FilesMatch ".(gif|jpg|jpeg|png|ico|js|css)$">
+Header set Cache-Control "max-age=25920000"
+</FilesMatch>
+
+# explicitly disable caching for scripts and other dynamic files
+<FilesMatch "\.(php)$">
+Header unset Cache-Control
+</FilesMatch>
+
 RewriteEngine On
 
 # Disclosure Authorisation headers to PHP

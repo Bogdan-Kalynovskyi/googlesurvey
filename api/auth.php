@@ -10,6 +10,7 @@
         define('AUTHORISED', true);
     }
     else {
+        session_destroy();
         header("HTTP/1.0 401 Unauthorized", true, 401);
         echo 'Oh no! Somebody restarted our server or you logged out from other browser tab. Please reload the page to start again.';
         die;

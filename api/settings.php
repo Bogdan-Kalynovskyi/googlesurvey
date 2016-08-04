@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `surveys` (
   PRIMARY KEY (`id`),
   INDEX `survey_google_id` (`survey_google_id`),
   INDEX `user_google_id` (`user_google_id`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT CHARSET=utf8;
 
 
 --
@@ -65,10 +65,10 @@ CREATE TABLE IF NOT EXISTS `tags` (
   `synonyms` text NOT NULL,
   `syn_count` text NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `tag` (`tag`),
+  INDEX `tag` (`tag`(32)),
   INDEX `survey_id` (`survey_id`),
   INDEX `count` (`count`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT CHARSET=utf8;
 
 
 --
@@ -81,10 +81,10 @@ CREATE TABLE IF NOT EXISTS `terms` (
   `term` varchar(255) NOT NULL,
   `count` int NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `term` (`term`),
+  INDEX `term` (`term`(32)),
   INDEX `survey_id` (`survey_id`),
   INDEX `count` (`count`)
-) DEFAULT CHARSET=utf8mb4;
+) DEFAULT CHARSET=utf8;
 
 
 */

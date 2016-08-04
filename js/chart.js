@@ -1,5 +1,7 @@
 function Chart (container) {
     var that = this,
+        gData,
+        updateThrottle,
         chart;
 
 
@@ -40,14 +42,13 @@ function Chart (container) {
 
 
             arr[0] = ['', 'Tag %'];
-            var gData = google.visualization.arrayToDataTable(arr);
+            gData = google.visualization.arrayToDataTable(arr);
 
             container.style.height = 28 * n + 'px';
             if (!chart) {
                 chart = new google.charts.Bar(container);
             }
             chart.draw(gData, {
-                chart: {},
                 bars: 'horizontal' // Required for Material Bar Charts.
             });
 
@@ -56,4 +57,17 @@ function Chart (container) {
                 '<br>Total answers: ' + survey.total + '</small><br><br>');
         });
     };
+
+
+    this.update = function () {
+        clearTimeout(updateThrottle);
+
+        updateThrottle = setTimeout(function () {
+            if (chart) {
+                chart.draw(gData, {
+                    bars: 'horizontal' // Required for Material Bar Charts.
+                });
+            }
+        }, 100);
+    }
 }
