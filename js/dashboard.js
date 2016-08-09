@@ -1,5 +1,5 @@
 
-    window.google.charts.load('44', {'packages': ['bar']});
+    google.charts.load('44', {'packages': ['bar']});
 
 
     app.controller('dashboard', ['model', 'surveys', '$rootScope', '$q', function (model, surveys, $rootScope, $q) {
@@ -8,7 +8,6 @@
         }
 
         var that = this,
-            surveyId,
             dupe = false,
             chart = new Chart(byId('tags-chart')),
             oldState;
@@ -34,7 +33,7 @@
 
 
         this.navigate = function (state) {
-            if (state !== 'surveys' && !(model.tagsArr || surveyId)) {
+            if (state !== 'surveys' && !(model.tagsArr || this.sId)) {
                 alert('Nothing to display, survey not loaded yet');
                 return;
             }
@@ -48,7 +47,7 @@
             oldState = state;
 
             if (state === 'chart') {
-                chart.create(model.tagsArr, surveys.surveys[surveyId]);
+                chart.create(model.tagsArr, surveys.surveys[this.sId]);
                 var table = new SimpleTable(byId('chart-table'));
                 table.create(model.tagsArr);
             }
@@ -75,10 +74,10 @@
 
         
         this.loadSurvey = function (id) {
-            surveyId = id;
+            this.sId = id;
             this.filterTerm = '';
             this.navigate('tags');
-            $('#tags-question').html(surveys.surveys[surveyId].question);
+            byId('tags-question').innerHTML = surveys.surveys[this.sId].question;
             total = +surveys.surveys[id].total;
             model.getTagsBySurveyId(id).success(function () {
                 model.tagsTable.create(model.tagsArr, true);
@@ -105,22 +104,22 @@
                 reader.onload = function (e) {
                     var workbook = XLS.read(e.target.result, {type: 'binary'}),
                         overview = workbook.Sheets.Overview,
-                        sId = surveys.findByGoogleId(overview.A2.w),
+                        surveyId = surveys.findByGoogleId(overview.A2.w),
                         msg = 'Survey with this id has already been uploaded. Do you want to overwrite existing one or add as a new survey?';
 
-                    if (sId !== -1) {
+                    if (surveyId !== -1) {
                         bootstrapConfirm(msg, 'Add as new', 'Overwrite', function (response) {
                             if (response === 2) {
-                                surveyId = sId;
+                                that.sId = surveyId;
                             }
                             else {
-                                surveyId = undefined;
+                                that.sId = undefined;
                             }
                             stepTwo(model.initByExcel(workbook));
                         });
                     }
                     else {
-                        surveyId = undefined;
+                        that.sId = undefined;
                         stepTwo(model.initByExcel(workbook));
                     }
                 };
@@ -167,6 +166,14 @@
         };
 
 
+        this.deleteSyn = function (index, name) {
+            model.deleteSyn(index, name);
+            model.tagsTable.updatePerc(model.tagsArr);
+            model.termsTable.updatePerc(model.termsArr);
+            saveAll();
+        };
+
+
         function calcDrop (from, to) {
             var line;
             
@@ -179,13 +186,13 @@
                                 model.deleteTag(from.index);
                             }
                             else {
-                                line = model.deleteSubTerm(from.index, from.html);
+                                line = model.deleteSyn(from.index, from.html);
                                 model.addSubTerm(to.index, line[0], line[1]);
                             }
                         }
                         else {
                             if (from.isSynonym) {
-                                line = model.deleteSubTerm(from.index, from.html);
+                                line = model.deleteSyn(from.index, from.html);
                                 model.addTag(line);
                             }
                             else {
@@ -206,7 +213,7 @@
                         model.deleteTag(from.index);
                     }
                     else {
-                        line = model.deleteSubTerm(from.index, from.html);
+                        line = model.deleteSyn(from.index, from.html);
                     }
                     model.addTerm(line);
                 }
@@ -229,8 +236,8 @@
 
 
         this.dragTag = function (from, to) {
-            var table = from.isTagsTable ? model.tagsTable : model.termsTable,
-                selected = table.selectedIndexes(),
+            var fromTable = from.isTagsTable ? model.tagsTable : model.termsTable,
+                selected = fromTable.selectedIndexes(),
                 n = selected.length;
 
             if (n) {
@@ -269,14 +276,14 @@
             clearTimeout(saveTimeout);
 
             saveTimeout = setTimeout(function () {
-                if (surveyId && !dupe) {
-                    that.surveys[surveyId].total = total;
-                    model.overwriteSurvey(surveyId);
+                if (that.sId && !dupe) {
+                    that.surveys[that.sId].total = total;
+                    model.overwriteSurvey(that.sId);
                 }
                 else {
                     dupe = false;
                     model.saveNewSurvey().then(function (id) {
-                        surveyId = id;
+                        that.sId = id;
                         surveys.add(model.surveyId, model.surveyData);
                     });
                 }
@@ -285,7 +292,7 @@
 
 
         this.downloadCsv = function () {
-            var fileName = 'tags_' + surveys.surveys[surveyId].survey_google_id + '.csv';
+            var fileName = 'tags_' + surveys.surveys[this.sId].survey_google_id + '.csv';
 
             if (navigator.msSaveBlob) { // IE 10+
                 navigator.msSaveBlob(chart.csvBlob, fileName);
@@ -315,7 +322,7 @@
         this.deleteSurveyById = function (id) {
             if (confirm('Do you really want to delete this survey and all its data?')) {  //todo bootstrap
                 surveys.delete(id);
-                if (id === surveyId) {
+                if (id === this.sId) {
                     $('tr[ondragover]').remove();
                     $('#tags-chart').html('');
                 }

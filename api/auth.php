@@ -1,5 +1,5 @@
 <?php
-    include 'settings.php';
+    include '../settings/settings.php';
 
     session_start();
 

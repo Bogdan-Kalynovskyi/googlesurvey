@@ -1,5 +1,5 @@
 <?php
-    include 'api/settings.php';
+    include 'settings/settings.php';
     session_start();
     $token = isset($_SESSION['xsrfToken']) && $_SESSION['xsrfToken'];
 ?>
@@ -62,15 +62,17 @@
             height: 100%;
             background: white;
         }
-        #loading > h5 {
+        h5 {
             font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
             color: #373a3c;
             font-size: 1.25rem;
             font-weight: 500;
             line-height: 1.1;
             margin-top: 0;
+        }
+        #loading > h5 {
             position: absolute;
-            top: calc(50% - 17px);
+            top: calc(50% - 22px);
             text-align: center;
             width: 100%;
         }
@@ -158,7 +160,7 @@
             <thead class="thead-default"><tr>
                 <th colspan=3>&nbsp; Survey</th><th>Google ID</th><th>Question</th><th>Answers</th>
             </tr></thead>
-            <tr ng-repeat="(id, survey) in ctrl.surveys">
+            <tr ng-class="{'table-info': id === ctrl.sId}" ng-repeat="(id, survey) in ctrl.surveys">
                 <td><a ng-click="ctrl.loadSurvey(id)" class="p-x-1">edit</a></td>
                 <td><a ng-click="ctrl.duplicateSurvey(id)">duplicate & edit</a></td>
                 <td><a ng-click="ctrl.deleteSurveyById(id)">delete</a></td>
@@ -195,8 +197,8 @@
                 <input ng-model="ctrl.minRepeat" ng-change="ctrl.filterMin()" ng-model-options='{ debounce: 110 }' type="number">
             </label>
             <label class="col-xs-6 col-sm-4 col-lg-3"><small id="tags-f-span">Filter:</small>
-                <input ng-model="ctrl.filterTerm" ng-change="ctrl.filterTerms()" ng-model-options='{ debounce: 110 }' placeholder="Tags except" id="tags-f-input">
-                <span class="cross" ng-click="ctrl.filterTerm = ''">×</span>
+                <input ng-model="ctrl.filterTerm" ng-change="ctrl.filterTerms()" ng-model-options='{ debounce: 110 }' placeholder="Filter tags" id="tags-f-input">
+                <span class="cross" ng-click="ctrl.filterTerm = '';ctrl.filterTerms()">×</span>
             </label>
         </div>
         <div class="row" id="scroll-tbl">
@@ -209,7 +211,6 @@
     <div id="chart" class="nav-body"> <!-- todo scrollable -->
         <div id="comment-chart"></div>
         <div id="tags-chart"></div>
-        <button class="btn btn-sm btn-primary block-center m-y-1 m-l-1 m-b-1 p-x" ng-click="ctrl.downloadCsv()">Download tags as CSV</button>
         <div id="chart-table"></div>
         <button class="btn btn-sm btn-primary block-center m-y-1 m-l-1 m-b-1 p-x" ng-click="ctrl.downloadCsv()">Download tags as CSV</button>
     </div>
@@ -222,7 +223,14 @@
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
     <script src="lib/xls.min.js"></script>
     <script src="//gstatic.com/charts/loader.js"></script>
-    <script src="app.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/table.js"></script>
+    <script src="js/simple-table.js"></script>
+    <script src="js/model.js"></script>
+    <script src="js/surveys.js"></script>
+    <script src="js/ui.js"></script>
 </div>
 </body>
 </html>

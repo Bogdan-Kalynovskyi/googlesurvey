@@ -34,11 +34,11 @@ header {
     box-shadow: 0 0 1px rgba(255, 255, 255, .2);
 }
 
-.active {
-    box-shadow: 0 0 4px #014682;
+.btn.active {
+    box-shadow: 0 0 4px #0275d8;
 }
 
-.active .bullet {
+.btn.active .bullet {
     background: #ffffbb;
 }
 
@@ -48,10 +48,6 @@ big {
     font-size: 30px;
     line-height: 36px;
     vertical-align: bottom;
-}
-
-.button.active {
-    background: red;
 }
 
 .logout {
@@ -89,6 +85,10 @@ input[ng-model] {
     background: #ddd;
     color: #fff;
     cursor: pointer;
+}
+
+.cross:hover {
+    box-shadow: 1px 1px 2px #666;
 }
 
 .nav-body {
@@ -150,15 +150,20 @@ tbody a {
     cursor: pointer!important;
 }
 
-#tags tr td:last-child {
-    width: 1.2rem;
+.del-line {
     cursor: pointer;
+    width: 1.2em;
+    color: #C66;
 }
 
-#tags tr td:last-child:after {
-    content: '×';
-    margin-left: 2px;
-    color: #C66;
+#tags li > i {
+    cursor: pointer;
+    float: right;
+    color: #014682;
+    position: relative;
+    top: -1px;
+    right: -12px;
+    display: none;
 }
 
 [draggable] {
@@ -170,9 +175,8 @@ tbody a {
 
 tbody span:hover,
 tbody li:hover {
-    background: #fdfdfd;
-    outline: 1px solid #dbdbdb;
-    box-shadow: 0 0 5px #888;
+    background: #fcfcfc;
+    box-shadow: 0 0 6px #777;
 }
 
 tbody tr:hover {
@@ -188,6 +192,17 @@ tbody input:not([type=checkbox]) {
     width: 100%;
 }
 
+tbody input:not([type=checkbox]) {
+    border: 0;
+    outline: 0;
+    box-shadow: 0 0 7px #666;
+}
+
+
+tbody li {
+    width: calc(100% - 14px);
+}
+
 tbody input {
     -webkit-user-select: text;
     -moz-user-select: text;
@@ -196,7 +211,7 @@ tbody input {
 }
 
 tbody ul {
-    margin: -3px 0 0 0;
+    margin: -2px 0 0 0;
 }
 
 .modal .close {

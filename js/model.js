@@ -1,5 +1,4 @@
-var total,
-    visibleTerms;
+var total;
 
     app.service('model', ['$http', function ($http) {
         var that = this;
@@ -41,7 +40,6 @@ var total,
                 };
 
                 total = t;
-                visibleTerms = new Array(total).fill(true);
             }
             catch (e) {
                 bootstrapAlert('Could not parse answers from Excel file');
@@ -61,7 +59,6 @@ var total,
         this.getTermsBySurveyId = function (surveyId) {
             return $http.get('api/terms.php?surveyId=' + surveyId).success(function (response) {
                 that.termsArr = response;
-                visibleTerms = new Array(total).fill(true);
             });
         };
 
@@ -181,7 +178,9 @@ var total,
         };
 
 
-        this.deleteSubTerm = function (index, name) {
+        this.deleteSyn = function (index, name) {
+            name = name.substr(name, name.length - 8);
+
             var line = this.tagsArr[index],
                 terms = line[2],
                 pos = terms.indexOf(name),
@@ -191,7 +190,7 @@ var total,
             line[1] -= line[3][pos];
             line[3].splice(pos, 1);
 
-            this.tagsTable.deleteSubTerm(index, pos, line[1]);
+            this.tagsTable.deleteSyn(index, pos, line[1]);
             return result;
         };
 
@@ -202,8 +201,8 @@ var total,
         };
 
 
-        this.updateTag = function (tableId, index, tagName, name, oldName) {
-            if (tableId === 'tags-table') {
+        this.updateTag = function (isTagsTable, index, tagName, name, oldName) {
+            if (isTagsTable) {
                 if (tagName === 'SPAN') {
                     this.tagsArr[index][0] = name;
                 }

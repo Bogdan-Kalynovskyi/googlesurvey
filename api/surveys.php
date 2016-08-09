@@ -44,6 +44,39 @@ function get () {
 }
 
 
+function appendTags ($tags, $surveyId) {
+    global $db;
+
+    $str = '';
+    $n = count($tags);
+    for ($i = 0; $i < $n; $i++) {
+        $line = $tags[$i];
+        $synonyms = isset($line[2]) ? ($db->a($line[2]).','.$db->a($line[3])) : '"",""';
+        $str .= '('.$surveyId.','.$db->a($line[0]).','.$db->b($line[1]).','.$synonyms.'),';
+    }
+
+    $str = substr($str, 0, -1);
+
+    $db->query('INSERT INTO tags (survey_id, tag, count, synonyms, syn_count) VALUES '.$str);
+}
+
+
+function appendTerms ($terms, $surveyId) {
+    global $db;
+
+    $str = '';
+    $n = count($terms);
+    for ($i = 0; $i < $n; $i++) {
+        $line = $terms[$i];
+        $str .= '('.$surveyId.','.$db->a($line[0]).','.$db->b($line[1]).'),';
+    }
+
+    $str = substr($str, 0, -1);
+
+    $db->query('INSERT INTO terms (survey_id, term, count) VALUES '.$str);
+}
+
+
 function create () {
     global $db;
 
@@ -58,35 +91,6 @@ function create () {
 
 function rewrite () {
     global $db;
-
-    function appendTags ($tags, $surveyId) {
-        $str = '';
-        $n = count($tags);
-        for ($i = 0; $i < $n; $i++) {
-            $line = $tags[$i];
-            $synonyms = isset($line[2]) ? ($db->a($line[2]).','.$db->a($line[3])) : '"",""';
-            $str .= '('.$surveyId.','.$db->a($line[0]).','.$db->b($line[1]).','.$synonyms.'),';
-        }
-
-        $str = substr($str, 0, -1);
-
-        $db->query('INSERT INTO tags (survey_id, tag, count, synonyms, syn_count) VALUES '.$str);
-    }
-
-
-    function appendTerms ($terms, $surveyId) {
-        $str = '';
-        $n = count($terms);
-        for ($i = 0; $i < $n; $i++) {
-            $line = $terms[$i];
-            $str .= '('.$surveyId.','.$db->a($line[0]).','.$db->b($line[1]).'),';
-        }
-
-        $str = substr($str, 0, -1);
-
-        $db->query('INSERT INTO terms (survey_id, term, count) VALUES '.$str);
-    }
-
 
     $post = json_decode(file_get_contents('php://input'), true);
     $surveyId = $db->b($post['surveyId']);
