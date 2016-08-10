@@ -134,6 +134,13 @@
         };
 
 
+        function recalcPerc () {
+            model.tagsTable.updatePerc(model.tagsArr);
+            model.termsTable.updatePerc(model.termsArr);
+            saveAll();
+        }
+
+
         this.addTags = function () {
             var arr = [];
             this.bulkAdd.toLowerCase().split(',').forEach(function (el) {
@@ -164,21 +171,23 @@
             }
             else {
                 total -= model.termsArr[index][1];
-                var trashId = trash.push([model.termsArr[index], isTagsTable]) - 1;
+                trashId = trash.push([model.termsArr[index], isTagsTable]) - 1;
                 model.deleteTerm(index, trashId);
             }
-            model.tagsTable.updatePerc(model.tagsArr);
-            model.termsTable.updatePerc(model.termsArr);
-            saveAll();
+            recalcPerc();
         };
 
 
         this.deleteSyn = function (index, name) {
             var syn = model.deleteSyn(index, name);
             total -= syn[1];
-            model.tagsTable.updatePerc(model.tagsArr);
-            model.termsTable.updatePerc(model.termsArr);
-            saveAll();
+            recalcPerc();
+        };
+
+
+        this.duplicateSyn = function (index, name) {
+            total += model.duplicateSyn(index, name);
+            recalcPerc();
         };
 
 
@@ -191,9 +200,7 @@
                 model.addTerm(restore[0]);
             }
             total += restore[0][1];
-            model.tagsTable.updatePerc(model.tagsArr);
-            model.termsTable.updatePerc(model.termsArr);
-            saveAll();
+            recalcPerc();
         };
 
 
@@ -281,10 +288,8 @@
 
         
         this.sort = function () {
-            model.sort(model.termsArr);
-            setTimeout(function () {
-                model.termsTable.update(model.termsArr);
-            }, 0);
+            model.sort(model.termsArr, true, true);
+            model.termsTable.update(model.termsArr);
         };
 
 

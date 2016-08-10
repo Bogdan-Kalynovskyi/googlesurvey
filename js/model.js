@@ -193,6 +193,23 @@ var total;
         };
 
 
+        this.duplicateSyn = function (index, name) {
+            var line = this.tagsArr[index],
+                terms = line[2],
+                counts = line[3],
+                pos = terms.indexOf(name),
+                term = terms[pos],
+                count = +counts[pos];
+
+            terms.splice(pos, 0, term);
+            line[1] += count;
+            counts.splice(pos, 0, count);
+
+            this.tagsTable.addSubTerm(index, term, count); //todo position
+            return count;
+        };
+
+
         this.deleteTerm = function (index, trashId) {
             this.termsTable.deleteRow(index, this.termsArr[index][0], trashId);
             this.termsArr.splice(index, 1);
@@ -224,21 +241,40 @@ var total;
             return that.sort(arr);
         }
 
+        var sortOrder = 1;
         
-        this.sort = function (arr) {
-            function compare(a, b) {
+        this.sort = function (arr, alpha, toggle) {
+            function alphabetical (a, b) {
                 if (a[0] > b[0]) {
-                    return 1;
+                    return sortOrder;
                 }
                 else if (a[0] < b[0]) {
-                    return -1;
+                    return -sortOrder;
                 }
                 else {
                     return 0;
                 }
             }
 
-            return arr.sort(compare);
+            function numeric (a, b) {
+                if (a[1] > b[1]) {
+                    return -1;
+                }
+                else if (a[1] < b[1]) {
+                    return 1;
+                }
+                else {
+                    return 0;
+                }
+            }
+
+            if (toggle) {
+                sortOrder *= -1;
+
+                $('.pull-xs-right').html('Sort terms ' + (sortOrder === 1 ? '▼' : '▲'));
+            }
+
+            return arr.sort(alpha ? alphabetical : numeric);
         };
 
 
@@ -268,6 +304,9 @@ var total;
             this.tagsArr = arr.slice(0, maxTags);
             this.termsArr = arr.slice(maxTags);
             unpackTerms();
+            this.sort(this.tagsArr, true);
+            this.sort(this.termsArr, true);
+
             this.tagsTable.create(this.tagsArr, reset);
             this.termsTable.create(this.termsArr, reset);
 
@@ -289,6 +328,9 @@ var total;
             this.tagsArr = arr.slice(0, i);
             this.termsArr = arr.slice(i);
             unpackTerms();
+            this.sort(this.tagsArr, true);
+            this.sort(this.termsArr, true);
+
             this.tagsTable.create(this.tagsArr);
             this.termsTable.create(this.termsArr);
 

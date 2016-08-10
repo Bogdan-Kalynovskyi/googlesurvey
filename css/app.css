@@ -61,7 +61,6 @@ input[ng-model] {
     width: 60px;
     padding: 0 4px;
     line-height: 27px;
-    border-color: #eee;
 }
 
 #tags-f-input {
@@ -181,23 +180,27 @@ tbody input:not([type=checkbox]) {
 }
 
 tbody li > span {
-    width: calc(100% - 15px);
+    width: calc(100% - 52px);
 }
 
 del-syn,
+dupl-syn,
 del-undo {
     cursor: pointer;
     float: right;
     color: #0275d8;
     position: relative;
-    left: -1px;
+    left: -2px;
+    margin-left: 6px;
 }
 
-del-syn {
+del-syn,
+dupl-syn {
     visibility: hidden;
 }
 
-li:hover > del-syn {
+li:hover > del-syn,
+li:hover > dupl-syn {
     visibility: visible;
 }
 

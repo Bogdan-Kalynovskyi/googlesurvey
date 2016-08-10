@@ -87,7 +87,7 @@ function Table (container) {
                 
                 synStr = '<ul>';
                 for (var j = 0, m = syn.length; j < m; j++) {
-                    synStr += '<li><span draggable=true>' + syn[j] + '</span><del-syn>×</del-syn></li>';
+                    synStr += '<li><span draggable=true>' + syn[j] + '</span><del-syn>×</del-syn><dupl-syn>clone</dupl-syn></li>';
                 }
                 synStr += '</ul>';
             }
@@ -166,7 +166,7 @@ function Table (container) {
             dragData = {
                 index: getIndex(startRow),
                 startRow: startRow,
-                html: isSyn ? target.children[0].innerHTML : 0,
+                html: isSyn ? target.innerHTML : 0,
                 isSynonym: isSyn,
                 isTagsTable: isTagsTable
             };
@@ -270,6 +270,10 @@ function Table (container) {
                 ctrl.deleteSyn(getIndex(target), target.parentNode.children[0].innerHTML);
             }
 
+            else if (tagName === 'DUPL-SYN') {
+                ctrl.duplicateSyn(getIndex(target), target.parentNode.children[0].innerHTML);
+            }
+
             else if (target.className === 'del-line') {
                 ctrl.deleteRow(getIndex(target), isTagsTable);
             }
@@ -359,7 +363,7 @@ function Table (container) {
     this.addSubTerm = function (index, name, repeat) {
         var tr = tbody.children[index],
             ul = tr.children[1].children[1],
-            str = '<li><span draggable=true>' + name + '</span><del-syn>×</del-syn></li>';
+            str = '<li><span draggable=true>' + name + '</span><del-syn>×</del-syn><dupl-syn>clone</dupl-syn></li>';
 
         if (ul) {
             $(ul).append(str);
@@ -374,9 +378,9 @@ function Table (container) {
 
     this.addSubTerms = function (index, arr) {
         var $ul = $(tbody.children[index].children[1].children[1]),
-            str = arr.join('</span><del-syn>×</del-syn></li><li><span draggable=true>');
+            str = arr.join('</span><del-syn>×</del-syn><dupl-syn>clone</dupl-syn></li><li><span draggable=true>');
         
-        $ul.append('<li><span draggable=true>' + str + '</span><del-syn>×</del-syn></li>');
+        $ul.append('<li><span draggable=true>' + str + '</span><del-syn>×</del-syn><dupl-syn>clone</dupl-syn></li>');
     };
 
 

@@ -186,7 +186,7 @@
                 <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags()" style="position: relative; top: -1px; left: -2px">Add tags manually</button>
             </div>
             <div class="col-xs-3">
-                <button class="btn btn-sm btn-primary pull-xs-right" ng-click="ctrl.sort()">Sort terms</button>
+                <button class="btn btn-sm btn-primary pull-xs-right" ng-click="ctrl.sort()">Sort terms ▼</button>
             </div>
         </div>
         <div class="row m-t-1">
@@ -224,7 +224,7 @@
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
     <script src="lib/xls.min.js"></script>
     <script src="//www.gstatic.com/charts/loader.js"></script>
-    <script src="app2.js"></script>
+    <script src="app3.js"></script>
 </div>
 </body>
 </html>
