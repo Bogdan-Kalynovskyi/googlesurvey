@@ -10,7 +10,8 @@
         var that = this,
             dupe = false,
             chart = new Chart(byId('tags-chart')),
-            oldState;
+            oldState,
+            trash;
 
 
         model.tagsTable = new Table(byId('tags-table'));
@@ -55,19 +56,22 @@
 
 
         function stepTwo (question) {
-            that.navigate('tags');
             that.filterTerm = '';
-            that.filterMax(true);
-            $('#tags-question').html(question);
+            trash = [];
+            that.navigate('tags');
+            that.splitMax(true);
+            byId('tags-question').innerHTML = question;
         }
 
         
-        this.filterMax = function (reset) {
-            this.minRepeat = model.splitMax(this.maxTags, reset);
-            saveAll();
+        this.splitMax = function (reset) {
+            if (this.maxTags) {
+                this.minRepeat = model.splitMax(this.maxTags, reset);
+                saveAll();
+            }
         };
 
-        this.filterMin = function () {
+        this.splitMin = function () {
             this.maxTags = model.splitMin(this.minRepeat);
             saveAll();
         };
@@ -76,6 +80,7 @@
         this.loadSurvey = function (id) {
             this.sId = id;
             this.filterTerm = '';
+            trash = [];
             this.navigate('tags');
             byId('tags-question').innerHTML = surveys.surveys[this.sId].question;
             total = +surveys.surveys[id].total;
@@ -151,14 +156,16 @@
         };
 
 
-        this.deleteLine = function (index, isTagsTable) {
+        this.deleteRow = function (index, isTagsTable) {
             if (isTagsTable) {
                 total -= model.tagsArr[index][1];
-                model.deleteTag(index);
+                var trashId = trash.push([model.tagsArr[index], isTagsTable]) - 1;
+                model.deleteTag(index, trashId);
             }
             else {
                 total -= model.termsArr[index][1];
-                model.deleteTerm(index);
+                var trashId = trash.push([model.termsArr[index], isTagsTable]) - 1;
+                model.deleteTerm(index, trashId);
             }
             model.tagsTable.updatePerc(model.tagsArr);
             model.termsTable.updatePerc(model.termsArr);
@@ -167,7 +174,23 @@
 
 
         this.deleteSyn = function (index, name) {
-            model.deleteSyn(index, name);
+            var syn = model.deleteSyn(index, name);
+            total -= syn[1];
+            model.tagsTable.updatePerc(model.tagsArr);
+            model.termsTable.updatePerc(model.termsArr);
+            saveAll();
+        };
+
+
+        this.undoRow = function (id) {
+            var restore = trash[id];
+            if (restore[1]) {
+                model.addTag(restore[0]);
+            }
+            else {
+                model.addTerm(restore[0]);
+            }
+            total += restore[0][1];
             model.tagsTable.updatePerc(model.tagsArr);
             model.termsTable.updatePerc(model.termsArr);
             saveAll();
@@ -268,6 +291,13 @@
         this.filterTerms = function () {
             model.filterTerms(this.filterTerm);
         };
+
+
+        // this.clearFilter = function () {
+        //     this.filterTerm = '';
+        //     $('#terms-table thead input')[0].checked = false;
+        //     //ctrl.filterTerms()
+        // };
         
 
         var saveTimeout;

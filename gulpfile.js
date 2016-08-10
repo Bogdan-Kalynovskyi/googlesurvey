@@ -10,7 +10,7 @@ var jsFiles = 'js/*.js',
 
 gulp.task('default', function() {
     return gulp.src(jsFiles)
-        .pipe(concat('app.js'))
+        .pipe(concat('app2.js'))
         .pipe(uglify())
         .pipe(gulp.dest(jsDest));
 });

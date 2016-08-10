@@ -33,7 +33,7 @@ catch (Exception $e) {
 function get () {
     global $db;
 
-    $query = mysql_query('SELECT tag, count, synonyms, syn_count FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']).' ORDER BY count DESC');
+    $query = mysql_query('SELECT tag, count, synonyms, syn_count FROM tags WHERE survey_id = '.$db->b($_GET['surveyId']).' ORDER BY tag');
     $result = array();
     while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
         $rrr = array($row[0], intval($row[1]));

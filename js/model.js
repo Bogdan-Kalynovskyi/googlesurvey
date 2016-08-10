@@ -172,15 +172,13 @@ var total;
         };
 
 
-        this.deleteTag = function (index) {
+        this.deleteTag = function (index, trashId) {
+            this.tagsTable.deleteRow(index, this.tagsArr[index][0], trashId);
             this.tagsArr.splice(index, 1);
-            this.tagsTable.deleteRow(index);
         };
 
 
-        this.deleteSyn = function (index, name) {
-            name = name.substr(name, name.length - 8);
-
+        this.deleteSyn = function (index, name, trashId) {
             var line = this.tagsArr[index],
                 terms = line[2],
                 pos = terms.indexOf(name),
@@ -190,25 +188,25 @@ var total;
             line[1] -= line[3][pos];
             line[3].splice(pos, 1);
 
-            this.tagsTable.deleteSyn(index, pos, line[1]);
+            this.tagsTable.deleteSyn(index, pos, line[1], trashId);
             return result;
         };
 
 
-        this.deleteTerm = function (index) {
+        this.deleteTerm = function (index, trashId) {
+            this.termsTable.deleteRow(index, this.termsArr[index][0], trashId);
             this.termsArr.splice(index, 1);
-            this.termsTable.deleteRow(index);
         };
 
 
-        this.updateTag = function (isTagsTable, index, tagName, name, oldName) {
+        this.updateTag = function (isTagsTable, index, isSyn, name, oldName) {
             if (isTagsTable) {
-                if (tagName === 'SPAN') {
-                    this.tagsArr[index][0] = name;
-                }
-                else {
+                if (isSyn) {
                     var arr = this.tagsArr[index][2];
                     arr[arr.indexOf(oldName)] = name;
+                }
+                else {
+                    this.tagsArr[index][0] = name;
                 }
             }
             else {
@@ -229,11 +227,11 @@ var total;
         
         this.sort = function (arr) {
             function compare(a, b) {
-                if (a[1] > b[1]) {
-                    return -1;
-                }
-                else if (a[1] < b[1]) {
+                if (a[0] > b[0]) {
                     return 1;
+                }
+                else if (a[0] < b[0]) {
+                    return -1;
                 }
                 else {
                     return 0;

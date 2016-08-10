@@ -39,7 +39,7 @@ header {
 }
 
 .btn.active .bullet {
-    background: #ffffbb;
+    background: #ffffb0;
 }
 
 big {
@@ -61,6 +61,7 @@ input[ng-model] {
     width: 60px;
     padding: 0 4px;
     line-height: 27px;
+    border-color: #eee;
 }
 
 #tags-f-input {
@@ -88,7 +89,7 @@ input[ng-model] {
 }
 
 .cross:hover {
-    box-shadow: 1px 1px 2px #666;
+    box-shadow: 0 0 1.5px #aaa;
 }
 
 .nav-body {
@@ -107,7 +108,7 @@ input[ng-model] {
 }
 
 #tags-question {
-    color: #999;
+    color: #888;
     font-size: 13px;
     margin-bottom: 12px;
 }
@@ -156,16 +157,6 @@ tbody a {
     color: #C66;
 }
 
-#tags li > i {
-    cursor: pointer;
-    float: right;
-    color: #014682;
-    position: relative;
-    top: -1px;
-    right: -12px;
-    display: none;
-}
-
 [draggable] {
     cursor: move;
     cursor: -webkit-grab;
@@ -173,37 +164,87 @@ tbody a {
     cursor: grab;
 }
 
-tbody span:hover,
-tbody li:hover {
-    background: #fcfcfc;
-    box-shadow: 0 0 6px #777;
+tbody span:hover {
+    background: #fbfbfc;
+    box-shadow: 0 0 6px #aaa;
 }
 
 tbody tr:hover {
-    background: #f8f8ff!important;
-    /*outline: 1px solid white; todo gradient bg */
+    background: #f7f7ff!important;
 }
 
 tbody span,
-tbody li,
 tbody input:not([type=checkbox]) {
     display: inline-block;
     padding: 0 3px;
     width: 100%;
 }
 
+tbody li > span {
+    width: calc(100% - 15px);
+}
+
+del-syn,
+del-undo {
+    cursor: pointer;
+    float: right;
+    color: #0275d8;
+    position: relative;
+    left: -1px;
+}
+
+del-syn {
+    visibility: hidden;
+}
+
+li:hover > del-syn {
+    visibility: visible;
+}
+
+#undo {
+    background: #dfdfdf;
+    font-size: 12px;
+    width: 50%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    opacity: 0.9;
+    color: black;
+    border-top: 1px solid white;
+}
+
+#undo > div {
+    padding: 4px 3px 3px 6px;
+    overflow: hidden;
+    box-shadow: 0 0 4px #d0d0d0;
+}
+
+#undo > div:hover {
+    background: #ddd;
+}
+
+undo {
+    cursor: pointer;
+    color: #0275d8;
+}
+
+undo:hover {
+    text-decoration: underline;
+}
+
+del-undo {
+    padding: 1px;
+}
+
+del-undo:hover {
+    background: #c0c0c0;
+    box-shadow: 0 0 3px #bbb;
+}
+
 tbody input:not([type=checkbox]) {
     border: 0;
-    outline: 0;
-    box-shadow: 0 0 7px #666;
-}
-
-
-tbody li {
-    width: calc(100% - 14px);
-}
-
-tbody input {
+    box-shadow: 0 0 12px #222;
+    outline: 1px solid #fff;
     -webkit-user-select: text;
     -moz-user-select: text;
     -ms-user-select: text;
@@ -212,6 +253,7 @@ tbody input {
 
 tbody ul {
     margin: -2px 0 0 0;
+    list-style: none;
 }
 
 .modal .close {
@@ -283,8 +325,14 @@ tbody ul {
 }
 
 @media (max-width: 544px) {
+    #scroll-tbl {
+        height: auto;
+    }
     tbody span {
         max-width: none;
+    }
+    #undo {
+        width: 100%;
     }
 }
 

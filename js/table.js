@@ -1,4 +1,20 @@
-var dragData;
+var $undo = $('#undo'),
+    ctrl,
+    dragData;
+
+$undo[0].onclick = function (evt) {
+    var target = evt.target,
+        tagName = target.tagName;
+
+    if (tagName === 'UNDO') {
+        ctrl.undoRow(target.getAttribute('trash-id'));
+        $undo[0].removeChild(target.parentNode);
+    }
+    else if (tagName === 'DEL-UNDO') {
+        $undo[0].removeChild(target.parentNode);
+    }
+};
+
 
 function Table (container) {
     var tbody,
@@ -19,6 +35,7 @@ function Table (container) {
         if (!isTagsTable) {
             visibleTerms = Array(total).fill(true);
         }
+        $undo.innerHTML = '';
 
         if (tbody && !reset) {
             this.update(arr);
@@ -44,10 +61,10 @@ function Table (container) {
 
         setTimeout(function () {
             $tbody = $(tbody);
+            ctrl = ctrl || angular.element(root).scope().ctrl;
             addMasterCheckbox();
             assignDragNDrop();
             assignDynamicInput();
-            assignLineDelete();
         }, 0);
     };
 
@@ -70,7 +87,7 @@ function Table (container) {
                 
                 synStr = '<ul>';
                 for (var j = 0, m = syn.length; j < m; j++) {
-                    synStr += '<li draggable=true>' + syn[j] + '<i>×</i></li>';
+                    synStr += '<li><span draggable=true>' + syn[j] + '</span><del-syn>×</del-syn></li>';
                 }
                 synStr += '</ul>';
             }
@@ -144,12 +161,12 @@ function Table (container) {
             }
 
             var startRow = getClosestRow(target),
-                isSyn = target.tagName === 'LI';
+                isSyn = target.parentNode.tagName === 'LI';
 
             dragData = {
                 index: getIndex(startRow),
                 startRow: startRow,
-                html: isSyn ? target.innerHTML : 0,
+                html: isSyn ? target.children[0].innerHTML : 0,
                 isSynonym: isSyn,
                 isTagsTable: isTagsTable
             };
@@ -217,20 +234,18 @@ function Table (container) {
                 outline.style.outline = '';
             }
 
-            angular.element(root).scope().ctrl.dragTag(dragData, to);
+            ctrl.dragTag(dragData, to);
         });
     }
 
 
     function assignDynamicInput () {
         tbody.addEventListener('click', function (evt) {
-            var target = evt.target;
+            var target = evt.target,
+                tagName = target.tagName;
 
-            if (target.tagName === 'SPAN' || target.tagName === 'LI') {
+            if (tagName === 'SPAN') {
                 var oldName = target.innerHTML;
-                if (target.tagName === 'LI') {
-                    oldName = oldName.substr(oldName, oldName.length - 8);
-                }
 
                 target.style.padding = '0';
                 target.innerHTML = '<input value="' + oldName + '">';
@@ -239,10 +254,7 @@ function Table (container) {
                 input.onblur = function () {
                     var val = input.value;
                     if (val && oldName !== input.value) {
-                        angular.element(root).scope().ctrl.updateTag(isTagsTable, getIndex(target), target.tagName, val, oldName);
-                    }
-                    if (target.tagName === 'LI') {
-                        val += '<i>×</i>';
+                        ctrl.updateTag(isTagsTable, getIndex(target), target.parentNode.tagName === 'LI', val, oldName);
                     }
                     target.style.padding = '';
                     target.innerHTML = val;
@@ -253,19 +265,13 @@ function Table (container) {
                     }
                 };
             }
-        });
-    }
 
-
-    function assignLineDelete () {
-        container.children[0].addEventListener('click', function (evt) {
-            var target = evt.target;
-
-            if (target.className === 'del-line') {
-                angular.element(root).scope().ctrl.deleteLine(getIndex(target), isTagsTable);
+            else if (tagName === 'DEL-SYN') {
+                ctrl.deleteSyn(getIndex(target), target.parentNode.children[0].innerHTML);
             }
-            else if (target.tagName === 'I') {
-                angular.element(root).scope().ctrl.deleteSyn(getIndex(target), target.innerHTML);
+
+            else if (target.className === 'del-line') {
+                ctrl.deleteRow(getIndex(target), isTagsTable);
             }
         });
     }
@@ -353,7 +359,7 @@ function Table (container) {
     this.addSubTerm = function (index, name, repeat) {
         var tr = tbody.children[index],
             ul = tr.children[1].children[1],
-            str = '<li draggable=true>' + name + '<i>×</i></li>';
+            str = '<li><span draggable=true>' + name + '</span><del-syn>×</del-syn></li>';
 
         if (ul) {
             $(ul).append(str);
@@ -368,9 +374,9 @@ function Table (container) {
 
     this.addSubTerms = function (index, arr) {
         var $ul = $(tbody.children[index].children[1].children[1]),
-            str = arr.join('<i>×</i></li><li draggable=true>');
+            str = arr.join('</span><del-syn>×</del-syn></li><li><span draggable=true>');
         
-        $ul.append('<li draggable=true>' + str + '<i>×</i></li>');
+        $ul.append('<li><span draggable=true>' + str + '</span><del-syn>×</del-syn></li>');
     };
 
 
@@ -383,10 +389,13 @@ function Table (container) {
     };
 
 
-    this.deleteRow = function (index) {
+    this.deleteRow = function (index, text, trashId) {
         tbody.removeChild(tbody.children[index]);
-        if (!isTagsTable) {
-            visibleTerms.splice(index, 1);
+        if (trashId !== undefined) {
+            $undo.prepend('<div><undo trash-id=' + trashId + '>undo</undo> ' + text + '<del-undo>×</del-undo></div>');
+            if (!isTagsTable) {
+                visibleTerms.splice(index, 1);
+            }
         }
     };
-}
+};

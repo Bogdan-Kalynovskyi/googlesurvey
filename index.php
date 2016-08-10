@@ -11,7 +11,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>Google Surveys</title>
     <meta name="google-signin-client_id" content="<?php echo $google_api_id ?>">
-    <script src="//apis.google.com/js/platform.js" async defer onload="onPlatformLoad()"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer onload="onPlatformLoad()"></script>
     <script>
         function logIn (g) {
             $.post('api/login.php', {
@@ -182,8 +182,8 @@
         <div id="tags-question"></div>
         <div class="row">
             <div class="col-xs-9 col-lg-6">
-                <input ng-model="ctrl.bulkAdd" placeholder="Comma separated tags list" ng-keyup="$event.keyCode == 13 && ctrl.addTags()" style="width: calc(100% - 90px)">
-                <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags()">Bulk add</button>
+                <input ng-model="ctrl.bulkAdd" placeholder="Comma separated tags list" ng-keyup="$event.keyCode == 13 && ctrl.addTags()" style="width: calc(100% - 148px);">
+                <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags()" style="position: relative; top: -1px; left: -2px">Add tags manually</button>
             </div>
             <div class="col-xs-3">
                 <button class="btn btn-sm btn-primary pull-xs-right" ng-click="ctrl.sort()">Sort terms</button>
@@ -191,10 +191,10 @@
         </div>
         <div class="row m-t-1">
             <label class="col-xs-6 col-sm-4 col-lg-3"><small>Maximum number of tags:</small>
-                <input ng-model="ctrl.maxTags" ng-change="ctrl.filterMax()" ng-model-options='{ debounce: 110 }' type="number">
+                <input ng-model="ctrl.maxTags" ng-change="ctrl.splitMax()" ng-model-options='{ debounce: 110 }' type="number">
             </label>
             <label class="col-xs-6 col-sm-4 col-lg-3"><small>Minimum repeat for tag:</small>
-                <input ng-model="ctrl.minRepeat" ng-change="ctrl.filterMin()" ng-model-options='{ debounce: 110 }' type="number">
+                <input ng-model="ctrl.minRepeat" ng-change="ctrl.splitMin()" ng-model-options='{ debounce: 110 }' type="number">
             </label>
             <label class="col-xs-6 col-sm-4 col-lg-3"><small id="tags-f-span">Filter:</small>
                 <input ng-model="ctrl.filterTerm" ng-change="ctrl.filterTerms()" ng-model-options='{ debounce: 110 }' placeholder="Filter tags" id="tags-f-input">
@@ -204,7 +204,8 @@
         <div class="row" id="scroll-tbl">
             <div class="col-sm-6 overflow" id="tags-table"></div>
             <div class="col-sm-6 overflow" id="terms-table"></div>
-        </div>
+              </div>
+        <div id="undo"></div>
     </div>
 
 
@@ -222,15 +223,8 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
     <script src="lib/xls.min.js"></script>
-    <script src="//gstatic.com/charts/loader.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/chart.js"></script>
-    <script src="js/dashboard.js"></script>
-    <script src="js/table.js"></script>
-    <script src="js/simple-table.js"></script>
-    <script src="js/model.js"></script>
-    <script src="js/surveys.js"></script>
-    <script src="js/ui.js"></script>
+    <script src="//www.gstatic.com/charts/loader.js"></script>
+    <script src="app2.js"></script>
 </div>
 </body>
 </html>

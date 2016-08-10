@@ -50,8 +50,9 @@
                 else if (allowAlert) {
                     if (status === -1) {
                         info('Oops, it seems you have lost internet connection');
-                    } else {
-                        info('Wow, the server is experiencing overload. Could you please try in a minute?');
+                    }
+                    else {
+                        info('We are restarting server. Could you please try in a minute?');
                     }
                     // here the code will be blocked with alert, so this line will be executed after alert closes
                     // put timeout back when html popup
@@ -74,9 +75,14 @@
 
                 responseError: function (response) {
                     switch (response.status) {
+                        case 400:
                         case 401:
-                        case 403:
                             bootstrapAlert(response.data);
+                            if (response.status === 401) {
+                                $('.modal button').click(function () {
+                                    location.reload();
+                                });
+                            }
                             break;
 
                         case -1:
