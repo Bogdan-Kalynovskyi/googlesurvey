@@ -288,14 +288,14 @@ app.service('model', ['$http', function ($http) {
             for (j in this.tags) {
                 var tag = this.tags[j];
                 if (answer.indexOf(tag[0]) !== -1) {
-                    list += i + ',';
+                    list += j + ',';
                     tag[1]++;
                 }
                 var syn = tag[2];
                 if (syn) {
                     for (var k in syn) {
                         if (answer.indexOf(syn[k]) !== -1) {
-                            list += k + ',';
+                            list += j + ',';
                             tag[1]++;
                         }
                     }

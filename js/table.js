@@ -144,7 +144,7 @@ function Table (container, tblType) {
                     }
                     str +=
                         '<tr ondragover="return false">' +
-                        '<td>' + line[0] + synStr + '</td></tr>';
+                        '<td><text>' + line[0] + '</text>' + synStr + '</td></tr>';
                 }
                 break;
 
@@ -165,7 +165,7 @@ function Table (container, tblType) {
 
                     str +=
                         '<tr><td><input type=checkbox></td>' +
-                        '<td draggable=true>' + line[0] + str + '</td>' +
+                        '<td draggable=true>' + line[0] + synStr + '</td>' +
                         '<td>' + toPerc(line[1]) + '%</td><td>' + line[1] + '</td></tr>';
                 }
                 break;
@@ -249,7 +249,7 @@ function Table (container, tblType) {
                 tblType: tblType
             };
 
-            $tbody.find('input:checked').css('outline', '5px solid rgba(0, 0, 255, 0.2)');// todo
+            $tbody.find('input:checked').css('outline', '5px solid rgba(0, 0, 255, 0.2)');// todo  todo
         });
 
 
@@ -375,7 +375,7 @@ function Table (container, tblType) {
             rows = tbody.children,
             i, n;
 
-        if (tblType !== TBL_terms) {
+        if (tblType === TBL_terms) {
             for (i in visibleTerms) {
                 if (visibleTerms[i] && rows[i].children[0].children[0].checked) {
                     selected.push(i);
@@ -430,7 +430,7 @@ function Table (container, tblType) {
         var rows = tbody.children,
             i, n;
 
-        if (tblType !== TBL_terms) {
+        if (tblType === TBL_terms) {
             for (i in visibleTerms) {
                 if (visibleTerms[i]) {
                     rows[i].children[2].innerHTML = toPerc(arr[i][1]) + '%'
@@ -474,8 +474,16 @@ function Table (container, tblType) {
 
     this.addSyn = function (index, name, repeat, pos) {
         var tr = tbody.children[index],
-            ul = tr.children[1].children[1],
+            td = tr.children[tblType === TBL_tags ? 1 : 0],
+            ul = td.children[1],
+            str;
+
+        if (tblType === TBL_tags) {
             str = '<li><span draggable=true>' + name + '</span><del-syn>×</del-syn><dupl-syn>clone</dupl-syn></li>';
+        }
+        else {
+            str = '<li><text>' + name + '</text><del-tag>×</del-tag></li>';
+        }
 
         if (ul) {
             if (pos) {
@@ -486,7 +494,7 @@ function Table (container, tblType) {
             }
         }
         else {
-            $(tr.children[1].children[0]).after('<ul>' + str + '</ul>');
+            $(td).append('<ul>' + str + '</ul>');
         }
         if (tblType !== TBL_answers) {
             tr.children[2].innerHTML = toPerc(repeat) + '%';
@@ -496,17 +504,27 @@ function Table (container, tblType) {
 
 
     this.addSyns = function (index, arr) {
-        var $ul = $(tbody.children[index].children[1].children[1]),
-            str = arr.join('</span><del-syn>×</del-syn><dupl-syn>clone</dupl-syn></li><li><span draggable=true>');
-        
-        $ul.prepend('<li><span draggable=true>' + str + '</span><del-syn>×</del-syn><dupl-syn>clone</dupl-syn></li>');
+        var td = tbody.children[index].children[tblType === TBL_tags ? 1 : 0],
+            $ul = $(td.children[1]),
+            str = '';
+
+        for (var i in arr) {
+            if (tblType === TBL_tags) {
+                str += '<li><span draggable=true>' + arr[i] + '</span><del-syn>×</del-syn><dupl-syn>clone</dupl-syn></li>';
+            }
+            else {
+                str += '<li><text>' + arr[i] + '</text><del-tag>×</del-tag></li>';
+            }
+        }
+
+        $ul.prepend(str);
     };
 
 
     function addTrash (trashId) {
         if (trashId !== undefined) {
             setTimeout(function () {
-                // don't remove this timeout, this is to fix trash initialisation order
+                // don't remove this timeout, this is to fix trash initialisation order (one function returns line after executon)
                 var restore = trash[trashId],
                     type = restore[1],
                     typeStr;
@@ -529,7 +547,8 @@ function Table (container, tblType) {
 
     this.deleteSyn = function (index, pos, repeat, trashId) {
         var tr = tbody.children[index],
-            ul = tr.children[1].children[1];
+            td = tr.children[tblType === TBL_tags ? 1 : 0],
+            ul = td.children[1];
         ul.removeChild(ul.children[pos]);
         if (tblType !== TBL_answers) {
             tr.children[2].innerHTML = toPerc(repeat) + '%';

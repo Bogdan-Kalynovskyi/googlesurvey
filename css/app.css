@@ -181,10 +181,9 @@ thead th {
     border-bottom: 0;
 }
 
-/*thead th[colspan="5"] {*/
-    /*font-weight: normal;*/
-    /*font-size: 10px;*/
-/*}*/
+td[draggable]:hover {
+    box-shadow: 0 0 6px #aaa inset;
+}
 
 #tags .table th:first-child,
 #answers .table th:first-child,
