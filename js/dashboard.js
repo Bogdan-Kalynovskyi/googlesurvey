@@ -1,21 +1,28 @@
+    var trash,
+        TBL_tags = 0,
+        TBL_terms = 1,
+        TBL_answers = 2,
+        TBL_short = 3;
+
+    function byId(id) {
+        return document.getElementById(id);
+    }
 
     google.charts.load('44', {'packages': ['bar']});
 
 
     app.controller('dashboard', ['model', 'surveys', '$rootScope', '$q', function (model, surveys, $rootScope, $q) {
-        function byId(id) {
-            return document.getElementById(id);
-        }
 
         var that = this,
             dupe = false,
             chart = new Chart(byId('tags-chart')),
             oldState,
-            trash;
 
+            tagsReady,
+            answersReady,
+            chartReady,
+            surveyJustDone;
 
-        model.tagsTable = new Table(byId('tags-table'));
-        model.termsTable = new Table(byId('terms-table'));
         this.maxTags = 10;
 
 
@@ -30,11 +37,11 @@
             if (oldState === 'chart') {
                 chart.update();
             }
-        }, 100);
+        });
 
 
         this.navigate = function (state) {
-            if (state !== 'surveys' && !(model.tagsArr || this.sId)) {
+            if (state !== 'surveys' && !(model.tags || this.sId)) {
                 alert('Nothing to display, survey not loaded yet');
                 return;
             }
@@ -47,55 +54,76 @@
             byId(state).style.display = 'block';
             oldState = state;
 
-            if (state === 'chart') {
-                chart.create(model.tagsArr, surveys.surveys[this.sId]);
+            if (!answersReady && state === 'answers') {
+                if (surveyJustDone) {
+                    model.prepareAnswers();
+                    model.saveAnswers(this.sId);
+                    answersReady = true;
+                }
+                else {
+                    model.getAnswers(this.sId).success(function () {
+                        answersReady = true;
+                    });
+                }
+                //todo what happens if we come here again, with changed tags after tags editing?
+            }
+
+            if (!chartReady && state === 'chart') {
+                chart.create(model.tags, surveys.surveys[this.sId]);
                 var table = new SimpleTable(byId('chart-table'));
-                table.create(model.tagsArr);
+                table.create(model.tags);
+                chartReady = true;
             }
         };
 
 
-        function stepTwo (question) {
-            that.filterTerm = '';
-            trash = [];
-            that.navigate('tags');
-            that.splitMax(true);
-            byId('tags-question').innerHTML = question;
+        function onSurveyCreated (question) {
+            if (question) {
+                surveyJustDone = true;
+                tagsReady = true;
+                that.filterTerm = '';
+                trash = [];
+                that.navigate('tags');
+                that.splitMax();
+                byId('tags-question').innerHTML = question;
+                $undo.innerHTML = '';
+            }
         }
 
         
-        this.splitMax = function (reset) {
-            if (this.maxTags) {
-                this.minRepeat = model.splitMax(this.maxTags, reset);
-                saveAll();
+        this.splitMax = function () {
+            if (!this.maxTags) {
+                this.maxTags = 1;
             }
+            this.minRepeat = model.splitMax(this.maxTags, tagsReady);
+            saveTagTerms();
         };
+
 
         this.splitMin = function () {
             this.maxTags = model.splitMin(this.minRepeat);
-            saveAll();
+            saveTagTerms();
         };
 
         
         this.loadSurvey = function (id) {
+            surveyJustDone = false;
             this.sId = id;
             this.filterTerm = '';
             trash = [];
             this.navigate('tags');
             byId('tags-question').innerHTML = surveys.surveys[this.sId].question;
+            $undo.innerHTML = '';
             total = +surveys.surveys[id].total;
-            model.getTagsBySurveyId(id).success(function () {
-                model.tagsTable.create(model.tagsArr, true);
-                that.maxTags = model.tagsArr.length;
-                that.minRepeat = model.tagsArr[that.maxTags - 1][1];
+            model.getTags(id).success(function () {
+                that.maxTags = model.tags.length;
+                that.minRepeat = model.tags[that.maxTags - 1][1];
             });
-            model.getTermsBySurveyId(id).success(function () {
-                model.termsTable.create(model.termsArr, true);
-            });
+            model.getTerms(id);
         };
 
 
-        this.duplicateSurvey = function (id) {
+        this.cloneSurvey = function (id) {
             this.loadSurvey(id);
             model.surveyData = surveys.surveys[id];
             dupe = true;
@@ -120,12 +148,12 @@
                             else {
                                 that.sId = undefined;
                             }
-                            stepTwo(model.initByExcel(workbook));
+                            onSurveyCreated(model.initByExcel(workbook));
                         });
                     }
                     else {
                         that.sId = undefined;
-                        stepTwo(model.initByExcel(workbook));
+                        onSurveyCreated(model.initByExcel(workbook));
                     }
                 };
 
@@ -134,10 +162,9 @@
         };
 
 
-        function recalcPerc () {
-            model.tagsTable.updatePerc(model.tagsArr);
-            model.termsTable.updatePerc(model.termsArr);
-            saveAll();
+        function saveTotalTagTerms () {
+            model.recalcPerc();
+            saveTagTerms();
         }
 
 
@@ -152,127 +179,165 @@
             this.bulkAdd = '';
 
             model.addTags(arr);
-            model.tagsTable.update(model.tagsArr);
-            saveAll();
+            saveTagTerms();
         };
 
 
         this.updateTag = function () {
             model.updateTag.apply(model, arguments);
-            saveAll();
+            saveTagTerms();
         };
 
 
         this.deleteRow = function (index, isTagsTable) {
             if (isTagsTable) {
-                total -= model.tagsArr[index][1];
-                var trashId = trash.push([model.tagsArr[index], isTagsTable]) - 1;
+                total -= model.tags[index][1];
+                var trashId = trash.push([model.tags[index], isTagsTable]) - 1;
                 model.deleteTag(index, trashId);
             }
             else {
-                total -= model.termsArr[index][1];
-                trashId = trash.push([model.termsArr[index], isTagsTable]) - 1;
+                total -= model.terms[index][1];
+                trashId = trash.push([model.terms[index], isTagsTable]) - 1;
                 model.deleteTerm(index, trashId);
             }
-            recalcPerc();
+            saveTotalTagTerms();
         };
 
 
-        this.deleteSyn = function (index, name) {
-            var syn = model.deleteSyn(index, name);
-            total -= syn[1];
-            recalcPerc();
+        this.deleteSyn = function (index, pos) {
+            var line = model.deleteSyn(index, pos, trash.length);
+            total -= +line[1];
+            trash.push([line, index]);
+            saveTotalTagTerms();
         };
 
 
-        this.duplicateSyn = function (index, name) {
-            total += model.duplicateSyn(index, name);
-            recalcPerc();
+        this.cloneSyn = function (index, pos) {
+            total += model.cloneSyn(index, pos);
+            saveTotalTagTerms();
+        };
+
+
+        this.addAnswer = function (indexAnswer, indexTag) {
+            model.addAnswer(indexAnswer, indexTag);
+            model.patchAnswer(this.sId, indexAnswer);
+            chartReady = false;
+        };
+
+
+        this.deleteAnswer = function (indexAnswer, pos) {
+            model.deleteAnswer(indexAnswer, pos);
+            model.patchAnswer(this.sId, indexAnswer);
+            chartReady = false;
         };
 
 
         this.undoRow = function (id) {
-            var restore = trash[id];
-            if (restore[1]) {
-                model.addTag(restore[0]);
+            var restore = trash[id],
+                data = restore[0],
+                type = restore[1];
+
+            if (type === true) {
+                model.addTag(data);
+            }
+            else if (type === false) {
+                model.addTerm(data);
             }
             else {
-                model.addTerm(restore[0]);
+                model.addSyn(type, data[0], data[1]);
             }
-            total += restore[0][1];
-            recalcPerc();
+
+            total += +data[1];
+            saveTotalTagTerms();
         };
 
 
         function calcDrop (from, to) {
             var line;
             
-            if (from.isTagsTable) {
-                if (to.isTagsTable) {
-                    if (from.index !== to.index) {
-                        if (to.isRow) {
-                            if (!from.isSynonym) {
-                                model.addSubTerms(from.index, to.index);
-                                model.deleteTag(from.index);
+            switch (from.tblType) {
+                case TBL_tags:
+                    if (to.tblType === TBL_tags) {
+                        if (from.index !== to.index) {
+                            if (to.isRow) {
+                                if (!from.isSynonym) {
+                                    model.addSyns(from.index, to.index);
+                                    model.deleteTag(from.index);
+                                }
+                                else {
+                                    line = model.deleteSyn(from.index, from.synPos);
+                                    model.addSyn(to.index, line[0], line[1]);
+                                }
                             }
                             else {
-                                line = model.deleteSyn(from.index, from.html);
-                                model.addSubTerm(to.index, line[0], line[1]);
+                                if (from.isSynonym) {
+                                    line = model.deleteSyn(from.index, from.synPos);
+                                    model.addTag(line);
+                                }
+                                else {
+                                    return false;
+                                }
                             }
                         }
                         else {
-                            if (from.isSynonym) {
-                                line = model.deleteSyn(from.index, from.html);
-                                model.addTag(line);
+                            return false;
+                        }
+                    }
+                    else {
+                        if (!from.isSynonym) {
+                            line = model.tags[from.index];
+                            if (line[2]) {
+                                model.addTerms(line);
                             }
-                            else {
-                                return false;
-                            }
+                            model.deleteTag(from.index);
+                        }
+                        else {
+                            line = model.deleteSyn(from.index, from.synPos);
+                        }
+                        model.addTerm(line);
+                    }
+                    break;
+
+                case TBL_terms:
+                    if (to.tblType === TBL_tags) {
+                        line = model.terms[from.index];
+                        model.deleteTerm(from.index);
+                        if (to.isRow) {
+                            model.addSyn(to.index, line[0], line[1]);
+                        }
+                        else {
+                            model.addTag(line);
                         }
                     }
                     else {
                         return false;
                     }
-                }
-                else {
-                    if (!from.isSynonym) {
-                        line = model.tagsArr[from.index];
-                        if (line[2]) {
-                            model.addTerms(line);
-                        }
-                        model.deleteTag(from.index);
+                    break;
+
+                case TBL_short:
+                    if (to.tblType === TBL_answers) {
+                        model.addAnswer(to.index, from.index);
                     }
                     else {
-                        line = model.deleteSyn(from.index, from.html);
+                        return false;
                     }
-                    model.addTerm(line);
-                }
+                    break;
+
+                default:
+                    return false;
             }
-            else if (to.isTagsTable) {
-                line = model.termsArr[from.index];
-                model.deleteTerm(from.index);
-                if (to.isRow) {
-                    model.addSubTerm(to.index, line[0], line[1]);
-                }
-                else {
-                    model.addTag(line);
-                }
-            }
-            else {
-                return false;
-            }
-            saveAll();
+
+            saveTagTerms();
         }
 
 
         this.dragTag = function (from, to) {
-            var fromTable = from.isTagsTable ? model.tagsTable : model.termsTable,
-                selected = fromTable.selectedIndexes(),
+            var selected = model.getSelected(from.tblType),
                 n = selected.length;
 
             if (n) {
                 var newFrom = {
-                        isTagsTable: from.isTagsTable,
+                        tblType: from.tblType,
                         isSynonym: false
                     };
 
@@ -288,8 +353,7 @@
 
         
         this.sort = function () {
-            model.sort(model.termsArr, true, true);
-            model.termsTable.update(model.termsArr);
+            model.sort(model.terms, true, true);
         };
 
 
@@ -307,7 +371,7 @@
 
         var saveTimeout;
 
-        function saveAll () {
+        function saveTagTerms () {
             clearTimeout(saveTimeout);
 
             saveTimeout = setTimeout(function () {
@@ -323,7 +387,19 @@
                     });
                 }
             }, 600);
+
+            tagsReady = false;
+            chartReady = false;
+            answersReady = false;
         }
+
+        // function saveTagTerms () {
+        //     clearTimeout(saveTimeout);
+        //
+        //     saveTimeout = setTimeout(function () {
+        //         model.save();
+        //     }, 600);
+        // }
 
 
         this.downloadCsv = function () {

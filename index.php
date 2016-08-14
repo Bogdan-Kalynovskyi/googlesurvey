@@ -144,13 +144,16 @@
     <header>
         <a href class="logout" ng-click="ctrl.logOut()">Log out</a>
         <button class="btn btn-sm btn-primary" id="btn-surveys" ng-click="ctrl.navigate('surveys')">
-            <span class="bullet">1</span> Upload or select survey
+            <span class="bullet">1</span> Surveys&nbsp;
         </button> <big>&raquo;</big>
         <button class="btn btn-sm btn-primary" id="btn-tags" ng-click="ctrl.navigate('tags')">
-            <span class="bullet">2</span> Manage tags and terms
+            <span class="bullet">2</span> Tags & terms
+        </button> <big>&raquo;</big>
+        <button class="btn btn-sm btn-primary" id="btn-answers" ng-click="ctrl.navigate('answers')">
+            <span class="bullet">3</span> Answers & tags
         </button> <big>&raquo;</big>
         <button class="btn btn-sm btn-primary" id="btn-chart" ng-click="ctrl.navigate('chart')">
-            <span class="bullet">3</span> View chart
+            <span class="bullet">4</span> Chart & CSV
         </button>
     </header>
 
@@ -160,11 +163,11 @@
             <thead class="thead-default"><tr>
                 <th colspan=3>&nbsp; Survey</th><th>Google ID</th><th>Question</th><th>Answers</th>
             </tr></thead>
-            <tr ng-class="{'table-info': id === ctrl.sId}" ng-repeat="(id, survey) in ctrl.surveys">
+            <tr ng-class="{active: id === ctrl.sId}" ng-repeat="(id, survey) in ctrl.surveys">
                 <td><a ng-click="ctrl.loadSurvey(id)" class="p-x-1">edit</a></td>
-                <td><a ng-click="ctrl.duplicateSurvey(id)">duplicate & edit</a></td>
+                <td><a ng-click="ctrl.cloneSurvey(id)">clone & edit</a></td>
                 <td><a ng-click="ctrl.deleteSurveyById(id)">delete</a></td>
-                <td ng-bind="survey.survey_google_id" style="font-size: 11px"></td>
+                <td ng-bind="survey.survey_google_id" id="sgi"></td>
                 <td ng-bind="survey.question"></td>
                 <td ng-bind="survey.total"></td>
             </tr>
@@ -209,7 +212,15 @@
     </div>
 
 
-    <div id="chart" class="nav-body"> <!-- todo scrollable -->
+    <div id="answers" class="nav-body">
+        <div class="row">
+            <div class="col-sm-6 overflow" id="answers-table"></div>
+            <div class="col-sm-6 overflow" id="short-table"></div>
+        </div>
+    </div>
+
+
+    <div id="chart" class="nav-body">
         <div id="comment-chart"></div>
         <div id="tags-chart"></div>
         <div id="chart-table"></div>
@@ -218,13 +229,20 @@
 
     <div id="modal-placeholder"></div>
 
-    <link rel=stylesheet href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+    <link rel=stylesheet href="node_modules/bootstrap/dist/css/bootstrap.css">
     <link rel=stylesheet href="css/app.css">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
-    <script src="lib/xls.min.js"></script>
+    <script src="node_modules/jquery/dist/jquery.js"></script>
+    <script src="node_modules/angular/angular.js"></script>
+    <script src="js/xls.min.js"></script>
     <script src="//www.gstatic.com/charts/loader.js"></script>
-    <script src="app3.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/table.js"></script>
+    <script src="js/simple-table.js"></script>
+    <script src="js/model.js"></script>
+    <script src="js/surveys.js"></script>
+    <script src="js/ui.js"></script>
 </div>
 </body>
 </html>

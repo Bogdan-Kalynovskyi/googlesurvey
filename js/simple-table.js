@@ -1,10 +1,10 @@
 function SimpleTable (container) {
 
-    this.create = function (tagsArr) {
+    this.create = function (tags) {
         var str = '';
 
-        for (var i = 0, n = tagsArr.length; i < n; i++) {
-            var line = tagsArr[i];
+        for (var i = 0, n = tags.length; i < n; i++) {
+            var line = tags[i];
             str +=
                 '<tr><td>' + line[0] + '</td><td>' + (line[1] * 100 / total).toFixed(2) + '%</td><td>' + line[1] + '</td></tr>';
         }

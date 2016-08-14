@@ -4,6 +4,10 @@ html, body {
 }
 
 .modal {
+    background: rgba(0,0,0,0);
+    transition: transform .3s ease-out, background-color .3s ease-out;
+}
+.modal.in {
     background: rgba(0,0,0,.5);
 }
 
@@ -16,52 +20,92 @@ html, body {
 }
 
 header {
-    height: 55px;
+    height: 50px;
 }
 
 .bullet {
     display: block;
     float: left;
-    margin-top: 2px;
     font-size: 13px;
     line-height: 17px;
+    margin: 1px 8px 1px 0;
     width: 17px;
     height: 17px;
     border-radius: 50%;
     background: white;
     color: #0275d8;
-    margin-right: 9px;
-    box-shadow: 0 0 1px rgba(255, 255, 255, .2);
+    box-shadow: 0 0 1px #fff;
 }
 
 .btn.active {
-    box-shadow: 0 0 4px #0275d8;
+    box-shadow: 0 0 1px 2px #0059a5;
 }
 
 .btn.active .bullet {
-    background: #ffffb0;
+    font-size: 111%;
+    font-weight: 500;
+    background: #ffc;
+    box-shadow: 0 0 0 2.2px #ffc;
 }
 
 big {
     color: #676767;
-    margin: 0 1px;
     font-size: 30px;
-    line-height: 36px;
+    line-height: 33px;
     vertical-align: bottom;
 }
 
 .logout {
     font-size: 14px;
     float: right;
-    margin-top: 13px;
+    margin-top: 10px;
     padding-left: .3em;
 }
 
 input[ng-model] {
     width: 60px;
     padding: 0 4px;
-    line-height: 27px;
+    line-height: 23px;
 }
+
+
+@media (min-width: 740px) {
+    header > button {
+        font-size: 16px !important;
+    }
+
+    .bullet {
+        font-size: 14px;
+        line-height: 18px;
+        margin: 2px 9px 2px 0;
+        width: 18px;
+        height: 18px;
+    }
+
+    big {
+        font-size: 32px;
+        line-height: 36px;
+        margin: 0 1px;
+    }
+
+    .logout {
+        font-size: 15px;
+        margin-top: 12px;
+    }
+
+    input[ng-model] {
+        line-height: 27px;
+    }
+
+    button {
+        line-height: 21px!important;
+    }
+
+    #scroll-tbl {
+        margin-top: 6px;
+    }
+}
+
 
 #tags-f-input {
     width: calc(100% - 37px);
@@ -79,7 +123,7 @@ input[ng-model] {
     height: 15px;
     line-height: 13px;
     text-align: center;
-    bottom: 8px;
+    bottom: 7px;
     right: 22px;
     border-radius: 50%;
     background: #ddd;
@@ -88,12 +132,12 @@ input[ng-model] {
 }
 
 .cross:hover {
-    box-shadow: 0 0 1.5px #aaa;
+    box-shadow: 0 0 1.5px #999;
 }
 
 .nav-body {
     display: none;
-    height: calc(100% - 71px);
+    height: calc(100% - 66px);
 }
 
 #scroll-tbl {
@@ -101,6 +145,7 @@ input[ng-model] {
 }
 
 .overflow {
+    padding-top: 2px;
     height: 100%;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -109,41 +154,47 @@ input[ng-model] {
 #tags-question {
     color: #888;
     font-size: 13px;
-    margin-bottom: 12px;
+    margin-bottom: 9px;
 }
 
 #tags .table {
-    margin-top: 6px;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
 
-.table td,
-.table th {
-    font-size: 13px;
-    padding: 3px;
+td,
+th {
+    font-size: 13px!important;
+    padding: 3px!important;
 }
 
-#tags thead th {
+tr.active {
+    background: #f0f0ff!important;
+}
+
+thead th {
     padding-top: 0;
     padding-bottom: 0;
     border-top: 0;
     border-bottom: 0;
 }
 
-thead th[colspan="5"] {
-    font-weight: normal;
-    font-size: 10px;
-}
+/*thead th[colspan="5"] {*/
+    /*font-weight: normal;*/
+    /*font-size: 10px;*/
+/*}*/
 
 #tags .table th:first-child,
-#tags .table td:first-child {
+#answers .table th:first-child,
+#tags .table td:first-child,
+#short-table > .table td:first-child {
     text-align: center;
 }
 
 tbody a {
+    color: #0275d8!important;
     display: inline-block;
     width: 100%;
     text-align: center;
@@ -163,13 +214,8 @@ tbody a {
     cursor: grab;
 }
 
-tbody span:hover {
-    background: #fbfbfc;
-    box-shadow: 0 0 6px #aaa;
-}
-
 tbody tr:hover {
-    background: #f7f7ff!important;
+    background: #f8f8ff!important;
 }
 
 tbody span,
@@ -179,51 +225,78 @@ tbody input:not([type=checkbox]) {
     width: 100%;
 }
 
+tbody span:hover {
+    background: #fcfcfc;
+    box-shadow: 0 0 6px #aaa;
+}
+
+tbody input:not([type=checkbox]) {
+    border: 0;
+    box-shadow: 0 0 14px #000;
+    outline: 1px solid #fff;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
+tbody li:hover {
+    background: #eeeefa;
+    box-shadow: 0 0 2px 2px #eeeefa;
+}
+
 tbody li > span {
     width: calc(100% - 52px);
 }
 
 del-syn,
+del-tag,
 dupl-syn,
 del-undo {
     cursor: pointer;
     float: right;
-    color: #0275d8;
+    color: #0275ff;
     position: relative;
     left: -2px;
     margin-left: 6px;
 }
 
 del-syn,
+del-tag,
 dupl-syn {
     visibility: hidden;
 }
 
 li:hover > del-syn,
+li:hover > del-tag,
 li:hover > dupl-syn {
     visibility: visible;
 }
 
+dupl-syn {
+    color: #090;
+}
+
 #undo {
-    background: #dfdfdf;
+    background: #ffefdb;
     font-size: 12px;
     width: 50%;
     position: fixed;
     bottom: 0;
     left: 0;
     opacity: 0.9;
-    color: black;
     border-top: 1px solid white;
 }
 
 #undo > div {
     padding: 4px 3px 3px 6px;
     overflow: hidden;
-    box-shadow: 0 0 4px #d0d0d0;
+    box-shadow: 0 0 4px 2px #ffefdb;
 }
 
 #undo > div:hover {
-    background: #ddd;
+    background: #fbecd8;
+    box-shadow: 0 0 4px 2px #fbecd8;
 }
 
 undo {
@@ -240,18 +313,7 @@ del-undo {
 }
 
 del-undo:hover {
-    background: #c0c0c0;
-    box-shadow: 0 0 3px #bbb;
-}
-
-tbody input:not([type=checkbox]) {
-    border: 0;
-    box-shadow: 0 0 12px #222;
-    outline: 1px solid #fff;
-    -webkit-user-select: text;
-    -moz-user-select: text;
-    -ms-user-select: text;
-    user-select: text;
+    box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.3);
 }
 
 tbody ul {
@@ -264,16 +326,17 @@ tbody ul {
 }
 
 ::-webkit-input-placeholder {
-    color: #ccc;
+    color: #cfcfcf;
 }
 
 ::-moz-placeholder {
-    color: #ccc;
+    color: #cfcfcf;
 }
 
 :-ms-input-placeholder {
-    color: #ccc;
+    color: #cfcfcf;
 }
+
 
 
 @media (max-width: 724px) {
@@ -300,34 +363,40 @@ tbody ul {
     }
 }
 
-@media (max-width: 640px) {
+
+@media (max-width: 634px) {
     header {
-        height: 91px;
+        height: 79px;
     }
-
-    #btn-chart {
-        margin-top: 10px;
-    }
-
     .nav-body {
-        height: calc(100% - 91px);
+        height: calc(100% - 79px);
+    }
+    #sgi {
+        font-size: 12px!important;
     }
     #scroll-tbl {
         height: calc(100% - 128px);
     }
-
     tbody span {
         max-width: 178px;
     }
 }
 
+
 @media (max-width: 590px) {
+    #sgi {
+        font-size: 11px!important;
+    }
     tbody span {
         max-width: 168px;
     }
 }
 
+
 @media (max-width: 544px) {
+    #sgi {
+        font-size: 10px!important;
+    }
     #scroll-tbl {
         height: auto;
     }
@@ -339,11 +408,12 @@ tbody ul {
     }
 }
 
-@media (max-width: 365px) {
+
+@media (max-width: 345px) {
     .bullet {
         display: none;
     }
     tbody span {
-        max-width: 255px;
+        max-width: 275px;
     }
 }

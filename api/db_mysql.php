@@ -6,14 +6,13 @@ if (!defined('AUTHORISED')) {
 
 class bDb {
 
-    var $link; // this object the MysqL connection handle
     var $result = null;
     var $output = null;
 
     //var debug
 
     // The constructor. Get the mysql info vars and connect to the server
-    function bDb ($db_host, $db_user, $db_pass, $db_name, $db_charset) {
+    function bDb ($db_host, $db_user, $db_pass, $db_name) {
         $this->link = mysql_connect($db_host, $db_user, $db_pass, TRUE); // Connect to the MySQL server
 
         if (!$this->link) {
@@ -47,7 +46,7 @@ class bDb {
     // Perform the MySQL queries
     function query ($query_str, $multi = true, $smart = false) {
 
-        $this->result = mysql_query($query_str, $this->link); // Do the quer
+        $this->result = mysql_query($query_str, $this->link);
         
         $begin = strtolower(substr(ltrim($query_str), 0, 7));
         if ($begin !== 'select ') { //SET //and others
@@ -79,12 +78,11 @@ class bDb {
                 $this->output[$num] = $row;
             }
 
-            return $this->output; // Return the multi demensional array
+            return $this->output; // Return the multi dementional array
         }
 
         // Return the result in a one dimensional array
         return mysql_fetch_array($this->result, MYSQL_ASSOC);
-
 
     }
 
@@ -104,4 +102,4 @@ class bDb {
 } // End class
 
 
-$db = new bDb($db_host, $db_user, $db_pass, $db_name, $db_charset);
+$db = new bDb($db_host, $db_user, $db_pass, $db_name);

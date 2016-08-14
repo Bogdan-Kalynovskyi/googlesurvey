@@ -1,352 +1,455 @@
 var total;
 
-    app.service('model', ['$http', function ($http) {
-        var that = this;
+app.service('model', ['$http', function ($http) {
+    var that = this,
+        tagsTable = new Table(byId('tags-table'), TBL_tags),
+        termsTable = new Table(byId('terms-table'), TBL_terms),
+        answersTable = new Table(byId('answers-table'), TBL_answers),
+        shortTable = new Table(byId('short-table'), TBL_short);
 
-        
-        this.initByExcel = function (workbook) {
-            try {
-                var raw = workbook.Sheets["Complete responses"],
-                    overview = workbook.Sheets.Overview,
-                    tagsObj = {},
-                    i = 2,
-                    row;
 
-                while (row = raw['K' + i]) {
-                    var words = row.w.trim().toLowerCase().split(/ and | or | - | but |\.|,|;|:|\?|!|&+/);
-                    for (var j = 0, len = words.length; j < len; j++) {
-                        var word = words[j].trim();
-                        if (word.length) {
-                            if (tagsObj[word]) {
-                                tagsObj[word]++;
-                            }
-                            else {
-                                tagsObj[word] = 1;
-                            }
+    this.initByExcel = function (workbook) {
+        // try {
+            var raw = workbook.Sheets["Complete responses"],
+                overview = workbook.Sheets.Overview,
+                tagsObj = {},
+                i = 2,
+                row,
+                splitter = / and | or | - | but | nor |\/|\.|,|;|:|\?|!|&+/,
+                trash = / very | much | many | a | the | such | so | lot of | lots of |  /g; //todo does not multiple
+
+            while (row = raw['K' + i]) {
+                var words = row.w.toLowerCase();
+
+                words = words.split(splitter);
+                for (var j in words) {
+                    var word = (' ' + words[j]).replace(trash, ' ').trim();
+                    if (word.length) {
+                        if (tagsObj[word]) {
+                            tagsObj[word]++;
+                        }
+                        else {
+                            tagsObj[word] = 1;
                         }
                     }
-                    i++;
                 }
-
-                this.tagsArr = objToArr(tagsObj);
-                this.termsArr = [];
-                var question = overview.C2.w,
-                    t = +overview.E2.w;
-
-                this.surveyData = {
-                    survey_google_id: overview.A2.w,
-                    question: question,
-                    total: t
-                };
-
-                total = t;
-            }
-            catch (e) {
-                bootstrapAlert('Could not parse answers from Excel file');
-            }
-
-            return question;
-        };
-
-
-        this.getTagsBySurveyId = function (surveyId) {
-            return $http.get('api/tags.php?surveyId=' + surveyId).success(function (response) {
-                that.tagsArr = response;
-            });
-        };
-
-
-        this.getTermsBySurveyId = function (surveyId) {
-            return $http.get('api/terms.php?surveyId=' + surveyId).success(function (response) {
-                that.termsArr = response;
-            });
-        };
-
-
-        function packTags () {
-            var i = 0,
-                src = that.tagsArr,
-                n = src.length,
-                arr = new Array(n);
-
-            for (; i < n; i++) {
-                var line = src[i];
-                arr[i] = line.slice(0, 2);
-                if (line[2]) {
-                    arr[i].push(line[2].join(','));
-                    arr[i].push(line[3].join(','));
-                }
-            }
-
-            return arr;
-        }
-
-
-        this.saveNewSurvey = function () {
-            return $http.post('api/surveys.php', {
-                survey_google_id: this.surveyData.survey_google_id,
-                question: this.surveyData.question,
-                tagsArr: packTags(this.tagsArr),    // todo: probably pack and unpack will be faster // we also have pack in table for that (for unpacking)
-                termsArr: this.termsArr,
-                total: total
-            })
-            .then(function (response) {
-                return that.surveyId = response.data;
-            });
-        };
-
-
-        this.overwriteSurvey = function (surveyId) {
-            return $http.put('api/surveys.php', {
-                surveyId: surveyId,
-                tagsArr: packTags(that.tagsArr),
-                termsArr: this.termsArr,
-                total: total
-            });
-        };
-
-
-        this.addTag = function (tag) {
-            this.tagsArr.unshift(tag);
-            this.tagsTable.addRow(tag);
-        };
-        
-
-        this.addTags = function (tagsArr) {
-            total += tagsArr.length;
-            this.tagsArr = tagsArr.concat(this.tagsArr);
-            this.tagsTable.addRows(tagsArr);
-        };
-        
-        
-        this.addSubTerm = function (index, name, repeat) {
-            var line = this.tagsArr[index];
-            if (!line[2]) {
-                line.push([name]);
-                line.push([repeat]);
-            }
-            else {
-                line[2].push(name);
-                line[3].push(repeat);
-            }
-            line[1] += +repeat;
-            this.tagsTable.addSubTerm(index, name, line[1]);
-        };
-
-
-        this.addSubTerms = function (fromIndex, toIndex) {
-            var lineFrom = this.tagsArr[fromIndex],
-                lineTo = this.tagsArr[toIndex],
-                terms = lineFrom[2];
-
-            this.addSubTerm(toIndex, lineFrom[0], lineFrom[1]);
-            if (terms) {
-                lineTo[2] = lineTo[2].concat(terms);
-                lineTo[3] = lineTo[3].concat(lineFrom[3]);
-                this.tagsTable.addSubTerms(toIndex, terms);
-            }
-        };
-
-
-        this.addTerm = function (term) {
-            this.termsArr.unshift(term);
-            this.termsTable.addRow(term);
-        };
-
-
-        this.addTerms = function (line) {
-            var arr = [],
-                sum = 0,
-                sub1 = line[2],
-                sub2 = line[3];
-
-            for (var i = 0, n = sub1.length; i < n; i++) {
-                sum += +sub2[i];
-                arr.push([sub1[i], sub2[i]]);
-            }
-            
-            line[1] -= sum;
-
-            this.termsArr = arr.concat(this.termsArr);
-            this.termsTable.addRows(arr);
-        };
-
-
-        this.deleteTag = function (index, trashId) {
-            this.tagsTable.deleteRow(index, this.tagsArr[index][0], trashId);
-            this.tagsArr.splice(index, 1);
-        };
-
-
-        this.deleteSyn = function (index, name, trashId) {
-            var line = this.tagsArr[index],
-                terms = line[2],
-                pos = terms.indexOf(name),
-                result = [name, line[3][pos]];
-
-            terms.splice(pos, 1);
-            line[1] -= line[3][pos];
-            line[3].splice(pos, 1);
-
-            this.tagsTable.deleteSyn(index, pos, line[1], trashId);
-            return result;
-        };
-
-
-        this.duplicateSyn = function (index, name) {
-            var line = this.tagsArr[index],
-                terms = line[2],
-                counts = line[3],
-                pos = terms.indexOf(name),
-                term = terms[pos],
-                count = +counts[pos];
-
-            terms.splice(pos, 0, term);
-            line[1] += count;
-            counts.splice(pos, 0, count);
-
-            this.tagsTable.addSubTerm(index, term, count); //todo position
-            return count;
-        };
-
-
-        this.deleteTerm = function (index, trashId) {
-            this.termsTable.deleteRow(index, this.termsArr[index][0], trashId);
-            this.termsArr.splice(index, 1);
-        };
-
-
-        this.updateTag = function (isTagsTable, index, isSyn, name, oldName) {
-            if (isTagsTable) {
-                if (isSyn) {
-                    var arr = this.tagsArr[index][2];
-                    arr[arr.indexOf(oldName)] = name;
-                }
-                else {
-                    this.tagsArr[index][0] = name;
-                }
-            }
-            else {
-                this.termsArr[index][0] = name;
-            }
-        };
-
-
-        function objToArr (obj) {
-            var arr = [];
-            for (var i in obj) {
-                arr.push([i, obj[i]]);
-            }
-            
-            return that.sort(arr);
-        }
-
-        var sortOrder = 1;
-        
-        this.sort = function (arr, alpha, toggle) {
-            function alphabetical (a, b) {
-                if (a[0] > b[0]) {
-                    return sortOrder;
-                }
-                else if (a[0] < b[0]) {
-                    return -sortOrder;
-                }
-                else {
-                    return 0;
-                }
-            }
-
-            function numeric (a, b) {
-                if (a[1] > b[1]) {
-                    return -1;
-                }
-                else if (a[1] < b[1]) {
-                    return 1;
-                }
-                else {
-                    return 0;
-                }
-            }
-
-            if (toggle) {
-                sortOrder *= -1;
-
-                $('.pull-xs-right').html('Sort terms ' + (sortOrder === 1 ? '▼' : '▲'));
-            }
-
-            return arr.sort(alpha ? alphabetical : numeric);
-        };
-
-
-        function unpackTerms () {
-            var terms = that.termsArr;
-            for (var i = 0, n = terms.length; i < n; i++) {
-                if (terms[i][2]) {
-                    var line = terms[i],
-                        name = line[2],
-                        repeat = line[3];
-
-                    for (var j = 0, m = name.length; j < m; j++) {
-                        that.termsArr.push([name[j], repeat[j]]);
-                    }
-                    line.splice(2, 2);
-                }
-            }
-        }
-
-
-        this.splitMax = function (maxTags, reset) {
-            var arr = this.tagsArr.concat(this.termsArr);
-
-            maxTags = Math.min(maxTags, arr.length);
-            this.sort(arr);
-
-            this.tagsArr = arr.slice(0, maxTags);
-            this.termsArr = arr.slice(maxTags);
-            unpackTerms();
-            this.sort(this.tagsArr, true);
-            this.sort(this.termsArr, true);
-
-            this.tagsTable.create(this.tagsArr, reset);
-            this.termsTable.create(this.termsArr, reset);
-
-            return this.tagsArr[maxTags - 1][1];
-        };
-
-
-        this.splitMin = function (minRepeat) {
-            var arr = this.tagsArr.concat(this.termsArr),
-                i = 0,
-                n = arr.length;
-
-            this.sort(arr);
-
-            while (i < n && arr[i][1] >= minRepeat) {
                 i++;
             }
+            var question = overview.C2.w,
+                t = +overview.E2.w;
 
-            this.tagsArr = arr.slice(0, i);
-            this.termsArr = arr.slice(i);
-            unpackTerms();
-            this.sort(this.tagsArr, true);
-            this.sort(this.termsArr, true);
+            this.surveyData = {
+                survey_google_id: overview.A2.w,
+                question: question,
+                total: t
+            };
+        // }
+        // catch (e) {
+        //     bootstrapAlert('Could not parse answers from Excel file');
+        // }
 
-            this.tagsTable.create(this.tagsArr);
-            this.termsTable.create(this.termsArr);
-
-            return i;
-        };
-
-
-        this.filterTerms = function (word) {
-            this.termsTable.filter(this.termsArr, word);
-        };
-
-
-        this.logOut = function () {
-            return $http.post('api/login.php', {
-                logout: xsrfToken
-            });
+        this.tags = [];
+        this.answers = [];
+        for (i in tagsObj) {
+            this.tags.push([i, tagsObj[i]]);
+            this.answers.push(i);
         }
-        
-    }]);
+        this.answers.sort();
+
+        this.terms = [];
+        total = t;
+
+        return question;
+    };
+
+
+    this.getTags = function (surveyId) {
+        return $http.get('api/tags.php?surveyId=' + surveyId).success(function (response) {
+            that.tags = response;
+            tagsTable.create(response);
+        });
+    };
+
+
+    this.getTerms = function (surveyId) {
+        return $http.get('api/terms.php?surveyId=' + surveyId).success(function (response) {
+            that.terms = response;
+            termsTable.create(response);
+        });
+    };
+
+
+    this.getAnswers = function (surveyId) {
+        return $http.get('api/answers.php?surveyId=' + surveyId).success(function (response) {
+            that.answers = response;
+            answersTable.create(response);
+            shortTable.create(that.tags);
+        });
+    };
+
+
+    this.saveNewSurvey = function () {
+        return $http.post('api/surveys.php', {
+            survey_google_id: this.surveyData.survey_google_id,
+            question: this.surveyData.question,
+            tags: packTags(this.tags),
+            terms: this.terms,
+            total: total
+        })
+        .then(function (response) {
+            return that.surveyId = response.data;
+        });
+    };
+
+
+    this.overwriteSurvey = function (surveyId) {
+        return $http.put('api/surveys.php', {
+            surveyId: surveyId,
+            tags: packTags(that.tags),
+            terms: this.terms,
+            total: total
+        });
+    };
+
+
+    this.saveAnswers = function (surveyId) {
+        return $http.post('api/answers.php', {
+            surveyId: surveyId,
+            answers: this.answers
+        });
+    };
+
+
+    this.updateAnswers = function (surveyId) {
+        return $http.put('api/answers.php', {
+            surveyId: surveyId,
+            answers: this.answers
+        });
+    };
+
+
+    this.patchAnswer = function (surveyId, answerId) {
+        return $http.patch('api/answers.php', {
+            surveyId: surveyId,
+            answer: this.answers[answerId][0],
+            tags: this.answers[answerId][1]
+        });
+    };
+
+
+    this.addTag = function (tag) {
+        this.tags.unshift(tag);
+        tagsTable.addRow(tag);
+    };
+
+
+    this.addTags = function (tags) {
+        this.tags = tags.concat(this.tags);
+        tagsTable.addRows(tags);
+    };
+
+
+    this.addSyn = function (index, name, repeat) {
+        var line = this.tags[index];
+        if (!line[2]) {
+            line.push([name]);
+            line.push([repeat]);
+        }
+        else {
+            line[2].unshift(name);
+            line[3].unshift(repeat);
+        }
+        line[1] += +repeat;
+        tagsTable.addSyn(index, name, line[1]);
+    };
+
+
+    this.addSyns = function (fromIndex, toIndex) {
+        var lineFrom = this.tags[fromIndex],
+            lineTo = this.tags[toIndex],
+            terms = lineFrom[2];
+
+        this.addSyn(toIndex, lineFrom[0], lineFrom[1]);
+        if (terms) {
+            lineTo[2] = terms.concat(lineTo[2]);
+            lineTo[3] = lineFrom[3].concat(lineTo[3]);
+            tagsTable.addSyns(toIndex, terms);
+        }
+    };
+
+
+    this.addTerm = function (term) {
+        this.terms.unshift(term);
+        termsTable.addRow(term);
+    };
+
+
+    this.addTerms = function (line) {
+        var arr = [],
+            sum = 0,
+            sub1 = line[2],
+            sub2 = line[3];
+
+        for (var i in sub1) {
+            sum += +sub2[i];
+            arr.push([sub1[i], sub2[i]]);
+        }
+
+        line[1] -= sum;
+
+        this.terms = arr.concat(this.terms);
+        termsTable.addRows(arr);
+    };
+
+
+    this.deleteTag = function (index, trashId) {
+        tagsTable.deleteRow(index, trashId);
+        this.tags.splice(index, 1);
+    };
+
+
+    this.deleteSyn = function (index, pos, trashId) {
+        var line = this.tags[index],
+            terms = line[2],
+            counts = line[3],
+            result = [terms[pos], counts[pos]];
+
+        terms.splice(pos, 1);
+        line[1] -= +counts[pos];
+        counts.splice(pos, 1);
+
+        tagsTable.deleteSyn(index, pos, line[1], trashId);
+        return result;
+    };
+
+
+    this.cloneSyn = function (index, pos) {
+        var line = this.tags[index],
+            terms = line[2],
+            counts = line[3],
+            term = terms[pos],
+            count = +counts[pos];
+
+        terms.splice(pos, 0, term);
+        counts.splice(pos, 0, count);
+        line[1] += count;
+
+        tagsTable.addSyn(index, term, line[1], pos);
+        return count;
+    };
+
+
+    this.deleteTerm = function (index, trashId) {
+        termsTable.deleteRow(index, trashId);
+        this.terms.splice(index, 1);
+    };
+
+
+    this.updateTag = function (isTagsTable, index, pos, name) {
+        if (isTagsTable) {
+            if (pos) {
+                this.tags[index][2][pos] = name;
+            }
+            else {
+                this.tags[index][0] = name;
+            }
+        }
+        else {
+            this.terms[index][0] = name;
+        }
+    };
+
+
+    this.addAnswer = function (indexAnswer, indexTag) {
+        this.answers[indexAnswer][1] += indexTag + ',';
+        this.tags[indexTag][1]++;
+        answersTable.addSyn(indexAnswer, this.tags[indexTag][0]);
+    };
+
+
+    this.deleteAnswer = function (indexAnswer, pos) {
+        var arr = this.answers[indexAnswer][1].split(','),
+        indexTag = arr.splice(pos, 1);
+        this.answers[indexAnswer][1] = arr.join(',');
+        this.tags[indexTag][1]--;
+        answersTable.deleteSyn(indexAnswer, pos);
+    };
+
+
+    this.prepareAnswers = function () {
+        for (var j in this.tags) {
+            this.tags[j][1] = 0;
+        }
+
+        for (var i in this.answers) {
+            var answer = this.answers[i],
+                list = '';
+
+            for (j in this.tags) {
+                var tag = this.tags[j];
+                if (answer.indexOf(tag[0]) !== -1) {
+                    list += i + ',';
+                    tag[1]++;
+                }
+                var syn = tag[2];
+                if (syn) {
+                    for (var k in syn) {
+                        if (answer.indexOf(syn[k]) !== -1) {
+                            list += k + ',';
+                            tag[1]++;
+                        }
+                    }
+                }
+            }
+
+            this.answers[i] = [answer, list];
+        }
+
+        answersTable.create(this.answers, this.tags);
+        shortTable.create(this.tags);
+    };
+
+
+    var sortOrder = 1;
+
+    this.sort = function (arr, alpha, toggle) {
+        function alphabetical (a, b) {
+            if (a[0] > b[0]) {
+                return sortOrder;
+            }
+            else if (a[0] < b[0]) {
+                return -sortOrder;
+            }
+            else {
+                return 0;
+            }
+        }
+
+        function numeric (a, b) {
+            if (a[1] > b[1]) {
+                return -1;
+            }
+            else if (a[1] < b[1]) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        }
+
+        arr.sort(alpha ? alphabetical : numeric);
+
+        if (toggle) {
+            sortOrder *= -1;
+            termsTable.update(this.terms);
+            document.querySelector('.pull-xs-right').innerHTML = 'Sort terms ' + (sortOrder === 1 ? '▼' : '▲');
+        }
+
+        return arr;
+    };
+
+
+    function packTags () {
+        var src = that.tags,
+            arr = new Array(that.tags.length);
+
+        for (var i in src) {
+            var line = src[i];
+            arr[i] = line.slice(0, 2);
+            if (line[2]) {
+                arr[i].push(line[2].join(','));
+                arr[i].push(line[3].join(','));
+            }
+        }
+
+        return arr;
+    }
+
+
+    function unpackTerms () {
+        var terms = that.terms;
+        for (var i in terms) {
+            if (terms[i][2]) {
+                var line = terms[i],
+                    name = line[2],
+                    repeat = line[3];
+
+                for (var j in name) {
+                    that.terms.push([name[j], repeat[j]]);
+                }
+                line.splice(2, 2);
+            }
+        }
+    }
+
+
+    this.recalcPerc = function () {
+        tagsTable.updatePerc(this.tags);
+        termsTable.updatePerc(this.terms);
+    };
+
+
+    var tables = [tagsTable, termsTable, answersTable, shortTable];
+
+    this.getSelected = function (tblType) {
+        return tables[tblType].selectedIndexes();
+    };
+
+
+    this.splitMax = function (maxTags, tagsReady) {
+        var arr = this.tags.concat(this.terms);
+
+        maxTags = Math.min(maxTags, arr.length);
+        this.sort(arr);
+
+        this.tags = arr.slice(0, maxTags);
+        this.terms = arr.slice(maxTags);
+        if (!tagsReady) {
+            unpackTerms();
+        }
+        this.sort(this.tags, true);
+        this.sort(this.terms, true);
+
+        tagsTable.create(this.tags);
+        termsTable.create(this.terms);
+
+        return this.tags[maxTags - 1][1];
+    };
+
+
+    this.splitMin = function (minRepeat) {
+        var arr = this.tags.concat(this.terms),
+            i = 0,
+            n = arr.length;
+
+        this.sort(arr);
+
+        while (i < n && arr[i][1] >= minRepeat) {
+            i++;
+        }
+
+        this.tags = arr.slice(0, i);
+        this.terms = arr.slice(i);
+        unpackTerms();
+        this.sort(this.tags, true);
+        this.sort(this.terms, true);
+
+        tagsTable.create(this.tags);
+        termsTable.create(this.terms);
+
+        return i;
+    };
+
+
+    this.filterTerms = function (word) {
+        termsTable.filter(this.terms, word);
+    };
+
+
+    this.logOut = function () {
+        return $http.post('api/login.php', {
+            logout: xsrfToken
+        });
+    }
+
+}]);

@@ -16,10 +16,10 @@ try {
             change();
             break;
 
-        case 'DELETE':
-            delete();
+        case 'PATCH':
+            patch();
             break;
-    }
+   }
 }
 
 catch (Exception $e) {
@@ -29,7 +29,7 @@ catch (Exception $e) {
 
 
 function get () {
-    $query = mysql_query('SELECT term, count FROM terms WHERE survey_id = '.intval($_GET['surveyId']).' ORDER BY term');
+    $query = mysql_query('SELECT answer, tags FROM answers WHERE survey_id = '.intval($_GET['surveyId']).' ORDER BY answer');
     $result = array();
     while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
         $result[] = array($row[0], intval($row[1]));
@@ -41,19 +41,20 @@ function get () {
 function add ($post = null) {
     $post = $post || json_decode(file_get_contents('php://input'), true);
     $surveyId = intval($post['surveyId']);
-    $terms = $post['terms'];
+    $answers = $post['answers'];
 
     $str = '';
-    $n = count($terms);
+    $i = 0;
+    $n = count($answers);
     for ($i = 0; $i < $n; $i++) {
-        $line = $terms[$i];
-        $str .= '('.$surveyId.','.esc($line[0]).','.intval($line[1]).')';
+        $line = $answers[$i];
+        $str .= '('.$surveyId.','.esc($line[0]).','.esc($line[1]).')';
         if ($i < $n - 1) {
             $str .= ',';
         }
     }
 
-    mysql_query('INSERT INTO terms (survey_id, term, count) VALUES '.$str);
+    mysql_query('INSERT INTO answers (survey_id, answer, tags) VALUES '.$str);
 }
 
 
@@ -61,6 +62,14 @@ function change () {
     $post = json_decode(file_get_contents('php://input'), true);
     $surveyId = intval($post['surveyId']);
 
-    mysql_query('DELETE FROM terms WHERE survey_id = '.$surveyId);
+    mysql_query('DELETE FROM answers WHERE survey_id = '.$surveyId);
     add($post);
+}
+
+
+function patch () {
+    $post = json_decode(file_get_contents('php://input'), true);
+    $surveyId = intval($post['surveyId']);
+
+    mysql_query('UPDATE answers SET tags = '.esc($post['tags']).' WHERE survey_id = '.$surveyId.' AND answer = '.esc($post['answer']));
 }

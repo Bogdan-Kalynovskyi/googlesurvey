@@ -4,7 +4,7 @@
 
 
     function open (modal) {
-        modal.addClass('in').show();
+        modal.show().addClass('in');
         //todo 13 27
         modal.find('button').on('click', function () {
             modal.removeClass('in');
@@ -27,7 +27,7 @@
 
     window.bootstrapConfirm = function (message, btnOne, btnTwo, callback) {
         $('#modal-placeholder').append(modalStart +
-            message + '<br><button class="btn btn-sm btn-primary pull-xs-right m-l-2 m-y-1" data-dismiss=modal>&nbsp; ' +
+            message + '<br><button class="btn btn-sm btn-primary pull-xs-right m-x-2 m-y-1" data-dismiss=modal>&nbsp; ' +
             btnOne +
             ' &nbsp;</button><button class="btn btn-sm btn-secondary pull-xs-right m-y-1" data-dismiss=modal>&nbsp; ' +
             btnTwo +

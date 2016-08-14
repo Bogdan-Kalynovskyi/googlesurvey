@@ -1,8 +1,6 @@
 <?php
 include 'auth.php';
 
-include 'db_mysql.php';
-
 
 try {
     switch ($_SERVER['REQUEST_METHOD']) {
@@ -31,12 +29,16 @@ catch (Exception $e) {
 
 
 function get () {
-    global $db;
+    $query = mysql_query('SELECT * FROM surveys WHERE user_google_id = '.esc($_SESSION['userGoogleId']).' ORDER BY id');
+    $result = array();
 
-    $response = $db->query('SELECT * FROM surveys WHERE user_google_id = '.$db->a($_SESSION['userGoogleId']).' ORDER BY id', true, true);
+    while ($row = mysql_fetch_array($query, MYSQL_ASSOC)) {
+        $num = array_shift($row);
+        $result[$num] = $row;
+    }
 
-    if ($response) {
-        echo json_encode($response);
+    if ($result) {
+        echo json_encode($result);
     }
     else {
         echo '{}';
@@ -45,70 +47,64 @@ function get () {
 
 
 function appendTags ($tags, $surveyId) {
-    global $db;
-
     $str = '';
     $n = count($tags);
     for ($i = 0; $i < $n; $i++) {
         $line = $tags[$i];
-        $synonyms = isset($line[2]) ? ($db->a($line[2]).','.$db->a($line[3])) : '"",""';
-        $str .= '('.$surveyId.','.$db->a($line[0]).','.$db->b($line[1]).','.$synonyms.'),';
+        $synonyms = isset($line[2]) ? (esc($line[2]).','.esc($line[3])) : '"",""';
+        $str .= '('.$surveyId.','.esc($line[0]).','.intval($line[1]).','.$synonyms.')';
+        if ($i < $n - 1) {
+            $str .= ',';
+        }
     }
 
-    $str = substr($str, 0, -1);
-
-    $db->query('INSERT INTO tags (survey_id, tag, count, synonyms, syn_count) VALUES '.$str);
+    mysql_query('INSERT INTO tags (survey_id, tag, count, synonyms, syn_count) VALUES '.$str);
 }
 
 
 function appendTerms ($terms, $surveyId) {
-    global $db;
-
     $str = '';
     $n = count($terms);
     for ($i = 0; $i < $n; $i++) {
         $line = $terms[$i];
-        $str .= '('.$surveyId.','.$db->a($line[0]).','.$db->b($line[1]).'),';
+        $str .= '('.$surveyId.','.esc($line[0]).','.intval($line[1]).')';
+        if ($i < $n - 1) {
+            $str .= ',';
+        }
     }
 
-    $str = substr($str, 0, -1);
-
-    $db->query('INSERT INTO terms (survey_id, term, count) VALUES '.$str);
+    mysql_query('INSERT INTO terms (survey_id, term, count) VALUES '.$str);
 }
 
 
 function create () {
-    global $db;
-
     $post = json_decode(file_get_contents('php://input'), true);
-    $surveyId = $db->query('INSERT INTO surveys (survey_google_id, user_google_id, question, total) VALUES ('.$db->a($post['survey_google_id']).', '.$db->a($_SESSION['userGoogleId']).', '.$db->a($post['question']).', '.$db->b($post['total']).')');
-    appendTags($post['tagsArr'], $surveyId);
-    appendTerms($post['termsArr'], $surveyId);
+    mysql_query('INSERT INTO surveys (survey_google_id, user_google_id, question, total, created) VALUES ('.esc($post['survey_google_id']).', '.esc($_SESSION['userGoogleId']).', '.esc($post['question']).', '.intval($post['total']).', UNIX_TIMESTAMP())');
+    $surveyId = mysql_insert_id();
+    appendTags($post['tags'], $surveyId);
+    appendTerms($post['terms'], $surveyId);
 
     echo $surveyId;
 }
 
 
 function rewrite () {
-    global $db;
-
     $post = json_decode(file_get_contents('php://input'), true);
-    $surveyId = $db->b($post['surveyId']);
+    $surveyId = intval($post['surveyId']);
 
-    $db->query('DELETE FROM tags WHERE survey_id = '.$surveyId);
-    $db->query('DELETE FROM terms WHERE survey_id = '.$surveyId);
+    mysql_query('DELETE FROM tags WHERE survey_id = '.$surveyId);
+    mysql_query('DELETE FROM terms WHERE survey_id = '.$surveyId);
 
-    appendTags($post['tagsArr'], $surveyId);
-    appendTerms($post['termsArr'], $surveyId);
-    $db->query('UPDATE surveys SET total = '.$db->b($post['total']).' WHERE id = '.$surveyId);
+    appendTags($post['tags'], $surveyId);
+    appendTerms($post['terms'], $surveyId);
+    mysql_query('UPDATE surveys SET total = '.intval($post['total']).' WHERE id = '.$surveyId);
 }
 
 
 function delete () {
-    global $db;
-
-    $surveyId = $db->b($_GET['surveyId']);
-    $db->query('DELETE FROM surveys WHERE id = '.$surveyId);
-    $db->query('DELETE FROM tags WHERE survey_id = '.$surveyId);
-    $db->query('DELETE FROM terms WHERE survey_id = '.$surveyId);
+    $surveyId = intval($_GET['surveyId']);
+    mysql_query('DELETE FROM surveys WHERE id = '.$surveyId);
+    mysql_query('DELETE FROM tags WHERE survey_id = '.$surveyId);
+    mysql_query('DELETE FROM terms WHERE survey_id = '.$surveyId);
+    mysql_query('DELETE FROM answers WHERE survey_id = '.$surveyId);
 }
