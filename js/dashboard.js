@@ -12,6 +12,7 @@
 
 
     app.controller('dashboard', ['model', 'surveys', '$rootScope', '$q', function (model, surveys, $rootScope, $q) {
+        $rootScope.angular = angular;
 
         var that = this,
             dupe = false,

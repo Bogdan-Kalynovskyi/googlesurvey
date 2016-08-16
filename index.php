@@ -161,7 +161,7 @@
     <div id="surveys" class="nav-body">
         <table ng-show="!angular.equals({}, ctrl.surveys)" class="table table-striped table-bordered table-hover m-t-1">
             <thead class="thead-default"><tr>
-                <th colspan=3>&nbsp; Survey</th><th>Google ID</th><th>Question</th><th>Answers</th>
+                <th colspan=3 class="p-x-1">Survey</th><th>Google ID</th><th>Question</th><th>Answers</th>
             </tr></thead>
             <tr ng-class="{active: id === ctrl.sId}" ng-repeat="(id, survey) in ctrl.surveys">
                 <td><a ng-click="ctrl.loadSurvey(id)" class="p-x-1">edit</a></td>

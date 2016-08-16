@@ -140,7 +140,7 @@ input[ng-model] {
 }
 
 #scroll-tbl {
-    height: calc(100% - 103px);
+    height: calc(100% - 98px);
     margin-top: 3px;
 }
 
@@ -194,6 +194,10 @@ th > b {
 #surveys th,
 #surveys td {
     padding: 4px!important;
+}
+
+#surveys td > a {
+    width: 100%;
 }
 
 
@@ -318,7 +322,6 @@ dupl-syn {
 
 #undo > div:hover {
     background: #fbecd8;
-    box-shadow: 0 0 2px 4px #fbecd8;
 }
 
 undo {
@@ -335,8 +338,8 @@ del-undo {
 }
 
 del-undo:hover {
-    background: rgba(0, 0, 0, 0.2);
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
 }
 
 tbody ul {
@@ -414,7 +417,7 @@ tbody ul {
         height: calc(100% - 77px);
     }
     #scroll-tbl {
-        height: calc(100% - 112px);
+        height: calc(100% - 114px);
     }
     tbody span {
         max-width: 189px;

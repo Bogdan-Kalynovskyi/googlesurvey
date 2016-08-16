@@ -47,6 +47,10 @@ function Table (container, tblType) {
             str = '<table class="table table-striped table-bordered table-hover"' + (tblType === TBL_terms ? ' ondragover="return false"' : '') + '>' +
                   '<thead class="thead-default"' + (tblType === TBL_tags ? ' ondragover="return false"' : '') + '><tr>' +
                   '<th colspan=' + colCount[tblType] + '><b>' + tableHeading[tblType] + '</b></th>';
+            if (tblType !== TBL_tags) {
+                str += '</tr><tr>' +
+                    '<th colspan=5><b>Drag here to add as tag</b></th>';
+            }
             if (tblType !== TBL_answers) {
                 str += '</tr><tr>' +
                     '<th><input type=checkbox></th>' +
