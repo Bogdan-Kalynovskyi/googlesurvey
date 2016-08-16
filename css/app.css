@@ -20,7 +20,7 @@ html, body {
 }
 
 header {
-    height: 50px;
+    height: 53px;
 }
 
 .bullet {
@@ -38,14 +38,16 @@ header {
 }
 
 .btn.active {
-    box-shadow: 0 0 1px 2px #0059a5;
+    box-shadow: 0 0 0 2px #0059a5;
 }
 
 .btn.active .bullet {
     font-size: 111%;
     font-weight: 500;
-    background: #ffc;
-    box-shadow: 0 0 0 2.2px #ffc;
+    background: #ffe;
+    box-shadow: 0 0 0 2.3px #ffe;
+    position: relative;
+    left: -1px;
 }
 
 big {
@@ -55,28 +57,29 @@ big {
     vertical-align: bottom;
 }
 
-.logout {
+#logout {
     font-size: 14px;
     float: right;
     margin-top: 10px;
-    padding-left: .3em;
+    padding-left: .4em;
 }
 
 input[ng-model] {
-    width: 60px;
+    width: 57px;
     padding: 0 4px;
     line-height: 23px;
 }
 
 
-@media (min-width: 740px) {
+@media (min-width: 723px) {
     header > button {
         font-size: 16px !important;
+        padding-left: 10px!important;
+        padding-right: 10px!important;
     }
 
     .bullet {
         font-size: 14px;
-        line-height: 18px;
         margin: 2px 9px 2px 0;
         width: 18px;
         height: 18px;
@@ -88,7 +91,7 @@ input[ng-model] {
         margin: 0 1px;
     }
 
-    .logout {
+    #logout {
         font-size: 15px;
         margin-top: 12px;
     }
@@ -100,15 +103,11 @@ input[ng-model] {
     button {
         line-height: 21px!important;
     }
-
-    #scroll-tbl {
-        margin-top: 6px;
-    }
 }
 
 
 #tags-f-input {
-    width: calc(100% - 37px);
+    width: calc(100% - 36px);
     float: right;
 }
 
@@ -123,7 +122,7 @@ input[ng-model] {
     height: 15px;
     line-height: 13px;
     text-align: center;
-    bottom: 7px;
+    bottom: 8px;
     right: 22px;
     border-radius: 50%;
     background: #ddd;
@@ -137,11 +136,12 @@ input[ng-model] {
 
 .nav-body {
     display: none;
-    height: calc(100% - 66px);
+    height: calc(100% - 69px);
 }
 
 #scroll-tbl {
-    height: calc(100% - 97px);
+    height: calc(100% - 103px);
+    margin-top: 3px;
 }
 
 .overflow {
@@ -151,10 +151,11 @@ input[ng-model] {
     -webkit-overflow-scrolling: touch;
 }
 
-#tags-question {
+#tags-question,
+#comment-chart {
     color: #888;
     font-size: 13px;
-    margin-bottom: 9px;
+    margin-bottom: 11px;
 }
 
 #tags .table {
@@ -164,39 +165,61 @@ input[ng-model] {
     user-select: none;
 }
 
-td,
-th {
+th,
+td {
     font-size: 13px!important;
     padding: 3px!important;
+    line-height: 1.2;
 }
 
 tr.active {
     background: #f0f0ff!important;
 }
 
-thead th {
-    padding-top: 0;
-    padding-bottom: 0;
-    border-top: 0;
-    border-bottom: 0;
+th {
+    background: #eceeef!important;
+    padding-top: 0!important;
+    padding-bottom: 0!important;
+    border-top: 0!important;
+}
+
+th:first-child {
+    border-bottom: 0!important;
+}
+
+th > b {
+    font-size: 11px;
+}
+
+#surveys th,
+#surveys td {
+    padding: 4px!important;
+}
+
+
+tr:nth-of-type(odd) {
+    background-color: #f9f9f9!important;
+}
+
+tbody tr:hover {
+    background: #f9f9ff!important;
 }
 
 td[draggable]:hover {
-    box-shadow: 0 0 6px #aaa inset;
+    box-shadow: 0 0 6px #aaa inset, 0 0 1px #aaa;
 }
 
-#tags .table th:first-child,
-#answers .table th:first-child,
-#tags .table td:first-child,
-#short-table > .table td:first-child {
+#tags th:first-child,
+#answers th:first-child,
+#tags td:first-child,
+#short-table td:first-child {
     text-align: center;
 }
 
-tbody a {
+a {
     color: #0275d8!important;
-    display: inline-block;
-    width: 100%;
-    text-align: center;
+    display: inline-block!important;
+    text-align: center!important;
     cursor: pointer!important;
 }
 
@@ -213,10 +236,6 @@ tbody a {
     cursor: grab;
 }
 
-tbody tr:hover {
-    background: #f8f8ff!important;
-}
-
 tbody span,
 tbody input:not([type=checkbox]) {
     display: inline-block;
@@ -226,13 +245,13 @@ tbody input:not([type=checkbox]) {
 
 tbody span:hover {
     background: #fcfcfc;
-    box-shadow: 0 0 6px #aaa;
+    box-shadow: 0 0 7px 1px #ccc;
 }
 
 tbody input:not([type=checkbox]) {
     border: 0;
-    box-shadow: 0 0 14px #000;
-    outline: 1px solid #fff;
+    box-shadow: 0 0 14px 4px #000;
+    outline: 2px solid #fff;
     -webkit-user-select: text;
     -moz-user-select: text;
     -ms-user-select: text;
@@ -240,12 +259,16 @@ tbody input:not([type=checkbox]) {
 }
 
 tbody li:hover {
-    background: #eeeefa;
-    box-shadow: 0 0 2px 2px #eeeefa;
+    background: #ececff;
+    box-shadow: 0 0 0 1px #ececff;
 }
 
 tbody li > span {
     width: calc(100% - 52px);
+}
+
+#answers-table li {
+    color: orange;
 }
 
 del-syn,
@@ -277,7 +300,7 @@ dupl-syn {
 }
 
 #undo {
-    background: #ffefdb;
+    background: #fff4e2;
     font-size: 12px;
     width: 50%;
     position: fixed;
@@ -290,12 +313,12 @@ dupl-syn {
 #undo > div {
     padding: 4px 3px 3px 6px;
     overflow: hidden;
-    box-shadow: 0 0 4px 2px #ffefdb;
+    box-shadow: 0 0 2px 4px #fff4e2;
 }
 
 #undo > div:hover {
     background: #fbecd8;
-    box-shadow: 0 0 4px 2px #fbecd8;
+    box-shadow: 0 0 2px 4px #fbecd8;
 }
 
 undo {
@@ -312,11 +335,12 @@ del-undo {
 }
 
 del-undo:hover {
-    box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
 }
 
 tbody ul {
-    margin: -2px 0 0 0;
+    margin: -1px 0 0 0;
     list-style: none;
 }
 
@@ -325,22 +349,37 @@ tbody ul {
 }
 
 ::-webkit-input-placeholder {
-    color: #cfcfcf;
+    color: #ddd;
 }
 
 ::-moz-placeholder {
-    color: #cfcfcf;
+    color: #ddd;
 }
 
 :-ms-input-placeholder {
-    color: #cfcfcf;
+    color: #ddd;
 }
 
 
 
-@media (max-width: 724px) {
+@media (max-width: 722px) {
+    .cross {
+        bottom: 6px;
+    }
+
+    th,
+    td {
+        line-height: 1.1;
+    }
+
     #scroll-tbl {
-        height: calc(100% - 112px);
+        height: calc(100% - 98px);
+        margin-top: 0;
+    }
+
+    #tags-question,
+    #comment-chart {
+        margin-bottom: 6px;
     }
 
     #tags-f-input {
@@ -351,43 +390,47 @@ tbody ul {
         top: 0;
     }
 
-    #terms-table {
-        padding: 0!important;
+    #terms-table,
+    #short-table {
+        padding-left: 0!important;
     }
 
     tbody span {
-        max-width: 188px;
+        max-width: 218px;
         overflow: hidden;
         text-overflow: ellipsis;
-    }
-}
-
-
-@media (max-width: 634px) {
-    header {
-        height: 79px;
-    }
-    .nav-body {
-        height: calc(100% - 79px);
     }
     #sgi {
         font-size: 12px!important;
     }
+}
+
+
+@media (max-width: 632px) {
+    header {
+        height: 77px;
+    }
+    .nav-body {
+        height: calc(100% - 77px);
+    }
     #scroll-tbl {
-        height: calc(100% - 128px);
+        height: calc(100% - 112px);
     }
     tbody span {
-        max-width: 178px;
+        max-width: 189px;
+    }
+    #sgi {
+        font-size: 11px!important;
+    }
+    #btn-chart {
+        margin-top: 10px;
     }
 }
 
 
 @media (max-width: 590px) {
-    #sgi {
-        font-size: 11px!important;
-    }
     tbody span {
-        max-width: 168px;
+        max-width: 169px;
     }
 }
 
@@ -400,15 +443,21 @@ tbody ul {
         height: auto;
     }
     tbody span {
-        max-width: none;
+        max-width: 300px;
     }
     #undo {
         width: 100%;
+    }
+    #btn-chart {
+        margin-top: 0;
     }
 }
 
 
 @media (max-width: 345px) {
+    tbody span {
+        max-width: 200px;
+    }
     .bullet {
         display: none;
     }

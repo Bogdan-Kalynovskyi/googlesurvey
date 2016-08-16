@@ -26,24 +26,22 @@ function Table (container, tblType) {
         isFiltered;
 
 
-    function toPerc (repeat) {
-        return (100 * repeat / total).toFixed(2);
+    function toPerc (count) {
+        return (100 * count / total).toFixed(2);
     }
 
 
-    this.create = function (arr, tags) {
+    this.draw = function (arr, unpackOrTags) {
         if (tblType === TBL_terms) {
             visibleTerms = Array(arr.length).fill(true);
         }
 
         if (tbody) {
-            this.update(arr, tags);
+            this.update(arr, unpackOrTags);
             return;
         }
 
-        tbody = null;
-
-        var tableHeading = ['Tags and synonyms', 'Unused terms', 'Answer', 'Tags'],
+        var tableHeading = ['Tags and synonyms', 'Unused terms', 'Answers', 'Tags'],
             columnHeading = ['Tag', 'Term', '', 'Tag'],
             colCount = [5, 5, 3, 4],
             str = '<table class="table table-striped table-bordered table-hover"' + (tblType === TBL_terms ? ' ondragover="return false"' : '') + '>' +
@@ -58,7 +56,7 @@ function Table (container, tblType) {
 
             str += '</tr></thead>' +
                    '<tbody>' +
-                       fillTableBody(arr, tags) +
+                       fillTableBody(arr, unpackOrTags) +
                    '</tbody></table>';
 
         container.innerHTML = str;
@@ -76,9 +74,9 @@ function Table (container, tblType) {
     };
 
 
-    function fillTableBody (arr, tags) {
+    function fillTableBody (arr, unpackOrTags) {
         var str = '',
-            i, j,
+            i, j, m,
             line,
             syn,
             synStr;
@@ -91,7 +89,7 @@ function Table (container, tblType) {
 
                     if (syn = line[2]) {
                         // simultaneously (and implicitly!) unpack on first pass
-                        if (!tbody) {
+                        if (unpackOrTags) {
                             syn = syn.split(',');
                             line[2] = syn;
                             line[3] = line[3].split(',');
@@ -130,12 +128,18 @@ function Table (container, tblType) {
                     line = arr[i];
 
                     if (syn = line[1]) {
+                        //todo
                         // simultaneously (and implicitly!) unpack on first pass
                         syn = syn.split(',');
 
                         synStr = '<ul>';
-                        for (j = 0; j < syn.length - 1; j++) {
-                            synStr += '<li><text>' + tags[syn[j]][0] + '</text><del-tag>×</del-tag></li>';
+                        for (j = 0, m = syn.length - 1; j < m; j++) {
+                            var tag = unpackOrTags[syn[j]];
+                            if (!tag) {
+                                line[1].replace(j + ',', '');
+                                continue;
+                            }
+                            synStr += '<li><text>' + tag[0] + '</text><del-tag>×</del-tag></li>';
                         }
                         synStr += '</ul>';
                     }
@@ -179,10 +183,18 @@ function Table (container, tblType) {
         masterCheckbox = container.querySelector('thead input');
         masterCheckbox.onchange = function () {
             var rows = tbody.children,
-                checked = this.checked;
+                checked = this.checked,
+                i, n;
 
-            for (var i = 0, n = rows.length; i < n; i++) {
-                if (tblType !== TBL_terms || visibleTerms[i]) {
+            if (tblType === TBL_terms) {
+                for (i in visibleTerms) {
+                    if (visibleTerms[i]) {
+                        rows[i].children[0].children[0].checked = checked;
+                    }
+                }
+            }
+            else {
+                for (i = 0, n = rows.length; i < n; i++) {
                     rows[i].children[0].children[0].checked = checked;
                 }
             }
@@ -249,6 +261,9 @@ function Table (container, tblType) {
                 tblType: tblType
             };
 
+            if (tblType !== TBL_short) {
+                masterCheckbox.checked = false;
+            }
             $tbody.find('input:checked').css('outline', '5px solid rgba(0, 0, 255, 0.2)');// todo  todo
         });
 
@@ -282,10 +297,6 @@ function Table (container, tblType) {
                         outline.style.outline = '2px solid blue';
                     }
                 }
-            }
-
-            if (tblType !== TBL_answers) {
-                masterCheckbox.checked = false;
             }
             evt.stopPropagation();
         });
@@ -360,7 +371,7 @@ function Table (container, tblType) {
             }
 
             else if (tagName === 'DEL-TAG') {
-                ctrl.deleteTag(getIndex(target), getSynIndex(li));
+                ctrl.deleteAnswer(getIndex(target), getSynIndex(li));
             }
 
             else if (target.className === 'del-line') {
@@ -383,7 +394,7 @@ function Table (container, tblType) {
             }
         }
         else {
-            for (var i = 0, n = rows.length; i < n; i++) {
+            for (i = 0, n = rows.length; i < n; i++) {
                 if (rows[i].children[0].children[0].checked) {
                     selected.push(i);
                 }
@@ -403,7 +414,7 @@ function Table (container, tblType) {
                 fil = arr[i][0].indexOf(word) !== -1;
                 tr = rows[i];
                 if (fil != visibleTerms[i]) {
-                    tr.style.display = fil ? 'table-row' : 'none';
+                    tr.style.display = fil ? '' : 'none';
                 }
                 visibleTerms[i] = fil;
                 if (!isFiltered) {
@@ -417,7 +428,7 @@ function Table (container, tblType) {
         else {
             for (i in arr) {
                 if (!visibleTerms[i]) {
-                    rows[i].style.display = 'table-row';
+                    rows[i].style.display = '';
                 }
             }
             visibleTerms = Array(arr.length).fill(true);
@@ -438,19 +449,31 @@ function Table (container, tblType) {
             }
         }
         else {
-            for (var i = 0, n = rows.length; i < n; i++) {
+            for (i = 0, n = rows.length; i < n; i++) {
                 rows[i].children[2].innerHTML = toPerc(arr[i][1]) + '%'
             }
         }
     };
+
+
+    this.updateCount = function (index, count) {
+        tbody.children[index].children[3].innerHTML = count;
+    };
+    
+    
+    this.clear = function () {
+        if (tbody) {
+            tbody.innerHTML = '';
+        }
+    };
     
 
-    this.update = function (arr, tags) {
+    this.update = function (arr, unpackOrTags) {
         tbody.innerHTML = '';
         if (tblType === TBL_terms) {
             visibleTerms = [];
         }
-        this.addRows(arr, tags);
+        this.addRows(arr, unpackOrTags);
     };
     
 
@@ -463,8 +486,8 @@ function Table (container, tblType) {
     };
 
 
-    this.addRows = function (arr, tags) {
-        $tbody.prepend(fillTableBody(arr, tags));
+    this.addRows = function (arr, unpackOrTags) {
+        $tbody.prepend(fillTableBody(arr, unpackOrTags));
 
         if (tblType === TBL_terms) {
             visibleTerms = Array(arr.length).fill(true).concat(visibleTerms);
@@ -472,7 +495,7 @@ function Table (container, tblType) {
     };
 
 
-    this.addSyn = function (index, name, repeat, pos) {
+    this.addSyn = function (index, name, count, pos) {
         var tr = tbody.children[index],
             td = tr.children[tblType === TBL_tags ? 1 : 0],
             ul = td.children[1],
@@ -497,8 +520,8 @@ function Table (container, tblType) {
             $(td).append('<ul>' + str + '</ul>');
         }
         if (tblType !== TBL_answers) {
-            tr.children[2].innerHTML = toPerc(repeat) + '%';
-            tr.children[3].innerHTML = repeat;
+            tr.children[2].innerHTML = toPerc(count) + '%';
+            tr.children[3].innerHTML = count;
         }
     };
 
@@ -539,20 +562,20 @@ function Table (container, tblType) {
                     typeStr = 'subterm';
                 }
 
-                $undo.prepend('<div><undo trash-id=' + trashId + '>undo</undo> <i>' + typeStr + '</i> ' + restore[0][0] + '<del-undo>×</del-undo></div>');
+                $undo.prepend('<div><undo trash-id=' + trashId + '>undo</undo> <i>' + typeStr + '</i>&nbsp; ' + restore[0][0] + '<del-undo>×</del-undo></div>');
             }, 0);
         }
     }
 
 
-    this.deleteSyn = function (index, pos, repeat, trashId) {
+    this.deleteSyn = function (index, pos, count, trashId) {
         var tr = tbody.children[index],
             td = tr.children[tblType === TBL_tags ? 1 : 0],
             ul = td.children[1];
         ul.removeChild(ul.children[pos]);
         if (tblType !== TBL_answers) {
-            tr.children[2].innerHTML = toPerc(repeat) + '%';
-            tr.children[3].innerHTML = repeat;
+            tr.children[2].innerHTML = toPerc(count) + '%';
+            tr.children[3].innerHTML = count;
             addTrash(trashId);
         }
     };

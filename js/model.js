@@ -16,14 +16,15 @@ app.service('model', ['$http', function ($http) {
                 i = 2,
                 row,
                 splitter = / and | or | - | but | nor |\/|\.|,|;|:|\?|!|&+/,
-                trash = / very | much | many | a | the | such | so | lot of | lots of |  /g; //todo does not multiple
+                trash = / very | so much | much | many | a | an | the | such | hi | so | lot of | lots of /g,
+                space = /  /g;
 
             while (row = raw['K' + i]) {
                 var words = row.w.toLowerCase();
 
                 words = words.split(splitter);
                 for (var j in words) {
-                    var word = (' ' + words[j]).replace(trash, ' ').trim();
+                    var word = (' ' + words[j]).replace(trash, ' ').replace(space, ' ').trim();
                     if (word.length) {
                         if (tagsObj[word]) {
                             tagsObj[word]++;
@@ -55,7 +56,6 @@ app.service('model', ['$http', function ($http) {
             this.answers.push(i);
         }
         this.answers.sort();
-
         this.terms = [];
         total = t;
 
@@ -66,7 +66,7 @@ app.service('model', ['$http', function ($http) {
     this.getTags = function (surveyId) {
         return $http.get('api/tags.php?surveyId=' + surveyId).success(function (response) {
             that.tags = response;
-            tagsTable.create(response);
+            tagsTable.draw(response, true);
         });
     };
 
@@ -74,7 +74,7 @@ app.service('model', ['$http', function ($http) {
     this.getTerms = function (surveyId) {
         return $http.get('api/terms.php?surveyId=' + surveyId).success(function (response) {
             that.terms = response;
-            termsTable.create(response);
+            termsTable.draw(response);
         });
     };
 
@@ -82,8 +82,8 @@ app.service('model', ['$http', function ($http) {
     this.getAnswers = function (surveyId) {
         return $http.get('api/answers.php?surveyId=' + surveyId).success(function (response) {
             that.answers = response;
-            answersTable.create(response);
-            shortTable.create(that.tags);
+            answersTable.draw(response, that.tags);
+            shortTable.draw(that.tags);
         });
     };
 
@@ -119,13 +119,13 @@ app.service('model', ['$http', function ($http) {
         });
     };
 
-
-    this.updateAnswers = function (surveyId) {
-        return $http.put('api/answers.php', {
-            surveyId: surveyId,
-            answers: this.answers
-        });
-    };
+    //
+    // this.updateAnswers = function (surveyId) {
+    //     return $http.put('api/answers.php', {
+    //         surveyId: surveyId,
+    //         answers: this.answers
+    //     });
+    // };
 
 
     this.patchAnswer = function (surveyId, answerId) {
@@ -149,17 +149,17 @@ app.service('model', ['$http', function ($http) {
     };
 
 
-    this.addSyn = function (index, name, repeat) {
+    this.addSyn = function (index, name, count) {
         var line = this.tags[index];
         if (!line[2]) {
             line.push([name]);
-            line.push([repeat]);
+            line.push([count]);
         }
         else {
             line[2].unshift(name);
-            line[3].unshift(repeat);
+            line[3].unshift(count);
         }
-        line[1] += +repeat;
+        line[1] += +count;
         tagsTable.addSyn(index, name, line[1]);
     };
 
@@ -262,8 +262,11 @@ app.service('model', ['$http', function ($http) {
 
     this.addAnswer = function (indexAnswer, indexTag) {
         this.answers[indexAnswer][1] += indexTag + ',';
-        this.tags[indexTag][1]++;
-        answersTable.addSyn(indexAnswer, this.tags[indexTag][0]);
+        var tag = this.tags[indexTag];
+        answersTable.addSyn(indexAnswer, tag[0]);
+        total++;
+        shortTable.updateCount(indexTag, ++tag[1]);
+        shortTable.updatePerc(this.tags);
     };
 
 
@@ -271,12 +274,16 @@ app.service('model', ['$http', function ($http) {
         var arr = this.answers[indexAnswer][1].split(','),
         indexTag = arr.splice(pos, 1);
         this.answers[indexAnswer][1] = arr.join(',');
-        this.tags[indexTag][1]--;
         answersTable.deleteSyn(indexAnswer, pos);
+        total--;
+        shortTable.updateCount(indexTag, --this.tags[indexTag][1]);
+        shortTable.updatePerc(this.tags);
     };
 
 
     this.prepareAnswers = function () {
+        total = 0;
+
         for (var j in this.tags) {
             this.tags[j][1] = 0;
         }
@@ -290,6 +297,8 @@ app.service('model', ['$http', function ($http) {
                 if (answer.indexOf(tag[0]) !== -1) {
                     list += j + ',';
                     tag[1]++;
+                    total++;
+                    continue;
                 }
                 var syn = tag[2];
                 if (syn) {
@@ -297,6 +306,8 @@ app.service('model', ['$http', function ($http) {
                         if (answer.indexOf(syn[k]) !== -1) {
                             list += j + ',';
                             tag[1]++;
+                            total++;
+                            break;
                         }
                     }
                 }
@@ -305,8 +316,8 @@ app.service('model', ['$http', function ($http) {
             this.answers[i] = [answer, list];
         }
 
-        answersTable.create(this.answers, this.tags);
-        shortTable.create(this.tags);
+        answersTable.draw(this.answers, this.tags);
+        shortTable.draw(this.tags);
     };
 
 
@@ -341,7 +352,7 @@ app.service('model', ['$http', function ($http) {
 
         if (toggle) {
             sortOrder *= -1;
-            termsTable.update(this.terms);
+            termsTable.draw(this.terms);
             document.querySelector('.pull-xs-right').innerHTML = 'Sort terms ' + (sortOrder === 1 ? '▼' : '▲');
         }
 
@@ -372,10 +383,10 @@ app.service('model', ['$http', function ($http) {
             if (terms[i][2]) {
                 var line = terms[i],
                     name = line[2],
-                    repeat = line[3];
+                    count = line[3];
 
                 for (var j in name) {
-                    that.terms.push([name[j], repeat[j]]);
+                    that.terms.push([name[j], count[j]]);
                 }
                 line.splice(2, 2);
             }
@@ -383,9 +394,21 @@ app.service('model', ['$http', function ($http) {
     }
 
 
+    this.clearTables = function () {
+        for (var i in tables) {
+            tables[i].clear();
+        }
+    };
+
+
     this.recalcPerc = function () {
         tagsTable.updatePerc(this.tags);
         termsTable.updatePerc(this.terms);
+    };
+
+
+    this.updateShort = function () {
+        shortTable.draw(this.tags);
     };
 
 
@@ -410,21 +433,21 @@ app.service('model', ['$http', function ($http) {
         this.sort(this.tags, true);
         this.sort(this.terms, true);
 
-        tagsTable.create(this.tags);
-        termsTable.create(this.terms);
+        tagsTable.draw(this.tags, tagsReady);
+        termsTable.draw(this.terms);
 
         return this.tags[maxTags - 1][1];
     };
 
 
-    this.splitMin = function (minRepeat) {
+    this.splitMin = function (minCount) {
         var arr = this.tags.concat(this.terms),
             i = 0,
             n = arr.length;
 
         this.sort(arr);
 
-        while (i < n && arr[i][1] >= minRepeat) {
+        while (i < n && arr[i][1] >= minCount) {
             i++;
         }
 
@@ -434,8 +457,8 @@ app.service('model', ['$http', function ($http) {
         this.sort(this.tags, true);
         this.sort(this.terms, true);
 
-        tagsTable.create(this.tags);
-        termsTable.create(this.terms);
+        tagsTable.draw(this.tags);
+        termsTable.draw(this.terms);
 
         return i;
     };

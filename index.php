@@ -11,50 +11,6 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>Google Surveys</title>
     <meta name="google-signin-client_id" content="<?php echo $google_api_id ?>">
-    <script src="https://apis.google.com/js/platform.js" async defer onload="onPlatformLoad()"></script>
-    <script>
-        function logIn (g) {
-            $.post('api/login.php', {
-                authToken: g.getAuthResponse().id_token
-            }, function (r) {
-                window.xsrfToken = r;
-                if (app) {
-                    alreadyLoggedIn();
-                }
-            });
-        }
-
-        function onLogIn (g) {
-            if ($) {
-                logIn(g);
-            }
-            else {
-                window.googleUser = g;
-            }
-        }
-
-        function onPlatformLoad() {
-            <?php if ($token) { ?>
-                gapi.load('auth2', function () {
-                    gapi.auth2.init({
-                        client_id: '<?php echo $google_api_id ?>'
-                    });
-                });
-            <?php } ?>
-        }
-
-        <?php if ($token) { ?>
-            window.xsrfToken = '<?php echo $_SESSION['xsrfToken'] ?>';
-        <?php } else { ?>
-            // check for 3d party cookies are enabled
-            window.addEventListener("message", function (evt) {
-                if (evt.data === 'MM:3PCunsupported') {
-                    document.getElementById('test3dPartyCookies').style.display = 'block';
-                }
-            });
-        <?php } ?>
-    </script>
-
     <style>
         #loading {
             position: absolute;
@@ -121,13 +77,57 @@
 </head>
 
 <body>
+<script src="https://apis.google.com/js/platform.js" async defer onload="onPlatformLoad()"></script>
+<script>
+    function logIn (g) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'api/login.php?authToken=' + encodeURIComponent(g.getAuthResponse().id_token));
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                window.xsrfToken = xhr.responseText;
+                if (window.app) {
+                    alreadyLoggedIn();
+                }
+            }
+            else {
+                alert('Server error: ' + xhr.responseText);
+            }
+        };
+        xhr.send();
+    }
+
+    // start loading only after app started
+    function onPlatformLoad() {
+        <?php if ($token) { ?>
+        if (window.app) {
+            gapi.load('auth2', function () {
+                gapi.auth2.init({
+                    client_id: '<?php echo $google_api_id ?>'
+                });
+            });
+        }
+        <?php } ?>
+    }
+
+    <?php if ($token) { ?>
+    window.xsrfToken = '<?php echo $_SESSION['xsrfToken'] ?>';
+    <?php } else { ?>
+    // check for 3d party cookies are enabled
+    window.addEventListener("message", function (evt) {
+        if (evt.data === 'MM:3PCunsupported') {
+            document.getElementById('test3dPartyCookies').style.display = 'block';
+        }
+    });
+    <?php } ?>
+</script>
+
 <?php if (!$token) { ?>
     <div id="logged-out">
         <div id="login-form">
-            <div class="col-half">Logo placeholder</div>
+            <div class="col-half">Company Logo</div>
             <div class="col-half">
                 <h5>Sign in using your Google account</h5><br>
-                <div class="g-signin2" data-onsuccess="onLogIn"></div>
+                <div class="g-signin2" data-onsuccess="logIn"></div>
             </div>
         </div>
         <div id="test3dPartyCookies"><strong>Third party cookies are disabled in your browser.</strong><br>
@@ -142,17 +142,17 @@
     <div id="loading"><h5>Loading...</h5></div>
 
     <header>
-        <a href class="logout" ng-click="ctrl.logOut()">Log out</a>
-        <button class="btn btn-sm btn-primary" id="btn-surveys" ng-click="ctrl.navigate('surveys')">
+        <a id="logout" ng-click="ctrl.logOut()">Log out</a>
+        <button class="btn btn-sm btn-primary" id="btn-surveys" ng-click="ctrl.navigate(0)">
             <span class="bullet">1</span> Surveys&nbsp;
         </button> <big>&raquo;</big>
-        <button class="btn btn-sm btn-primary" id="btn-tags" ng-click="ctrl.navigate('tags')">
+        <button class="btn btn-sm btn-primary disabled" id="btn-tags" ng-click="ctrl.navigate(1)">
             <span class="bullet">2</span> Tags & terms
         </button> <big>&raquo;</big>
-        <button class="btn btn-sm btn-primary" id="btn-answers" ng-click="ctrl.navigate('answers')">
+        <button class="btn btn-sm btn-primary disabled" id="btn-answers" ng-click="ctrl.navigate(2)">
             <span class="bullet">3</span> Answers & tags
         </button> <big>&raquo;</big>
-        <button class="btn btn-sm btn-primary" id="btn-chart" ng-click="ctrl.navigate('chart')">
+        <button class="btn btn-sm btn-primary disabled" id="btn-chart" ng-click="ctrl.navigate(3)">
             <span class="bullet">4</span> Chart & CSV
         </button>
     </header>
@@ -197,7 +197,7 @@
                 <input ng-model="ctrl.maxTags" ng-change="ctrl.splitMax()" ng-model-options='{ debounce: 110 }' type="number">
             </label>
             <label class="col-xs-6 col-sm-4 col-lg-3"><small>Minimum repeat for tag:</small>
-                <input ng-model="ctrl.minRepeat" ng-change="ctrl.splitMin()" ng-model-options='{ debounce: 110 }' type="number">
+                <input ng-model="ctrl.minCount" ng-change="ctrl.splitMin()" ng-model-options='{ debounce: 110 }' type="number">
             </label>
             <label class="col-xs-6 col-sm-4 col-lg-3"><small id="tags-f-span">Filter:</small>
                 <input ng-model="ctrl.filterTerm" ng-change="ctrl.filterTerms()" ng-model-options='{ debounce: 110 }' placeholder="Filter tags" id="tags-f-input">
@@ -229,20 +229,13 @@
 
     <div id="modal-placeholder"></div>
 
-    <link rel=stylesheet href="node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel=stylesheet href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/css/bootstrap.min.css">
     <link rel=stylesheet href="css/app.css">
-    <script src="node_modules/jquery/dist/jquery.js"></script>
-    <script src="node_modules/angular/angular.js"></script>
-    <script src="js/xls.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/xls/0.7.5/xls.core.min.js"></script>
     <script src="//www.gstatic.com/charts/loader.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/chart.js"></script>
-    <script src="js/dashboard.js"></script>
-    <script src="js/table.js"></script>
-    <script src="js/simple-table.js"></script>
-    <script src="js/model.js"></script>
-    <script src="js/surveys.js"></script>
-    <script src="js/ui.js"></script>
+    <script src="app6.js"></script>
 </div>
 </body>
 </html>

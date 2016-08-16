@@ -16,6 +16,8 @@
         var that = this,
             dupe = false,
             chart = new Chart(byId('tags-chart')),
+            states = ['surveys', 'tags', 'answers', 'chart'],
+            maxState = 0,
             oldState,
 
             tagsReady,
@@ -28,47 +30,69 @@
 
         surveys.load().success(function () {
             $('#loading').remove();
-            that.navigate('surveys');
+            that.navigate(0);
             that.surveys = surveys.surveys;
         });
 
 
         window.addEventListener('resize', function () {
-            if (oldState === 'chart') {
+            if (oldState === 3) {
                 chart.update();
             }
         });
 
 
+        function setMaxState (state) {
+            maxState = state;
+            byId('btn-' + states[state - 1]).classList.remove('disabled');
+            byId('btn-' + states[state]).classList.remove('disabled');
+            for (state++; state < states.length; state++) {
+                byId('btn-' + states[state]).classList.add('disabled');
+            }
+        }
+
+
         this.navigate = function (state) {
-            if (state !== 'surveys' && !(model.tags || this.sId)) {
-                alert('Nothing to display, survey not loaded yet');
+            if (state > maxState) {
+                if (maxState === 0) {
+                    bootstrapAlert('Nothing to display, please load survey first');
+                }
+                else {
+                    bootstrapAlert('Please open "Answers" tab first, to see if everything is correct');
+                }
                 return;
             }
 
-            if (oldState) {
-                byId('btn-' + oldState).classList.remove('active');
-                byId(oldState).style.display = 'none';
+            if (oldState !== undefined) {
+                byId('btn-' + states[oldState]).classList.remove('active');
+                byId(states[oldState]).style.display = 'none';
             }
-            byId('btn-' + state).classList.add('active');
-            byId(state).style.display = 'block';
+            byId('btn-' + states[state]).classList.add('active');
+            byId(states[state]).style.display = 'block';
             oldState = state;
 
-            if (!answersReady && state === 'answers') {
-                if (surveyJustDone) {
-                    model.prepareAnswers();
-                    model.saveAnswers(this.sId);
-                    answersReady = true;
+            if (state === 2) {
+                if (!answersReady) {
+                    if (surveyJustDone) {
+                        model.prepareAnswers();
+                        model.saveAnswers(this.sId);
+                        setMaxState(3);
+                        answersReady = true;
+                    }
+                    else {
+                        model.getAnswers(this.sId).success(function () {
+                            setMaxState(3);
+                            answersReady = true;
+                        });
+                    }
                 }
                 else {
-                    model.getAnswers(this.sId).success(function () {
-                        answersReady = true;
-                    });
+                    model.updateShort();
                 }
                 //todo what happens if we come here again, with changed tags after tags editing?
             }
 
-            if (!chartReady && state === 'chart') {
+            if (!chartReady && state === 3) {
                 chart.create(model.tags, surveys.surveys[this.sId]);
                 var table = new SimpleTable(byId('chart-table'));
                 table.create(model.tags);
@@ -77,49 +101,53 @@
         };
 
 
+        function onSurveyLoad (question) {
+            answersReady = false;
+            that.filterTerm = '';
+            trash = [];
+            byId('tags-question').innerHTML = question;
+            $undo[0].innerHTML = '';
+            setMaxState(2);
+            that.navigate(1);
+        }
+
+
         function onSurveyCreated (question) {
             if (question) {
                 surveyJustDone = true;
                 tagsReady = true;
-                that.filterTerm = '';
-                trash = [];
-                that.navigate('tags');
                 that.splitMax();
-                byId('tags-question').innerHTML = question;
-                $undo.innerHTML = '';
+                onSurveyLoad(question);
             }
         }
+
+
+        this.loadSurvey = function (id) {
+            surveyJustDone = false;
+            this.sId = id;
+            onSurveyLoad(surveys.surveys[this.sId].question);
+            total = +surveys.surveys[id].total;
+            model.clearTables();
+            model.getTags(id).success(function () {
+                that.maxTags = model.tags.length;
+                that.minCount = model.tags[that.maxTags - 1][1];
+            });
+            model.getTerms(id);
+        };
 
         
         this.splitMax = function () {
             if (!this.maxTags) {
                 this.maxTags = 1;
             }
-            this.minRepeat = model.splitMax(this.maxTags, tagsReady);
+            this.minCount = model.splitMax(this.maxTags, tagsReady);
             saveTagTerms();
         };
 
 
         this.splitMin = function () {
-            this.maxTags = model.splitMin(this.minRepeat);
+            this.maxTags = model.splitMin(this.minCount);
             saveTagTerms();
-        };
-
-        
-        this.loadSurvey = function (id) {
-            surveyJustDone = false;
-            this.sId = id;
-            this.filterTerm = '';
-            trash = [];
-            this.navigate('tags');
-            byId('tags-question').innerHTML = surveys.surveys[this.sId].question;
-            $undo.innerHTML = '';
-            total = +surveys.surveys[id].total;
-            model.getTags(id).success(function () {
-                that.maxTags = model.tags.length;
-                that.minRepeat = model.tags[that.maxTags - 1][1];
-            });
-            model.getTerms(id);
         };
 
 
@@ -244,7 +272,7 @@
                 model.addTerm(data);
             }
             else {
-                model.addSyn(type, data[0], data[1]);
+                model.addSyn(Math.min(type, model.tags.length - 1), data[0], data[1]);
             }
 
             total += +data[1];
@@ -275,12 +303,12 @@
                                     model.addTag(line);
                                 }
                                 else {
-                                    return false;
+                                    return;
                                 }
                             }
                         }
                         else {
-                            return false;
+                            return;
                         }
                     }
                     else {
@@ -296,6 +324,7 @@
                         }
                         model.addTerm(line);
                     }
+                    saveTagTerms();
                     break;
 
                 case TBL_terms:
@@ -310,24 +339,20 @@
                         }
                     }
                     else {
-                        return false;
+                        return;
                     }
+                    saveTagTerms();
                     break;
 
                 case TBL_short:
                     if (to.tblType === TBL_answers) {
-                        model.addAnswer(to.index, from.index);
+                        that.addAnswer(to.index, from.index);
                     }
                     else {
-                        return false;
+                        return;
                     }
                     break;
-
-                default:
-                    return false;
             }
-
-            saveTagTerms();
         }
 
 
@@ -381,8 +406,8 @@
                 }
                 else {
                     dupe = false;
-                    model.saveNewSurvey().then(function (id) {
-                        that.sId = id;
+                    model.saveNewSurvey().then(function (surveyId) {
+                        that.sId = surveyId;
                         surveys.add(model.surveyId, model.surveyData);
                     });
                 }
@@ -390,16 +415,7 @@
 
             tagsReady = false;
             chartReady = false;
-            answersReady = false;
         }
-
-        // function saveTagTerms () {
-        //     clearTimeout(saveTimeout);
-        //
-        //     saveTimeout = setTimeout(function () {
-        //         model.save();
-        //     }, 600);
-        // }
 
 
         this.downloadCsv = function () {

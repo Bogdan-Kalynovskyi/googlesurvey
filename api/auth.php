@@ -7,7 +7,7 @@
     // compare header with xsrf token to cookie-based session
 
     if (isset($_SERVER['HTTP_AUTHORIZATION']) && isset($_SESSION['xsrfToken']) && $_SERVER['HTTP_AUTHORIZATION'] === $_SESSION['xsrfToken']) {
-        mysql_connect($db_host, $db_user, $db_pass, TRUE);
+        mysql_connect($db_host, $db_user, $db_pass);
         mysql_select_db($db_name);   //mysql_query("SET NAMES $db_charset"
     }
     else {

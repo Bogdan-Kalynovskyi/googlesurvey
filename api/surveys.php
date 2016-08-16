@@ -2,34 +2,33 @@
 include 'auth.php';
 
 
-try {
-    switch ($_SERVER['REQUEST_METHOD']) {
-        case 'GET':
-            get();
-            break;
+switch ($_SERVER['REQUEST_METHOD']) {
+    case 'GET':
+        get();
+        break;
 
-        case 'POST':
-            create();
-            break;
+    case 'POST':
+        create();
+        break;
 
-        case 'PUT':
-            rewrite();
-            break;
+    case 'PUT':
+        rewrite();
+        break;
 
-        case 'DELETE':
-            delete();
-            break;
-    }
+    case 'DELETE':
+        delete();
+        break;
 }
 
-catch (Exception $e) {
+if ($s = mysql_error()) {
     header("HTTP/1.0 400 Bad Request", true, 400);
-    echo $e->getMessage();
+    echo $s;
+    die;
 }
 
 
 function get () {
-    $query = mysql_query('SELECT * FROM surveys WHERE user_google_id = '.esc($_SESSION['userGoogleId']).' ORDER BY id');
+    $query = mysql_query('SELECT * FROM surveys WHERE user_google_id = '.esc($_SESSION['userGoogleId']).' ORDER BY created');
     $result = array();
 
     while ($row = mysql_fetch_array($query, MYSQL_ASSOC)) {

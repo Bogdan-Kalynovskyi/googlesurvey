@@ -38,7 +38,7 @@ function Chart (container) {
             }
 
             that.csvStr = csvStr;
-            that.csvBlob = new Blob([csvStr], { type: 'text/csv;charset=utf-8;' });
+            that.csvBlob = new Blob([csvStr], {type: 'text/csv;charset=utf-8;'});
 
 
             arr[0] = ['', 'Tag %'];
@@ -48,13 +48,26 @@ function Chart (container) {
             if (!chart) {
                 chart = new google.charts.Bar(container);
             }
+
+            var options = {
+                textStyle: {
+                    fontName: 'Helvetica, Arial'
+                },
+                titleTextStyle: {
+                    fontName: 'Helvetica, Arial'
+                }
+            };
             chart.draw(gData, {
-                bars: 'horizontal' // Required for Material Bar Charts.
+                bars: 'horizontal',
+                annotations: options,
+                legend: options,
+                tooltip: options,
+                titleTextStyle: options,
+                hAxis: options,
+                vAxis: options
             });
 
-            $('#comment-chart').html(
-                '<small>Question: ' + survey.question +
-                '<br>Total answers: ' + survey.total + '</small><br><br>');
+            $('#comment-chart').html(survey.question);
         });
     };
 

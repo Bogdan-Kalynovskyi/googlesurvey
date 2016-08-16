@@ -1,23 +1,27 @@
 (function () {
-    var modalStart = '<div class="modal fade"><div class=modal-dialog><div class=modal-content><div class=modal-body><button class=close data-dismiss=modal>&times;</button><br>',
+    var modalStart = '<div class="modal fade"><div class=modal-dialog><div class=modal-content><div class=modal-body><button class=close>&times;</button><br>',
         modalEnd = '</div></div></div></div>';
 
 
     function open (modal) {
         modal.show().addClass('in');
         //todo 13 27
-        modal.find('button').on('click', function () {
+        modal.add('.modal button').on('click', function () {
             modal.removeClass('in');
             setTimeout(function () {
                 modal.remove();
             }, 300);
+        });
+        modal.find('.modal-dialog').on('click', function (evt) {
+            evt.stopPropagation();
+            return false;
         });
     }
 
 
     window.bootstrapAlert = function (message) {
         $('#modal-placeholder').append(modalStart +
-            message + '<br><button class="btn btn-sm btn-primary center-block m-t-1 p-x-3" data-dismiss=modal>Ok</button>' +
+            message + '<br><button class="btn btn-sm btn-primary m-t-1 p-x-3" style="margin: 0 auto;display: block;">Ok</button>' +
             modalEnd);
         var modal = $('.modal');
         open(modal);
@@ -27,11 +31,12 @@
 
     window.bootstrapConfirm = function (message, btnOne, btnTwo, callback) {
         $('#modal-placeholder').append(modalStart +
-            message + '<br><button class="btn btn-sm btn-primary pull-xs-right m-x-2 m-y-1" data-dismiss=modal>&nbsp; ' +
+            message +
+                 '<br><button class="btn btn-sm btn-primary pull-xs-right m-l-3 m-y-1 p-x-2" style="margin-right: 137px!important;">' +
             btnOne +
-            ' &nbsp;</button><button class="btn btn-sm btn-secondary pull-xs-right m-y-1" data-dismiss=modal>&nbsp; ' +
+            '</button><button class="btn btn-sm btn-secondary pull-xs-right m-y-1 p-x-2">' +
             btnTwo +
-            ' &nbsp;</button><br class="clearfix"><br><br>' +
+            '</button><br class="clearfix"><br><br>' +
             modalEnd);
 
         var modal = $('.modal');
@@ -48,16 +53,27 @@
 
 
 
+
+
 function alreadyLoggedIn () {
-    $('#logged-out').hide();
-    var root = $('#logged-in').show();
-    angular.bootstrap(root[0], ['app']);
+    var loggedIn = byId('logged-in'),
+        loggedOut = byId('logged-out');
+    angular.bootstrap(loggedIn, ['app']);
+    if (loggedOut) {
+        loggedOut.style.display = 'none';
+        loggedIn.style.display = 'block';
+    }
 }
 
 
-if (window.googleUser) {
-    logIn(googleUser);
-}
+// total reload timeout 60s
+
+
+
 if (window.xsrfToken) {
     alreadyLoggedIn();
+}
+
+if (window.gapi) {
+    onPlatformLoad();
 }
