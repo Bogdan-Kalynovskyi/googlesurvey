@@ -36,13 +36,13 @@ app.service('model', ['$http', function ($http) {
                 }
                 i++;
             }
-            var question = overview.C2.w,
-                t = +overview.E2.w;
+            var question = overview.C2.w;
+            total = +overview.E2.w;
 
             this.surveyData = {
                 survey_google_id: overview.A2.w,
                 question: question,
-                total: t
+                total: total
             };
         // }
         // catch (e) {
@@ -57,7 +57,6 @@ app.service('model', ['$http', function ($http) {
         }
         this.answers.sort();
         this.terms = [];
-        total = t;
 
         return question;
     };

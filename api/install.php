@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `tags` (
   `syn_count` text NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `tag` (`tag`(32)),
-  INDEX `survey_id` (`survey_id`),
+  INDEX `survey_id` (`survey_id`)
 ) DEFAULT CHARSET=utf8 ENGINE = MyISAM;
 ';
 mysql_query($query);

@@ -125,9 +125,9 @@
         this.loadSurvey = function (id) {
             surveyJustDone = false;
             this.sId = id;
+            model.clearTables();
             onSurveyLoad(surveys.surveys[this.sId].question);
             total = +surveys.surveys[id].total;
-            model.clearTables();
             model.getTags(id).success(function () {
                 that.maxTags = model.tags.length;
                 that.minCount = model.tags[that.maxTags - 1][1];
@@ -151,9 +151,9 @@
         };
 
 
-        this.cloneSurvey = function (id) {
-            this.loadSurvey(id);
-            model.surveyData = surveys.surveys[id];
+        this.cloneSurvey = function (surveyId) {
+            this.loadSurvey(surveyId);
+            model.surveyData = surveys.surveys[surveyId];
             dupe = true;
         };
 
