@@ -159,7 +159,7 @@
 
 
     <div id="surveys" class="nav-body">
-        <table ng-show="!angular.equals({}, ctrl.surveys)" class="table table-striped table-bordered table-hover m-t-1">
+        <table ng-show="ctrl.hasSurveys()" class="table table-striped table-bordered table-hover m-t-1">
             <thead class="thead-default"><tr>
                 <th colspan=3 class="p-x-1">Survey</th><th>Google ID</th><th>Question</th><th>Answers</th>
             </tr></thead>
@@ -172,7 +172,7 @@
                 <td ng-bind="survey.total"></td>
             </tr>
         </table>
-        <b ng-show="angular.equals({}, ctrl.surveys)">No surveys yet. Please upload a spreadsheet below</b>
+        <b ng-show="!ctrl.hasSurveys()">No surveys yet. Please upload a spreadsheet below ↓</b>
         <br>
         <hr>
         <br>

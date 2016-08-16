@@ -322,6 +322,7 @@ dupl-syn {
 
 #undo > div:hover {
     background: #fbecd8;
+    box-shadow: 0 2px 0 2px #fbecd8;
 }
 
 undo {

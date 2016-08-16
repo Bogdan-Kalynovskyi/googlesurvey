@@ -32,4 +32,11 @@
             return -1;
         };
 
+
+        this.notEmpty = function () {
+            for (var i in this.surveys) {
+                return true;
+            }
+        }
+
     }]);

@@ -12,7 +12,6 @@
 
 
     app.controller('dashboard', ['model', 'surveys', '$rootScope', '$q', function (model, surveys, $rootScope, $q) {
-        $rootScope.angular = angular;
 
         var that = this,
             dupe = false,
@@ -156,6 +155,11 @@
             this.loadSurvey(surveyId);
             model.surveyData = surveys.surveys[surveyId];
             dupe = true;
+        };
+
+
+        this.hasSurveys = function () {
+            return surveys.notEmpty();
         };
 
 
