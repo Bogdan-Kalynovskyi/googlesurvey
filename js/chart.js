@@ -2,10 +2,34 @@ function Chart (container) {
     var that = this,
         gData,
         updateThrottle,
-        chart;
+        chart,
+
+        opts = {
+            textStyle: {
+                fontName: 'Helvetica, Arial'
+            },
+            titleTextStyle: {
+                fontName: 'Helvetica, Arial'
+            }
+        },
+        options = {
+            bars: 'horizontal',
+            annotations: opts,
+            legend: opts,
+            tooltip: opts,
+            hAxis: opts,
+            vAxis: opts,
+            textStyle: {
+                fontName: 'Helvetica, Arial'
+            },
+            titleTextStyle: {
+                fontName: 'Helvetica, Arial'
+            }
+        };
 
 
     this.create = function (data, survey) {
+        //todo add callbaclk here
         google.charts.setOnLoadCallback(function () {
 
             function encodeRow(row) {
@@ -43,43 +67,26 @@ function Chart (container) {
 
             arr[0] = ['', 'Tag %'];
             gData = google.visualization.arrayToDataTable(arr);
+            // todo visualization can be not loaded when this callback fires!!!!!
 
             container.style.height = 28 * n + 'px';
             if (!chart) {
                 chart = new google.charts.Bar(container);
             }
 
-            var options = {
-                textStyle: {
-                    fontName: 'Helvetica, Arial'
-                },
-                titleTextStyle: {
-                    fontName: 'Helvetica, Arial'
-                }
-            };
-            chart.draw(gData, {
-                bars: 'horizontal',
-                annotations: options,
-                legend: options,
-                tooltip: options,
-                titleTextStyle: options,
-                hAxis: options,
-                vAxis: options
-            });
+           chart.draw(gData, options);
 
-            $('#comment-chart').html(survey.question);
+            byId('comment-chart').innerHTML = survey.question;
         });
     };
 
 
-    this.update = function () {
+    this.resize = function () {
         clearTimeout(updateThrottle);
 
         updateThrottle = setTimeout(function () {
             if (chart) {
-                chart.draw(gData, {
-                    bars: 'horizontal' // Required for Material Bar Charts.
-                });
+                chart.draw(gData, options);
             }
         }, 100);
     }

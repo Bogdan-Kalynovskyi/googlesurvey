@@ -49,7 +49,7 @@ function Table (container, tblType) {
                   '<th colspan=' + colCount[tblType] + '><b>' + tableHeading[tblType] + '</b></th>';
             if (tblType === TBL_tags) {
                 str += '</tr><tr>' +
-                    '<th colspan=5><b style="font-weight: 100">Drag on table header to add as tag</b></th>';
+                    '<th colspan=5><b style="font-weight: 240">Drop on table header to add as new tag</b></th>';
             }
             if (tblType !== TBL_answers) {
                 str += '</tr><tr>' +

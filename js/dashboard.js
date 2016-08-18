@@ -8,8 +8,6 @@
         return document.getElementById(id);
     }
 
-    google.charts.load('44', {'packages': ['bar']});
-
 
     app.controller('dashboard', ['model', 'surveys', '$rootScope', '$q', function (model, surveys, $rootScope, $q) {
 
@@ -23,7 +21,7 @@
             tagsReady,
             answersReady,
             chartReady,
-            surveyJustDone;
+            answersNeedScan;
 
         this.maxTags = 10;
 
@@ -37,7 +35,7 @@
 
         window.addEventListener('resize', function () {
             if (oldState === 3) {
-                chart.update();
+                chart.resize();
             }
         });
 
@@ -73,7 +71,7 @@
 
             if (state === 2) {
                 if (!answersReady) {
-                    if (surveyJustDone) {
+                    if (answersNeedScan) {
                         model.prepareAnswers();
                         model.saveAnswers(this.sId);
                         setMaxState(3);
@@ -93,6 +91,10 @@
             }
 
             if (!chartReady && state === 3) {
+                if (!answersReady && answersNeedScan) {
+                    model.prepareAnswers();
+                    model.saveAnswers(this.sId);
+                }
                 chart.create(model.tags, surveys.surveys[this.sId]);
                 var table = new SimpleTable(byId('chart-table'));
                 table.create(model.tags);
@@ -114,7 +116,7 @@
 
         function onSurveyCreated (question) {
             if (question) {
-                surveyJustDone = true;
+                answersNeedScan = true;
                 tagsReady = true;
                 that.splitMax();
                 onSurveyLoad(question);
@@ -123,14 +125,14 @@
 
 
         this.loadSurvey = function (id) {
-            surveyJustDone = false;
+            answersNeedScan = false;
             this.sId = id;
             model.clearTables();
             onSurveyLoad(surveys.surveys[this.sId].question);
             total = +surveys.surveys[id].total;
             model.getTags(id).success(function () {
                 that.maxTags = model.tags.length;
-                that.minCount = model.tags[that.maxTags - 1][1];
+                that.minCount = model.minTag();
             });
             model.getTerms(id);
         };
@@ -171,7 +173,7 @@
                     var workbook = XLS.read(e.target.result, {type: 'binary'}),
                         overview = workbook.Sheets.Overview,
                         surveyId = surveys.findByGoogleId(overview.A2.w),
-                        msg = 'Survey with this id has already been uploaded. Do you want to overwrite existing one or add as a new survey?';
+                        msg = 'This survey has already been uploaded. Do you want to overwrite existing one or add as a new survey?';
 
                     if (surveyId !== -1) {
                         bootstrapConfirm(msg, 'Add as new', 'Overwrite', function (response) {
@@ -420,6 +422,8 @@
 
             tagsReady = false;
             chartReady = false;
+            answersReady = false;
+            answersNeedScan = true;
         }
 
 

@@ -9,45 +9,40 @@ app.service('model', ['$http', function ($http) {
 
 
     this.initByExcel = function (workbook) {
-        // try {
-            var raw = workbook.Sheets["Complete responses"],
-                overview = workbook.Sheets.Overview,
-                tagsObj = {},
-                i = 2,
-                row,
-                splitter = / and | or | - | but | nor |\/|\.|,|;|:|\?|!|&+/,
-                trash = / very | so much | much | many | a | an | the | such | hi | so | lot of | lots of /g,
-                space = /  /g;
+        var raw = workbook.Sheets["Complete responses"],
+            overview = workbook.Sheets.Overview,
+            tagsObj = {},
+            i = 2,
+            row,
+            splitter = / and | or | - | but | nor |\/|\.|,|;|:|\?|!|&+/,
+            trash = / very | so much | much | many | a | an | the | such | hi | so | lot of | lots of /g,
+            space = /  /g;
 
-            while (row = raw['K' + i]) {
-                var words = row.w.toLowerCase();
+        while (row = raw['K' + i]) {
+            var words = row.w.toLowerCase();
 
-                words = words.split(splitter);
-                for (var j in words) {
-                    var word = (' ' + words[j]).replace(trash, ' ').replace(space, ' ').trim();
-                    if (word.length) {
-                        if (tagsObj[word]) {
-                            tagsObj[word]++;
-                        }
-                        else {
-                            tagsObj[word] = 1;
-                        }
+            words = words.split(splitter);
+            for (var j in words) {
+                var word = (' ' + words[j]).replace(trash, ' ').replace(space, ' ').trim();
+                if (word.length) {
+                    if (tagsObj[word]) {
+                        tagsObj[word]++;
+                    }
+                    else {
+                        tagsObj[word] = 1;
                     }
                 }
-                i++;
             }
-            var question = overview.C2.w;
-            total = +overview.E2.w;
+            i++;
+        }
+        var question = overview.C2.w;
+        total = +overview.E2.w;
 
-            this.surveyData = {
-                survey_google_id: overview.A2.w,
-                question: question,
-                total: total
-            };
-        // }
-        // catch (e) {
-        //     bootstrapAlert('Could not parse answers from Excel file');
-        // }
+        this.surveyData = {
+            survey_google_id: overview.A2.w,
+            question: question,
+            total: total
+        };
 
         this.tags = [];
         this.answers = [];
@@ -272,7 +267,7 @@ app.service('model', ['$http', function ($http) {
     this.deleteAnswer = function (indexAnswer, pos) {
         var arr = this.answers[indexAnswer][1].split(','),
         indexTag = arr.splice(pos, 1);
-        this.answers[indexAnswer][1] = arr.join(',');
+        this.answers[indexAnswer][1] = arr.join(',') + ',';
         answersTable.deleteSyn(indexAnswer, pos);
         total--;
         shortTable.updateCount(indexTag, --this.tags[indexTag][1]);
@@ -281,29 +276,64 @@ app.service('model', ['$http', function ($http) {
 
 
     this.prepareAnswers = function () {
+        function findSub (haystack, needle) {
+            var j,
+                i = 0,
+                m = needle.length,
+                n = haystack.length - m + 1;
+
+            for (; i < n; i++) {
+                if (haystack[i] === needle[0]) {
+                    j = 1;
+                    while (j < m && haystack[i + j] === needle[j]) {
+                        j++;
+                    }
+                    if (j === m) {
+                        return true;
+                    }
+                }
+            }
+        }
+
         total = 0;
 
+        var spaceNCommaSplitTrim = /\s*[,\s]+\s*/,
+            l = this.tags.length,
+            tagWords = Array(l),
+            tagSynWords = Array(l);
+
         for (var j in this.tags) {
-            this.tags[j][1] = 0;
+            var tag = this.tags[j],
+                syn = tag[2];
+            tagWords[j] = tag[0].split(spaceNCommaSplitTrim);
+            if (syn) {
+                var synArr = [];
+                for (var k in syn) {
+                    synArr.push(syn[k].split(spaceNCommaSplitTrim));
+                }
+                tagSynWords[j] = synArr;
+            }
+            tag[1] = 0;
         }
 
         for (var i in this.answers) {
             var answer = this.answers[i],
-                list = '';
+                ansWords = answer.split(spaceNCommaSplitTrim),
+                tagIds = '';
 
             for (j in this.tags) {
-                var tag = this.tags[j];
-                if (answer.indexOf(tag[0]) !== -1) {
-                    list += j + ',';
+                tag = this.tags[j];
+                if (findSub(ansWords, tagWords[j])) {
+                    tagIds += j + ',';
                     tag[1]++;
                     total++;
                     continue;
                 }
-                var syn = tag[2];
+                syn = tagSynWords[j];
                 if (syn) {
-                    for (var k in syn) {
-                        if (answer.indexOf(syn[k]) !== -1) {
-                            list += j + ',';
+                    for (k in syn) {
+                        if (findSub(ansWords, syn[k])) {
+                            tagIds += j + ',';
                             tag[1]++;
                             total++;
                             break;
@@ -312,7 +342,7 @@ app.service('model', ['$http', function ($http) {
                 }
             }
 
-            this.answers[i] = [answer, list];
+            this.answers[i] = [answer, tagIds];
         }
 
         answersTable.draw(this.answers, this.tags);
@@ -350,9 +380,9 @@ app.service('model', ['$http', function ($http) {
         arr.sort(alpha ? alphabetical : numeric);
 
         if (toggle) {
-            sortOrder *= -1;
             termsTable.draw(this.terms);
-            document.querySelector('.pull-xs-right').innerHTML = 'Sort terms ' + (sortOrder === 1 ? '▼' : '▲');
+            document.getElementsByClassName('pull-xs-right')[0].innerHTML = 'Sort terms ' + (sortOrder === 1 ? '▼' : '▲');
+            sortOrder *= -1;
         }
 
         return arr;
@@ -419,13 +449,15 @@ app.service('model', ['$http', function ($http) {
 
 
     this.splitMax = function (maxTags, tagsReady) {
-        var arr = this.tags.concat(this.terms);
+        var arr = this.tags.concat(this.terms),
+            min;
 
         maxTags = Math.min(maxTags, arr.length);
         this.sort(arr);
 
         this.tags = arr.slice(0, maxTags);
         this.terms = arr.slice(maxTags);
+        min = this.tags[maxTags - 1][1];
         if (!tagsReady) {
             unpackTerms();
         }
@@ -435,7 +467,7 @@ app.service('model', ['$http', function ($http) {
         tagsTable.draw(this.tags, tagsReady);
         termsTable.draw(this.terms);
 
-        return this.tags[maxTags - 1][1];
+        return min;
     };
 
 
@@ -460,6 +492,19 @@ app.service('model', ['$http', function ($http) {
         termsTable.draw(this.terms);
 
         return i;
+    };
+
+
+    this.minTag = function () {
+        var min = Infinity,
+            count;
+        for (var i in this.tags) {
+            count = this.tags[i][1];
+            if (count < min) {
+                min = count;
+            }
+        }
+        return min;
     };
 
 

@@ -213,14 +213,14 @@
 
 
     <div id="answers" class="nav-body">
-        <div class="row">
+        <div class="row" style="height: 100%">
             <div class="col-sm-6 overflow" id="answers-table"></div>
             <div class="col-sm-6 overflow" id="short-table"></div>
         </div>
     </div>
 
 
-    <div id="chart" class="nav-body">
+    <div id="chart" class="nav-body overflow">
         <div id="comment-chart"></div>
         <div id="tags-chart"></div>
         <div id="chart-table"></div>
@@ -234,7 +234,6 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/xls/0.7.5/xls.core.min.js"></script>
-    <script src="//www.gstatic.com/charts/loader.js"></script>
     <script src="app6.js"></script>
 </div>
 </body>

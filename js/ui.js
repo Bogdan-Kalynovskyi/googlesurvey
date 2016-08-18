@@ -66,6 +66,12 @@ function alreadyLoggedIn () {
 }
 
 
+function loadBarChart() {
+    google.charts.load('current', {'packages': ['bar']});
+    //todo register calls
+}
+
+
 // total reload timeout 60s
 
 
@@ -77,3 +83,5 @@ if (window.xsrfToken) {
 if (window.gapi) {
     onPlatformLoad();
 }
+
+$(document.body).append('<script src="//www.gstatic.com/charts/loader.js" onload="loadBarChart()"></script>');
