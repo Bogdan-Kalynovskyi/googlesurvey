@@ -1,52 +1,67 @@
 (function () {
     var modalStart = '<div class="modal fade"><div class=modal-dialog><div class=modal-content><div class=modal-body><button class=close>&times;</button><br>',
-        modalEnd = '</div></div></div></div>';
+        modalEnd = '</div></div></div></div>',
+        modalPlaceholder = byId('modal-placeholder');
 
 
     function open (modal) {
-        modal.show().addClass('in');
-        //todo 13 27
-        modal.add('.modal button').on('click', function () {
-            modal.removeClass('in');
+        function close () {
+            modal.classList.remove('in');
             setTimeout(function () {
-                modal.remove();
+                modal.parentNode.removeChild(modal);
             }, 300);
-        });
-        modal.find('.modal-dialog').on('click', function (evt) {
-            evt.stopPropagation();
+        }
+
+        modal.style.display = 'block';
+        //todo animation
+        modal.classList.add('in');
+        //todo 13 27
+
+        modal.onclick = close;
+        var btn = modal.getElementsByTagName('button');
+        for (var i = 0; i < btn.length; i++) {
+            btn[i].addEventListener('click', close);
+        }
+        modal.onkeyup = function (e) {
+            if (e.keyCode == 27) {
+                close();
+            }
+        };
+
+        modal.querySelector('.modal-dialog').addEventListener('click', function (evt) {
+            //evt.stopPropagation();
             return false;
-        });
+        }, true);
     }
 
 
     window.bootstrapAlert = function (message) {
-        $('#modal-placeholder').append(modalStart +
+        modalPlaceholder.insertAdjacentHTML('beforeend', modalStart +
             message + '<br><button class="btn btn-sm btn-primary m-t-1 p-x-3" style="margin: 0 auto;display: block;">Ok</button>' +
             modalEnd);
-        var modal = $('.modal');
+        var modal = byQs('.modal');
         open(modal);
-        modal.find('.btn-primary').focus();
+        modal.querySelector('.btn-primary').focus();
     };
 
 
     window.bootstrapConfirm = function (message, btnOne, btnTwo, callback) {
-        $('#modal-placeholder').append(modalStart +
+        modalPlaceholder.insertAdjacentHTML('beforeend', modalStart +
             message +
-                 '<br><button class="btn btn-sm btn-primary pull-xs-right m-l-3 m-y-1 p-x-2" style="margin-right: 137px!important;">' +
+             '<br><br><button class="btn btn-sm btn-primary pull-xs-right m-r-3 m-y-1 p-x-2">' +
             btnOne +
-            '</button><button class="btn btn-sm btn-secondary pull-xs-right m-y-1 p-x-2">' +
+            '</button><button class="btn btn-sm btn-secondary m-l-3 m-y-1 p-x-2">' +
             btnTwo +
-            '</button><br class="clearfix"><br><br>' +
-            modalEnd);
+            '</button>' + modalEnd);
 
-        var modal = $('.modal');
+        var modal = byQs('.modal');
         open(modal);
-        modal.find('.btn-primary').on('click', function () {
-            callback(1);
-        }).focus();
-        modal.find('.btn-secondary').on('click', function () {
-            callback(2);
-        });
+        var b1 = modal.querySelector('.btn-primary'),
+            b2 = modal.querySelector('.btn-secondary');
+
+        b1.onclick = callback.bind(b1, true);
+        b2.onclick = callback.bind(b2, false);
+        b1.focus();
     };
 })();
 
@@ -66,12 +81,6 @@ function alreadyLoggedIn () {
 }
 
 
-function loadBarChart() {
-    google.charts.load('current', {'packages': ['bar']});
-    //todo register calls
-}
-
-
 // total reload timeout 60s
 
 
@@ -84,4 +93,10 @@ if (window.gapi) {
     onPlatformLoad();
 }
 
-$(document.body).append('<script src="//www.gstatic.com/charts/loader.js" onload="loadBarChart()"></script>');
+
+var _script = document.createElement('script');
+_script.onload = function () {
+    google.charts.load('current', {'packages': ['bar']});
+};
+_script.src = '//www.gstatic.com/charts/loader.js';
+document.body.appendChild(_script);

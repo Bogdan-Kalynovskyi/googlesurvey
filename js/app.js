@@ -79,9 +79,9 @@
                         case 401:
                             bootstrapAlert(response.data);
                             if (response.status === 401) {
-                                $('.modal button').click(function () {
+                                byQs('.modal button').onclick = function () {
                                     location.reload();
-                                });
+                                };
                             }
                             break;
 

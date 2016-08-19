@@ -44,10 +44,11 @@ header {
 .btn.active .bullet {
     font-size: 111%;
     font-weight: 500;
-    background: #ffe;
-    box-shadow: 0 0 0 2px #ffe;
+    background: #ffd;
+    box-shadow: 0 -0.5px 0 2.42px #ffd;
     position: relative;
     left: -1px;
+    top: 0.66px;
 }
 
 big {
@@ -148,7 +149,7 @@ input[ng-model] {
     margin-top: 3px;
 }
 
-.overflow {
+.scroll {
     padding-top: 2px;
     height: 100%;
     overflow-y: auto;
@@ -162,7 +163,9 @@ input[ng-model] {
     margin-bottom: 11px;
 }
 
-#tags .table {
+#tags-table,
+#terms-table,
+#short-table {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -254,25 +257,25 @@ tbody input:not([type=checkbox]) {
 
 tbody span:hover {
     background: #fcfcfc;
-    box-shadow: 0 0 7px 1px #ccc;
+    box-shadow: 0 0 7.5px 1px #ccc;
 }
 
 tbody input:not([type=checkbox]) {
     border: 0;
-    box-shadow: 0 0 14px 4px #000;
-    outline: 2px solid #fff;
+    box-shadow: 0 0 22px 4px #555;
+    outline: 3px solid #fff;
     -webkit-user-select: text;
     -moz-user-select: text;
     -ms-user-select: text;
     user-select: text;
 }
 
-tbody li:hover {
+#tags-table li:hover {
     background: #ececff;
-    box-shadow: 0 0 0 1px #ececff;
+    box-shadow: 0 0 0 2px #ececff;
 }
 
-tbody li > span {
+#tags-table li > span {
     width: calc(100% - 52px);
 }
 
@@ -308,6 +311,10 @@ dupl-syn {
     color: #090;
 }
 
+del-tag {
+    top: -1px;
+}
+
 #undo {
     background: #fff4e2;
     font-size: 12px;
@@ -316,18 +323,18 @@ dupl-syn {
     bottom: 0;
     left: 0;
     opacity: 0.9;
-    border-top: 1px solid white;
+    border-top: 1px solid #fff4e2;
+    box-shadow: 0 -2px 1px white;
 }
 
 #undo > div {
     padding: 4px 3px 3px 6px;
     overflow: hidden;
-    box-shadow: 0 0 2px 4px #fff4e2;
 }
 
 #undo > div:hover {
     background: #fbecd8;
-    box-shadow: 0 2px 0 2px #fbecd8;
+    box-shadow: 0 0 0 1px #fbecd8;
 }
 
 undo {
@@ -344,8 +351,8 @@ del-undo {
 }
 
 del-undo:hover {
-    background: rgba(0, 0, 0, 0.05);
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.07);
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.07);
 }
 
 tbody ul {
@@ -409,7 +416,7 @@ tbody ul {
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    #sgi {
+    .tinytext {
         font-size: 12px!important;
     }
 }
@@ -428,7 +435,7 @@ tbody ul {
     tbody span {
         max-width: 189px;
     }
-    #sgi {
+    .tinytext {
         font-size: 11px!important;
     }
     #btn-chart {
@@ -445,7 +452,7 @@ tbody ul {
 
 
 @media (max-width: 544px) {
-    #sgi {
+    .tinytext {
         font-size: 10px!important;
     }
     #scroll-tbl {

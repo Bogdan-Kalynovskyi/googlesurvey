@@ -8,6 +8,10 @@
         return document.getElementById(id);
     }
 
+    function byQs(id) {
+        return document.querySelector(id);
+    }
+
 
     app.controller('dashboard', ['model', 'surveys', '$rootScope', '$q', function (model, surveys, $rootScope, $q) {
 
@@ -18,16 +22,17 @@
             maxState = 0,
             oldState,
 
-            tagsReady,
+            answersNeedScan,
+            answersNeedLoad,
+            tagsJustBorn,
             answersReady,
-            chartReady,
-            answersNeedScan;
+            chartReady;
 
         this.maxTags = 10;
 
 
         surveys.load().success(function () {
-            $('#loading').remove();
+            angular.element(byId('loading')).remove();
             that.navigate(0);
             that.surveys = surveys.surveys;
         });
@@ -42,22 +47,21 @@
 
         function setMaxState (state) {
             maxState = state;
-            byId('btn-' + states[state - 1]).classList.remove('disabled');
-            byId('btn-' + states[state]).classList.remove('disabled');
-            for (state++; state < states.length; state++) {
-                byId('btn-' + states[state]).classList.add('disabled');
+            for (state = 1; state < states.length; state++) {
+                var btn = byId('btn-' + states[state]).classList;
+                if (state > maxState) {
+                    btn.add('disabled');
+                }
+                else {
+                    btn.remove('disabled');
+                }
             }
         }
 
 
         this.navigate = function (state) {
             if (state > maxState) {
-                if (maxState === 0) {
-                    bootstrapAlert('Nothing to display, please load survey first');
-                }
-                else {
-                    bootstrapAlert('Please open "Answers" tab first, to see if everything is correct');
-                }
+                bootstrapAlert('Nothing to display, please load survey first');
                 return;
             }
 
@@ -69,72 +73,77 @@
             byId(states[state]).style.display = 'block';
             oldState = state;
 
-            if (state === 2) {
-                if (!answersReady) {
-                    if (answersNeedScan) {
-                        model.prepareAnswers();
-                        model.saveAnswers(this.sId);
-                        setMaxState(3);
-                        answersReady = true;
-                    }
-                    else {
-                        model.getAnswers(this.sId).success(function () {
-                            setMaxState(3);
-                            answersReady = true;
-                        });
-                    }
+            if (state === 2 && !answersReady) {
+                if (answersNeedScan) {
+                    model.prepareAnswers(this.sId);
+                    model.updateAnsTbl();
+                    answersNeedScan = false;
+                }
+                else if (answersNeedLoad) {
+                    model.getAnswers(that.sId).success(function () {
+                        model.updateAnsTbl();
+                    });
+                    answersNeedLoad = false;
                 }
                 else {
-                    model.updateShort();
+                    model.updateAnsTbl();
                 }
-                //todo what happens if we come here again, with changed tags after tags editing?
+                answersReady = true;
+                model.updateShort();
             }
 
-            if (!chartReady && state === 3) {
-                if (!answersReady && answersNeedScan) {
-                    model.prepareAnswers();
-                    model.saveAnswers(this.sId);
+            if (state === 3 && !chartReady) {
+                if (answersNeedScan) {
+                    model.prepareAnswers(this.sId);
+                    answersNeedScan = false;
                 }
-                chart.create(model.tags, surveys.surveys[this.sId]);
                 var table = new SimpleTable(byId('chart-table'));
                 table.create(model.tags);
+                chart.create(model.tags, surveys.surveys[this.sId]);
                 chartReady = true;
             }
         };
 
 
-        function onSurveyLoad (question) {
+        function navigateTagsTab (question) {
             answersReady = false;
+            answersNeedScan = false;
             that.filterTerm = '';
             trash = [];
             byId('tags-question').innerHTML = question;
-            $undo[0].innerHTML = '';
-            setMaxState(2);
+            undo.innerHTML = '';
             that.navigate(1);
         }
 
 
         function onSurveyCreated (question) {
             if (question) {
-                answersNeedScan = true;
-                tagsReady = true;
+                tagsJustBorn = true;
+                answersNeedLoad = false;
                 that.splitMax();
-                onSurveyLoad(question);
+                setMaxState(3);
+                navigateTagsTab(question);
             }
         }
 
 
         this.loadSurvey = function (id) {
-            answersNeedScan = false;
+            tagsJustBorn = false;
+            answersNeedLoad = true;
             this.sId = id;
-            model.clearTables();
-            onSurveyLoad(surveys.surveys[this.sId].question);
             total = +surveys.surveys[id].total;
-            model.getTags(id).success(function () {
+            model.clearTables();
+            setMaxState(1);
+            navigateTagsTab(surveys.surveys[this.sId].question);
+            var q1 = model.getTags(id).success(function () {
                 that.maxTags = model.tags.length;
                 that.minCount = model.minTag();
             });
             model.getTerms(id);
+            var q2 = model.getAnswers(this.sId);
+            $q.all([q1, q2]).then(function () {
+                setMaxState(3);
+            });
         };
 
         
@@ -142,7 +151,7 @@
             if (!this.maxTags) {
                 this.maxTags = 1;
             }
-            this.minCount = model.splitMax(this.maxTags, tagsReady);
+            this.minCount = model.splitMax(this.maxTags, tagsJustBorn);
             saveTagTerms();
         };
 
@@ -176,12 +185,12 @@
                         msg = 'This survey has already been uploaded. Do you want to overwrite existing one or add as a new survey?';
 
                     if (surveyId !== -1) {
-                        bootstrapConfirm(msg, 'Add as new', 'Overwrite', function (response) {
-                            if (response === 2) {
-                                that.sId = surveyId;
+                        bootstrapConfirm(msg, 'Add as new', 'Overwrite', function (add) {
+                            if (add) {
+                                that.sId = undefined;
                             }
                             else {
-                                that.sId = undefined;
+                                that.sId = surveyId;
                             }
                             onSurveyCreated(model.initByExcel(workbook));
                         });
@@ -418,9 +427,10 @@
                         surveys.add(model.surveyId, model.surveyData);
                     });
                 }
-            }, 600);
+            }, 500);
 
-            tagsReady = false;
+            tagsJustBorn = false;
+            // don't touch three below when only terms changed
             chartReady = false;
             answersReady = false;
             answersNeedScan = true;
@@ -447,7 +457,7 @@
                     }, 10000);
                 }
                 else {
-                    var csvWin = window.open('', '', '');
+                    var csvWin = window.open('', '', '');// todo this is not tested and possibly only needed for legacy browsers
                     csvWin.document.write('<meta name=content-type content=text/csv><meta name=content-disposition content="attachment;  filename=' + fileName + '">  ');
                     csvWin.document.write(chart.csvStr);
                 }
@@ -456,13 +466,14 @@
 
 
         this.deleteSurveyById = function (id) {
-            if (confirm('Do you really want to delete this survey and all its data?')) {  //todo bootstrap
-                surveys.delete(id);
-                if (id === this.sId) {
-                    $('tr[ondragover]').remove();
-                    $('#tags-chart').html('');
+            bootstrapConfirm('Do you really want to delete this survey and all its data?', 'Delete', 'Cancel', function (yes) {
+                if (yes) {
+                    surveys.delete(id);
+                    if (id === that.sId) {
+                        setMaxState(0);
+                    }
                 }
-            }
+            });
         };
 
 

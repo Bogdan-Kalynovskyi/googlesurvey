@@ -68,6 +68,7 @@ $query = '
 CREATE TABLE IF NOT EXISTS `answers` (
   `survey_id` int NOT NULL,
   `answer` varchar(255) NOT NULL,
+  `count` int NOT NULL,
   `tags` TEXT NOT NULL,
   INDEX `answer` (`answer`(32)),
   INDEX `survey_id` (`survey_id`)

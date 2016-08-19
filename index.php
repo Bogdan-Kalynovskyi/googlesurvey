@@ -143,7 +143,7 @@
 
     <header>
         <a id="logout" ng-click="ctrl.logOut()">Log out</a>
-        <button class="btn btn-sm btn-primary" id="btn-surveys" ng-click="ctrl.navigate(0)">
+        <button class="btn btn-sm btn-primary active" id="btn-surveys" ng-click="ctrl.navigate(0)" style="position:relative">
             <span class="bullet">1</span> Surveys&nbsp;
         </button> <big>&raquo;</big>
         <button class="btn btn-sm btn-primary disabled" id="btn-tags" ng-click="ctrl.navigate(1)">
@@ -161,15 +161,15 @@
     <div id="surveys" class="nav-body">
         <table ng-show="ctrl.hasSurveys()" class="table table-striped table-bordered table-hover m-t-1">
             <thead class="thead-default"><tr>
-                <th colspan=3 class="p-x-1">Survey</th><th>Google ID</th><th>Question</th><th>Answers</th>
+                <th colspan=3 class="p-x-1">Survey</th><th>Google ID</th><th>Question</th><th>Created</th>
             </tr></thead>
             <tr ng-class="{active: id === ctrl.sId}" ng-repeat="(id, survey) in ctrl.surveys">
                 <td><a ng-click="ctrl.loadSurvey(id)" class="p-x-1">edit</a></td>
                 <td><a ng-click="ctrl.cloneSurvey(id)">clone & edit</a></td>
                 <td><a ng-click="ctrl.deleteSurveyById(id)">delete</a></td>
-                <td ng-bind="survey.survey_google_id" id="sgi"></td>
+                <td ng-bind="survey.survey_google_id" class="tinytext"></td>
                 <td ng-bind="survey.question"></td>
-                <td ng-bind="survey.total"></td>
+                <td ng-bind="survey.created * 1000 | date:'MMM dd H:mm'" class="tinytext"></td>
             </tr>
         </table>
         <b ng-show="!ctrl.hasSurveys()">No surveys yet. Please upload a spreadsheet below ↓</b>
@@ -205,8 +205,8 @@
             </label>
         </div>
         <div class="row" id="scroll-tbl">
-            <div class="col-sm-6 overflow" id="tags-table"></div>
-            <div class="col-sm-6 overflow" id="terms-table"></div>
+            <div class="col-sm-6 scroll" id="tags-table"></div>
+            <div class="col-sm-6 scroll" id="terms-table"></div>
               </div>
         <div id="undo"></div>
     </div>
@@ -214,27 +214,27 @@
 
     <div id="answers" class="nav-body">
         <div class="row" style="height: 100%">
-            <div class="col-sm-6 overflow" id="answers-table"></div>
-            <div class="col-sm-6 overflow" id="short-table"></div>
+            <div class="col-sm-6 scroll" id="answers-table"></div>
+            <div class="col-sm-6 scroll" id="short-table"></div>
         </div>
     </div>
 
 
-    <div id="chart" class="nav-body overflow">
+    <div id="chart" class="nav-body scroll">
         <div id="comment-chart"></div>
         <div id="tags-chart"></div>
+        <br>
         <div id="chart-table"></div>
-        <button class="btn btn-sm btn-primary block-center m-y-1 m-l-1 m-b-1 p-x" ng-click="ctrl.downloadCsv()">Download tags as CSV</button>
+        <button class="btn btn-sm btn-primary block-center m-y-1 p-x-1" ng-click="ctrl.downloadCsv()">Download tags as CSV</button>
     </div>
 
     <div id="modal-placeholder"></div>
 
     <link rel=stylesheet href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/css/bootstrap.min.css">
     <link rel=stylesheet href="css/app.css">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/xls/0.7.5/xls.core.min.js"></script>
-    <script src="app6.js"></script>
+    <script src="app8.js"></script>
 </div>
 </body>
 </html>

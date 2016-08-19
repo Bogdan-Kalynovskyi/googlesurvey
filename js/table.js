@@ -1,26 +1,26 @@
-var $undo = $('#undo'),
+var undo = byId('undo'),
     ctrl,
     dragData;
 
 
-$undo[0].onclick = function (evt) {
+undo.onclick = function (evt) {
     var target = evt.target,
         tagName = target.tagName;
 
     if (tagName === 'UNDO') {
         ctrl.undoRow(target.getAttribute('trash-id'));
-        $undo[0].removeChild(target.parentNode);
+        undo.removeChild(target.parentNode);
     }
     else if (tagName === 'DEL-UNDO') {
-        $undo[0].removeChild(target.parentNode);
+        undo.removeChild(target.parentNode);
     }
 };
 
 
 
 function Table (container, tblType) {
-    var tbody,
-        $tbody,
+    var that = this,
+        tbody,
         masterCheckbox,
         visibleTerms,
         isFiltered;
@@ -41,7 +41,7 @@ function Table (container, tblType) {
             return;
         }
 
-        var tableHeading = ['Tags and synonyms', 'Unused terms', 'Answers', 'Tags'],
+        var tableHeading = ['Tags and synonyms', 'Unused terms', 'Answers with associated tags<br><br>', 'Tags'],
             columnHeading = ['Tag', 'Term', '', 'Tag'],
             colCount = [5, 5, 3, 4],
             str = '<table class="table table-striped table-bordered table-hover"' + (tblType === TBL_terms ? ' ondragover="return false"' : '') + '>' +
@@ -49,7 +49,7 @@ function Table (container, tblType) {
                   '<th colspan=' + colCount[tblType] + '><b>' + tableHeading[tblType] + '</b></th>';
             if (tblType === TBL_tags) {
                 str += '</tr><tr>' +
-                    '<th colspan=5><b style="font-weight: 240">Drop on table header to add as new tag</b></th>';
+                    '<th colspan=5><b style="font-weight: 200">Drop on table header to add as new tag</b></th>';
             }
             if (tblType !== TBL_answers) {
                 str += '</tr><tr>' +
@@ -67,8 +67,7 @@ function Table (container, tblType) {
         tbody = container.children[0].children[1];
 
         setTimeout(function () {
-            $tbody = $(tbody);
-            ctrl = ctrl || angular.element(document.getElementById('logged-in')).scope().ctrl;
+            ctrl = ctrl || angular.element(byId('logged-in')).scope().ctrl;
             if (tblType !== TBL_answers) {
                 addMasterCheckbox();
             }
@@ -110,8 +109,8 @@ function Table (container, tblType) {
                     }
 
                     str +=
-                        '<tr ondragover="return false"><td><input type=checkbox></td>' +
-                        '<td><span draggable=true>' + line[0] + '</span>' + synStr + '</td>' +
+                        '<tr draggable=true ondragover="return false"><td><input type=checkbox></td>' +
+                        '<td><span>' + line[0] + '</span>' + synStr + '</td>' +
                         '<td>' + toPerc(line[1]) + '%</td><td>' + line[1] + '</td><td class=del-line>×</td></tr>';
                 }
                 break;
@@ -131,8 +130,7 @@ function Table (container, tblType) {
                 for (i in arr) {
                     line = arr[i];
 
-                    if (syn = line[1]) {
-                        //todo
+                    if (syn = line[2]) {
                         // simultaneously (and implicitly!) unpack on first pass
                         syn = syn.split(',');
 
@@ -140,7 +138,7 @@ function Table (container, tblType) {
                         for (j = 0, m = syn.length - 1; j < m; j++) {
                             var tag = unpackOrTags[syn[j]];
                             if (!tag) {
-                                line[1].replace(j + ',', '');
+                                line[2].replace(j + ',', '');
                                 continue;
                             }
                             synStr += '<li><text>' + tag[0] + '</text><del-tag>×</del-tag></li>';
@@ -172,8 +170,8 @@ function Table (container, tblType) {
                     }
 
                     str +=
-                        '<tr><td><input type=checkbox></td>' +
-                        '<td draggable=true>' + line[0] + synStr + '</td>' +
+                        '<tr draggable=true><td><input type=checkbox></td>' +
+                        '<td>' + line[0] + synStr + '</td>' +
                         '<td>' + toPerc(line[1]) + '%</td><td>' + line[1] + '</td></tr>';
                 }
                 break;
@@ -240,7 +238,18 @@ function Table (container, tblType) {
         var outline, lastTarget,
             table = container.children[0];
 
+
+        function paintCheckboxes (unpaint) {
+            var rows = tbody.children,
+                arr = that.selectedIndexes();
+            for (var i in arr) {
+                rows[arr[i]].children[0].children[0].style.outline = unpaint ? '' : '5px solid rgba(0, 0, 255, 0.2)';
+            }
+        }
+
+
         tbody.addEventListener('dragstart', function (evt) {
+            //todo: this looks to be unneeded already?
             if (window.getSelection) {
                 window.getSelection().removeAllRanges();
             } else if (document.selection) {
@@ -268,7 +277,7 @@ function Table (container, tblType) {
             if (tblType !== TBL_short) {
                 masterCheckbox.checked = false;
             }
-            $tbody.find('input:checked').css('outline', '5px solid rgba(0, 0, 255, 0.2)');// todo  todo
+            paintCheckboxes();
         });
 
 
@@ -327,6 +336,10 @@ function Table (container, tblType) {
             if (lastTarget) {
                 outline.style.background = '';
                 outline.style.outline = '';
+            }
+
+            if (tblType === TBL_answers) {
+                paintCheckboxes(true);
             }
 
             ctrl.dragTag(dragData, to);
@@ -482,7 +495,7 @@ function Table (container, tblType) {
     
 
     this.addRow = function (tag) {
-        $tbody.prepend(fillTableBody([tag]));
+        tbody.insertAdjacentHTML('afterbegin', fillTableBody([tag]));
 
         if (tblType === TBL_terms) {
             visibleTerms.unshift(true);
@@ -491,7 +504,7 @@ function Table (container, tblType) {
 
 
     this.addRows = function (arr, unpackOrTags) {
-        $tbody.prepend(fillTableBody(arr, unpackOrTags));
+        tbody.insertAdjacentHTML('afterbegin', fillTableBody(arr, unpackOrTags));
 
         if (tblType === TBL_terms) {
             visibleTerms = Array(arr.length).fill(true).concat(visibleTerms);
@@ -514,14 +527,14 @@ function Table (container, tblType) {
 
         if (ul) {
             if (pos) {
-                $(ul.children[pos]).after(str);
+                ul.children[pos].insertAdjacentHTML('afterend', str);
             }
             else {
-                $(ul).prepend(str);
+                ul.insertAdjacentHTML('afterbegin', str);
             }
         }
         else {
-            $(td).append('<ul>' + str + '</ul>');
+            td.insertAdjacentHTML('beforeend', '<ul>' + str + '</ul>');
         }
         if (tblType !== TBL_answers) {
             tr.children[2].innerHTML = toPerc(count) + '%';
@@ -532,7 +545,7 @@ function Table (container, tblType) {
 
     this.addSyns = function (index, arr) {
         var td = tbody.children[index].children[tblType === TBL_tags ? 1 : 0],
-            $ul = $(td.children[1]),
+            ul = td.children[1],
             str = '';
 
         for (var i in arr) {
@@ -544,7 +557,7 @@ function Table (container, tblType) {
             }
         }
 
-        $ul.prepend(str);
+        ul.insertAdjacentHTML('afterbegin', str);
     };
 
 
@@ -566,7 +579,7 @@ function Table (container, tblType) {
                     typeStr = 'subterm';
                 }
 
-                $undo.prepend('<div><undo trash-id=' + trashId + '>undo</undo> <i>' + typeStr + '</i>&nbsp; ' + restore[0][0] + '<del-undo>×</del-undo></div>');
+                undo.insertAdjacentHTML('afterbegin', '<div><undo trash-id=' + trashId + '>undo</undo> <i>' + typeStr + '</i>&nbsp; ' + restore[0][0] + '<del-undo>×</del-undo></div>');
             }, 0);
         }
     }

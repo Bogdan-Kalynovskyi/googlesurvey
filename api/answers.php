@@ -28,7 +28,7 @@ if ($s = mysql_error()) {
 
 
 function get () {
-    $query = mysql_query('SELECT answer, tags FROM answers WHERE survey_id = '.intval($_GET['surveyId']).' ORDER BY answer');
+    $query = mysql_query('SELECT answer, count, tags FROM answers WHERE survey_id = '.intval($_GET['surveyId']).' ORDER BY answer');
     $result = array();
     while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
         $result[] = $row;
@@ -47,13 +47,13 @@ function add ($post = null) {
     $nn = $n - 1;
     for ($i = 0; $i < $n; $i++) {
         $line = $answers[$i];
-        $str .= '('.$surveyId.','.esc($line[0]).','.esc($line[1]).')';
+        $str .= '('.$surveyId.','.esc($line[0]).','.intval($line[1]).','.esc($line[2]).')';
         if ($i < $nn) {
             $str .= ',';
         }
     }
 
-    mysql_query('INSERT INTO answers (survey_id, answer, tags) VALUES '.$str);
+    mysql_query('INSERT INTO answers (survey_id, answer, count, tags) VALUES '.$str);
 }
 
 
