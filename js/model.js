@@ -453,6 +453,11 @@ app.service('model', ['$http', function ($http) {
     };
 
 
+    this.updateTagsTbl = function () {
+        tagsTable.draw(this.tags);
+    };
+
+
     this.updateAnsTbl = function () {
         answersTable.draw(this.answers, this.tags);
     };

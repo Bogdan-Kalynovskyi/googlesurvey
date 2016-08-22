@@ -73,6 +73,10 @@
             byId(states[state]).style.display = 'block';
             oldState = state;
 
+            if (state === 1 && !(tagsJustBorn || answersNeedLoad)) {
+                model.updateTagsTbl();
+            }
+
             if (state === 2 && !answersReady) {
                 if (answersNeedScan) {
                     model.prepareAnswers(this.sId);
@@ -108,6 +112,7 @@
         function navigateTagsTab (question) {
             answersReady = false;
             answersNeedScan = false;
+            chartReady = false;
             that.filterTerm = '';
             trash = [];
             byId('tags-question').innerHTML = question;
@@ -120,7 +125,7 @@
             if (question) {
                 tagsJustBorn = true;
                 answersNeedLoad = false;
-                that.splitMax();
+                that.splitMax();    // this saves tags
                 setMaxState(3);
                 navigateTagsTab(question);
             }
