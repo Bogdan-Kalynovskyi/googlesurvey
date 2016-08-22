@@ -13,11 +13,12 @@
         }
 
         modal.style.display = 'block';
-        //todo animation
-        modal.classList.add('in');
-        //todo 13 27
+        modal.offsetWidth; //
+        modal.getBoundingClientRect(); //
 
-        modal.onclick = close;
+        modal.classList.add('in');
+
+        modal.addEventListener('click', close);
         var btn = modal.getElementsByTagName('button');
         for (var i = 0; i < btn.length; i++) {
             btn[i].addEventListener('click', close);
@@ -29,9 +30,8 @@
         };
 
         modal.querySelector('.modal-dialog').addEventListener('click', function (evt) {
-            //evt.stopPropagation();
-            return false;
-        }, true);
+            evt.stopPropagation();
+        });
     }
 
 
@@ -48,9 +48,9 @@
     window.bootstrapConfirm = function (message, btnOne, btnTwo, callback) {
         modalPlaceholder.insertAdjacentHTML('beforeend', modalStart +
             message +
-             '<br><br><button class="btn btn-sm btn-primary pull-xs-right m-r-3 m-y-1 p-x-2">' +
+                 '<br><button class="btn btn-sm btn-primary pull-xs-right m-r-3 m-t-1 p-x-2">' +
             btnOne +
-            '</button><button class="btn btn-sm btn-secondary m-l-3 m-y-1 p-x-2">' +
+            '</button><button class="btn btn-sm btn-secondary m-l-3 m-t-1 p-x-2" style="margin-bottom:.5rem">' +
             btnTwo +
             '</button>' + modalEnd);
 

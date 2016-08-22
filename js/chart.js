@@ -9,10 +9,10 @@ function Chart (container) {
 
 
     this.create = function (data, survey) {
-        if (!google || !google.charts.Bar || !google.visualization) {
+        if (!window.google || !google.charts.Bar || !google.visualization) {
             setTimeout(function () {
                 that.create(data, survey);
-            }, 500);
+            }, 200);
         }
         else {
             google.charts.setOnLoadCallback(function () {

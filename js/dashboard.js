@@ -22,13 +22,11 @@
             maxState = 0,
             oldState,
 
+            tagsReady,
             answersNeedScan,
             answersNeedLoad,
-            tagsJustBorn,
             answersReady,
             chartReady;
-
-        this.maxTags = 10;
 
 
         surveys.load().success(function () {
@@ -73,8 +71,9 @@
             byId(states[state]).style.display = 'block';
             oldState = state;
 
-            if (state === 1 && !(tagsJustBorn || answersNeedLoad)) {
+            if (state === 1 && !tagsReady) {
                 model.updateTagsTbl();
+                tagsReady = true;
             }
 
             if (state === 2 && !answersReady) {
@@ -110,6 +109,7 @@
 
 
         function navigateTagsTab (question) {
+            tagsReady = true;
             answersReady = false;
             answersNeedScan = false;
             chartReady = false;
@@ -121,19 +121,17 @@
         }
 
 
-        function onSurveyCreated (question) {
-            if (question) {
-                tagsJustBorn = true;
-                answersNeedLoad = false;
-                that.splitMax();    // this saves tags
-                setMaxState(3);
-                navigateTagsTab(question);
-            }
+        function onSurveyCreated (newSurvey) {
+            answersNeedLoad = false;
+            that.maxTags = 20;
+            that.minCount = newSurvey.split;
+            saveTagTerms(newSurvey);
+            setMaxState(3);
+            navigateTagsTab(newSurvey.question);
         }
 
 
         this.loadSurvey = function (id) {
-            tagsJustBorn = false;
             answersNeedLoad = true;
             this.sId = id;
             total = +surveys.surveys[id].total;
@@ -156,7 +154,7 @@
             if (!this.maxTags) {
                 this.maxTags = 1;
             }
-            this.minCount = model.splitMax(this.maxTags, tagsJustBorn);
+            this.minCount = model.splitMax(this.maxTags);
             saveTagTerms();
         };
 
@@ -270,14 +268,18 @@
         this.addAnswer = function (indexAnswer, indexTag) {
             model.addAnswer(indexAnswer, indexTag);
             model.patchAnswer(this.sId, indexAnswer);
+            tagsReady = false;
             chartReady = false;
+            saveTagTerms();
         };
 
 
         this.deleteAnswer = function (indexAnswer, pos) {
             model.deleteAnswer(indexAnswer, pos);
             model.patchAnswer(this.sId, indexAnswer);
+            tagsReady = false;
             chartReady = false;
+            saveTagTerms();
         };
 
 
@@ -417,25 +419,26 @@
 
         var saveTimeout;
 
-        function saveTagTerms () {
+        function saveTagTerms (newSurvey) {
             clearTimeout(saveTimeout);
 
             saveTimeout = setTimeout(function () {
-                if (that.sId && !dupe) {
+                if (newSurvey || dupe) {
+                    dupe = false;
+                    model.saveNewSurvey(newSurvey).success(function (surveyId) {
+                        that.sId = surveyId;
+                        model.saveAnswers(surveyId);
+                        surveys.add(surveyId, newSurvey);
+                    });
+                }
+                else {
                     that.surveys[that.sId].total = total;
                     model.overwriteSurvey(that.sId);
                 }
-                else {
-                    dupe = false;
-                    model.saveNewSurvey().then(function (surveyId) {
-                        that.sId = surveyId;
-                        surveys.add(model.surveyId, model.surveyData);
-                    });
-                }
-            }, 500);
+            }, newSurvey || dupe ? 0 : 500);
 
-            tagsJustBorn = false;
-            // don't touch three below when only terms changed
+            // don't touch those below when only terms changed
+            tagsReady = true;
             chartReady = false;
             answersReady = false;
             answersNeedScan = true;

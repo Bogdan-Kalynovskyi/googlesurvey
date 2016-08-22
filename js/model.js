@@ -35,15 +35,6 @@ app.service('model', ['$http', function ($http) {
             }
             i++;
         }
-        var question = overview.C2.w,
-            surveyId = overview.A2.w;
-        total = +overview.E2.w;
-
-        this.surveyData = {
-            survey_google_id: surveyId,
-            question: question,
-            total: total
-        };
 
         this.tags = [];
         this.answers = [];
@@ -52,14 +43,18 @@ app.service('model', ['$http', function ($http) {
             this.tags.push([i, count]);
             this.answers.push([i, count]);
         }
-        this.answers.sort();
-        this.terms = [];
+        this.sort(this.answers, true);
 
-        setTimeout(function () {
-            that.prepareAnswers(surveyId, true);
-        }, 300);
+        var split = this.splitMax(20, true);
+        this.prepareAnswers();
 
-        return question;
+        return {
+            split: split,
+            survey_google_id: overview.A2.w,
+            question: overview.C2.w,
+            created: Date.now() / 1000,
+            total: total
+        };
     };
 
 
@@ -86,16 +81,13 @@ app.service('model', ['$http', function ($http) {
     };
 
 
-    this.saveNewSurvey = function () {
+    this.saveNewSurvey = function (newSurvey) {
         return $http.post('api/surveys.php', {
-            survey_google_id: this.surveyData.survey_google_id,
-            question: this.surveyData.question,
+            survey_google_id: newSurvey.survey_google_id,
+            question: newSurvey.question,
             tags: packTags(this.tags),
             terms: this.terms,
             total: total
-        })
-        .then(function (response) {
-            return that.surveyId = response.data;
         });
     };
 
@@ -130,7 +122,7 @@ app.service('model', ['$http', function ($http) {
         return $http.patch('api/answers.php', {
             surveyId: surveyId,
             answer: this.answers[answerId][0],
-            tags: this.answers[answerId][1]
+            tags: this.answers[answerId][2]
         });
     };
 
@@ -259,27 +251,43 @@ app.service('model', ['$http', function ($http) {
 
 
     this.addAnswer = function (indexAnswer, indexTag) {
-        this.answers[indexAnswer][1] += indexTag + ',';
-        var tag = this.tags[indexTag];
+        var answer = this.answers[indexAnswer],
+            count = +answer[1],
+            tag = this.tags[indexTag];
+
+        answer[2] += indexTag + ',';
         answersTable.addSyn(indexAnswer, tag[0]);
-        total++;
-        shortTable.updateCount(indexTag, ++tag[1]);
+        total += count;
+        tag[1] += count;
+        shortTable.updateCount(indexTag, tag[1]);
         shortTable.updatePerc(this.tags);
     };
 
 
     this.deleteAnswer = function (indexAnswer, pos) {
-        var arr = this.answers[indexAnswer][1].split(','),
-        indexTag = arr.splice(pos, 1);
-        this.answers[indexAnswer][1] = arr.join(',') + ',';
+        var answer = this.answers[indexAnswer],
+            count = +answer[1],
+            arr = answer[2].split(','),
+            indexTag = arr.splice(pos, 1)[0],
+            tag = this.tags[indexTag];
+
+        if (arr.length) {
+            answer[2] = arr.join(',') + ',';
+        }
+        else {
+            answer[2] = '';
+        }
         answersTable.deleteSyn(indexAnswer, pos);
-        total--;
-        shortTable.updateCount(indexTag, --this.tags[indexTag][1]);
-        shortTable.updatePerc(this.tags);
+        total -= count;
+        if (tag) {
+            tag[1] -= count;
+            shortTable.updateCount(indexTag, tag[1]);
+            shortTable.updatePerc(this.tags);
+        }
     };
 
 
-    this.prepareAnswers = function (surveyId, unpack) {
+    this.prepareAnswers = function (surveyId) {
         function findSub (haystack, needle) {
             var j,
                 i = 0,
@@ -299,9 +307,7 @@ app.service('model', ['$http', function ($http) {
             }
         }
 
-        if (!unpack) {
-            total = 0;
-        }
+        total = 0;
 
         var spaceNCommaSplitTrim = /[\s,]+/,
             l = this.tags.length,
@@ -320,9 +326,7 @@ app.service('model', ['$http', function ($http) {
                 }
                 tagSynWords[j] = synArr;
             }
-            if (!unpack) {
-                tag[1] = 0;
-            }
+            tag[1] = 0;
         }
 
         for (var i in this.answers) {
@@ -334,11 +338,9 @@ app.service('model', ['$http', function ($http) {
                 tag = this.tags[j];
                 if (findSub(ansWords, tagWords[j])) {
                     tagIds += j + ',';
-                    if (!unpack) {
-                        count = +answer[1];
-                        tag[1] += count;
-                        total += count;
-                    }
+                    count = +answer[1];
+                    tag[1] += count;
+                    total += count;
                     continue;
                 }
                 syn = tagSynWords[j];
@@ -346,11 +348,9 @@ app.service('model', ['$http', function ($http) {
                     for (k in syn) {
                         if (findSub(ansWords, syn[k])) {
                             tagIds += j + ',';
-                            if (!unpack) {
-                                count = +answer[1];
-                                tag[1] += count;
-                                total += count;
-                            }
+                            count = +answer[1];
+                            tag[1] += count;
+                            total += count;
                             break;
                         }
                     }
@@ -360,7 +360,9 @@ app.service('model', ['$http', function ($http) {
             answer[2] = tagIds;
         }
 
-        unpack ? this.saveAnswers(surveyId) : this.updateAnswers(surveyId);
+        if (surveyId !== undefined) {
+            this.updateAnswers(surveyId);
+        }
     };
 
 
@@ -430,7 +432,7 @@ app.service('model', ['$http', function ($http) {
         for (var i in terms) {
             var line = terms[i];
             if (name = line[2]) {
-                count = line[3];
+                count = +line[3];
                 for (var j in name) {
                     that.terms.push([name[j], count[j]]); // unshift??
                 }
@@ -475,9 +477,16 @@ app.service('model', ['$http', function ($http) {
     };
 
 
-    this.splitMax = function (maxTags, tagsReady) {
-        var arr = this.tags.concat(this.terms),
+    this.splitMax = function (maxTags, tagsJustBorn) {
+        var arr,
             min;
+
+        if (tagsJustBorn) {
+            arr = this.tags;
+        }
+        else {
+            arr = this.tags.concat(this.terms)
+        }
 
         maxTags = Math.min(maxTags, arr.length);
         this.sort(arr);
@@ -485,13 +494,22 @@ app.service('model', ['$http', function ($http) {
         this.tags = arr.slice(0, maxTags);
         this.terms = arr.slice(maxTags);
         min = this.tags[maxTags - 1][1];
-        if (!tagsReady) {
+        if (!tagsJustBorn) {
             unpackTerms();
         }
         this.sort(this.tags, true);
         this.sort(this.terms, true);
 
-        tagsTable.draw(this.tags, tagsReady);
+        if (!tagsJustBorn) {
+            total = 0;
+            for (var i in this.tags) {
+                total += +this.tags[i][1];
+            }
+        }
+
+        setTimeout(function () {    // for performance and because tags' repeats will become reassigned when tagsJustBorn
+            tagsTable.draw(that.tags);
+        }, 0);
         termsTable.draw(this.terms);
 
         return min;
@@ -526,7 +544,7 @@ app.service('model', ['$http', function ($http) {
         var min = Infinity,
             count;
         for (var i in this.tags) {
-            count = this.tags[i][1];
+            count = +this.tags[i][1];
             if (count < min) {
                 min = count;
             }

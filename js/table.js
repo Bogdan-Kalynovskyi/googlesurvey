@@ -41,24 +41,20 @@ function Table (container, tblType) {
             return;
         }
 
-        var tableHeading = ['Tags and synonyms', 'Unused terms', 'Answers with associated tags<br><br>', 'Tags'],
-            columnHeading = ['Tag', 'Term', '', 'Tag'],
-            colCount = [5, 5, 3, 4],
+        var tableHeading = ['Tags and synonyms', 'Unused terms', 'Answers with associated tags', 'Tags'],
+            columnHeading = ['Tag', 'Term', 'Answer', 'Tag'],
+            colCount = [5, 5, 2, 4],
             str = '<table class="table table-striped table-bordered table-hover"' + (tblType === TBL_terms ? ' ondragover="return false"' : '') + '>' +
                   '<thead class="thead-default"' + (tblType === TBL_tags ? ' ondragover="return false"' : '') + '><tr>' +
-                  '<th colspan=' + colCount[tblType] + '><b>' + tableHeading[tblType] + '</b></th>';
+                  '<th colspan=' + colCount[tblType] + '><b>' + tableHeading[tblType] + '</b></th></tr><tr>';
             if (tblType === TBL_tags) {
-                str += '</tr><tr>' +
-                    '<th colspan=5><b style="font-weight: 200">Drop on table header to add as new tag</b></th>';
+                str += '<th colspan=5><b style="font-weight: 200">Drop on table header to add as new tag</b></th></tr><tr>';
             }
             if (tblType !== TBL_answers) {
-                str += '</tr><tr>' +
-                    '<th><input type=checkbox></th>' +
-                    '<th>' + columnHeading[tblType] + '</th>' +
-                    '<th colspan=' + (colCount[tblType] - 2) + '>Repeats</th>';
+                str += '<th><input type=checkbox></th>';
             }
-
-            str += '</tr></thead>' +
+            str += '<th>' + columnHeading[tblType] + '</th>' +
+                   '<th colspan=' + (colCount[tblType] - 2) + '>Repeats</th></tr></thead>' +
                    '<tbody>' +
                        fillTableBody(arr, unpackOrTags) +
                    '</tbody></table>';
@@ -150,7 +146,7 @@ function Table (container, tblType) {
                     }
                     str +=
                         '<tr ondragover="return false">' +
-                        '<td><text>' + line[0] + '</text>' + synStr + '</td></tr>';
+                        '<td><text>' + line[0] + '</text>' + synStr + '</td><td>' + line[1] + '</td></tr>';
                 }
                 break;
 
