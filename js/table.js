@@ -1,4 +1,5 @@
 var undo = byId('undo'),
+    undo2 = byId('undo2'),
     ctrl,
     dragData;
 
@@ -13,6 +14,19 @@ undo.onclick = function (evt) {
     }
     else if (tagName === 'DEL-UNDO') {
         undo.removeChild(target.parentNode);
+    }
+};
+
+undo2.onclick = function (evt) {
+    var target = evt.target,
+        tagName = target.tagName;
+
+    if (tagName === 'UNDO') {
+        ctrl.addAnswer(target.getAttribute('answer-id'), target.getAttribute('tag-id'));
+        undo2.removeChild(target.parentNode);
+    }
+    else if (tagName === 'DEL-UNDO') {
+        undo2.removeChild(target.parentNode);
     }
 };
 
@@ -184,7 +198,7 @@ function Table (container, tblType) {
                 checked = this.checked,
                 i, n;
 
-            if (tblType === TBL_terms) {
+            if (isFiltered && tblType === TBL_terms) {
                 for (i in visibleTerms) {
                     if (visibleTerms[i]) {
                         rows[i].children[0].children[0].checked = checked;
@@ -399,7 +413,7 @@ function Table (container, tblType) {
             rows = tbody.children,
             i, n;
 
-        if (tblType === TBL_terms) {
+        if (isFiltered && tblType === TBL_terms) {
             for (i in visibleTerms) {
                 if (visibleTerms[i] && rows[i].children[0].children[0].checked) {
                     selected.push(i);
@@ -454,7 +468,7 @@ function Table (container, tblType) {
         var rows = tbody.children,
             i, n;
 
-        if (tblType === TBL_terms) {
+        if (isFiltered && tblType === TBL_terms) {
             for (i in visibleTerms) {
                 if (visibleTerms[i]) {
                     rows[i].children[2].innerHTML = toPerc(arr[i][1]) + '%'
@@ -483,9 +497,6 @@ function Table (container, tblType) {
 
     this.update = function (arr, unpackOrTags) {
         tbody.innerHTML = '';
-        if (tblType === TBL_terms) {
-            visibleTerms = [];
-        }
         this.addRows(arr, unpackOrTags);
     };
     

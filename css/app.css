@@ -315,7 +315,7 @@ del-tag {
     top: -1px;
 }
 
-#undo {
+.undo {
     background: #fff4e2;
     font-size: 12px;
     width: 50%;
@@ -327,12 +327,17 @@ del-tag {
     box-shadow: 0 -2px 1px white;
 }
 
-#undo > div {
+#undo2 {
+    left: auto;
+    right: 0;
+}
+
+.undo > div {
     padding: 4px 3px 3px 6px;
     overflow: hidden;
 }
 
-#undo > div:hover {
+.undo > div:hover {
     background: #fbecd8;
     box-shadow: 0 0 0 1px #fbecd8;
 }
@@ -351,8 +356,8 @@ del-undo {
 }
 
 del-undo:hover {
-    background: rgba(0, 0, 0, 0.07);
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.07);
+    background: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.16);
 }
 
 tbody ul {
@@ -385,7 +390,7 @@ tbody ul {
 
     th,
     td {
-        line-height: 1.1;
+        line-height: 1;
     }
 
     #scroll-tbl {

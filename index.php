@@ -207,8 +207,8 @@
         <div class="row" id="scroll-tbl">
             <div class="col-sm-6 scroll" id="tags-table"></div>
             <div class="col-sm-6 scroll" id="terms-table"></div>
-              </div>
-        <div id="undo"></div>
+        </div>
+        <div id="undo" class="undo"></div>
     </div>
 
 
@@ -217,6 +217,7 @@
             <div class="col-sm-6 scroll" id="answers-table"></div>
             <div class="col-sm-6 scroll" id="short-table"></div>
         </div>
+        <div id="undo2" class="undo"></div>
     </div>
 
 

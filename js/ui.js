@@ -36,7 +36,7 @@
 
 
     window.bootstrapAlert = function (message) {
-        modalPlaceholder.insertAdjacentHTML('beforeend', modalStart +
+        modalPlaceholder.insertAdjacentHTML('afterbegin', modalStart +
             message + '<br><button class="btn btn-sm btn-primary m-t-1 p-x-3" style="margin: 0 auto;display: block;">Ok</button>' +
             modalEnd);
         var modal = byQs('.modal');
@@ -46,7 +46,7 @@
 
 
     window.bootstrapConfirm = function (message, btnOne, btnTwo, callback) {
-        modalPlaceholder.insertAdjacentHTML('beforeend', modalStart +
+        modalPlaceholder.insertAdjacentHTML('afterbegin', modalStart +
             message +
                  '<br><button class="btn btn-sm btn-primary pull-xs-right m-r-3 m-t-1 p-x-2">' +
             btnOne +

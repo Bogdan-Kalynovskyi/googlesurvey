@@ -77,6 +77,7 @@ app.service('model', ['$http', function ($http) {
     this.getAnswers = function (surveyId) {
         return $http.get('api/answers.php?surveyId=' + surveyId).success(function (response) {
             that.answers = response;
+            undo2.innerHTML = '';
         });
     };
 
@@ -255,7 +256,7 @@ app.service('model', ['$http', function ($http) {
             count = +answer[1],
             tag = this.tags[indexTag];
 
-        answer[2] += indexTag + ',';
+        answer[2] = indexTag + ',' + answer[2];
         answersTable.addSyn(indexAnswer, tag[0]);
         total += count;
         tag[1] += count;
@@ -267,9 +268,11 @@ app.service('model', ['$http', function ($http) {
     this.deleteAnswer = function (indexAnswer, pos) {
         var answer = this.answers[indexAnswer],
             count = +answer[1],
-            arr = answer[2].split(','),
+            arr = answer[2].substr(0, answer[2].length - 1).split(','),
             indexTag = arr.splice(pos, 1)[0],
             tag = this.tags[indexTag];
+
+        undo2.insertAdjacentHTML('afterbegin', '<div><undo answer-id=' + indexAnswer + ' tag-id=' + indexTag + '>undo</undo> <i>tag</i> &nbsp; ' + tag[0] + '<del-undo>×</del-undo></div>');
 
         if (arr.length) {
             answer[2] = arr.join(',') + ',';
@@ -308,6 +311,7 @@ app.service('model', ['$http', function ($http) {
         }
 
         total = 0;
+        undo2.innerHTML = '';
 
         var spaceNCommaSplitTrim = /[\s,]+/,
             l = this.tags.length,
@@ -507,10 +511,10 @@ app.service('model', ['$http', function ($http) {
             }
         }
 
-        setTimeout(function () {    // for performance and because tags' repeats will become reassigned when tagsJustBorn
-            tagsTable.draw(that.tags);
+        setTimeout(function () {
+            tagsTable.draw(that.tags);      // repeats will become reassigned when tagsJustBorn
+            termsTable.draw(that.terms);    // because total is not assigned yet
         }, 0);
-        termsTable.draw(this.terms);
 
         return min;
     };

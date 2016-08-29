@@ -115,8 +115,8 @@
             chartReady = false;
             that.filterTerm = '';
             trash = [];
-            byId('tags-question').innerHTML = question;
             undo.innerHTML = '';
+            byId('tags-question').innerHTML = question;
             that.navigate(1);
         }
 
@@ -139,14 +139,28 @@
             setMaxState(1);
             navigateTagsTab(surveys.surveys[this.sId].question);
             var q1 = model.getTags(id).success(function () {
-                that.maxTags = model.tags.length;
-                that.minCount = model.minTag();
-            });
-            model.getTerms(id);
-            var q2 = model.getAnswers(this.sId);
-            $q.all([q1, q2]).then(function () {
+                    that.maxTags = model.tags.length;
+                    that.minCount = model.minTag();
+                }),
+                q2 = model.getTerms(id),
+                q3 = model.getAnswers(this.sId);
+
+            $q.all([q1, q3]).then(function () {
                 setMaxState(3);
             });
+
+            var q4 = $q.all([q1, q2]).then(function () {
+                if (dupe) {
+                    return saveTagTerms(surveys.surveys[that.sId], true);
+                }
+            });
+
+            if (dupe) {
+                $q.all([q3, q4]).then(function () {
+                    model.saveAnswers(that.sId);
+                    dupe = false;
+                });
+            }
         };
 
         
@@ -166,9 +180,8 @@
 
 
         this.cloneSurvey = function (surveyId) {
-            this.loadSurvey(surveyId);
-            model.surveyData = surveys.surveys[surveyId];
             dupe = true;
+            this.loadSurvey(surveyId);
         };
 
 
@@ -270,7 +283,7 @@
             model.patchAnswer(this.sId, indexAnswer);
             tagsReady = false;
             chartReady = false;
-            saveTagTerms();
+            saveTagTerms(false, true);
         };
 
 
@@ -279,7 +292,7 @@
             model.patchAnswer(this.sId, indexAnswer);
             tagsReady = false;
             chartReady = false;
-            saveTagTerms();
+            saveTagTerms(false, true);
         };
 
 
@@ -419,29 +432,32 @@
 
         var saveTimeout;
 
-        function saveTagTerms (newSurvey) {
+        function saveTagTerms (newSurvey, noScan) {
             clearTimeout(saveTimeout);
 
-            saveTimeout = setTimeout(function () {
-                if (newSurvey || dupe) {
-                    dupe = false;
-                    model.saveNewSurvey(newSurvey).success(function (surveyId) {
-                        that.sId = surveyId;
+            if (newSurvey) {
+                return model.saveNewSurvey(newSurvey).success(function (surveyId) {
+                    that.sId = surveyId;
+                    if (!noScan) {
                         model.saveAnswers(surveyId);
-                        surveys.add(surveyId, newSurvey);
-                    });
-                }
-                else {
+                    }
+                    surveys.add(surveyId, newSurvey);
+                });
+            }
+            else {
+                saveTimeout = setTimeout(function () {
                     that.surveys[that.sId].total = total;
                     model.overwriteSurvey(that.sId);
-                }
-            }, newSurvey || dupe ? 0 : 500);
+                }, 500);
+            }
 
             // don't touch those below when only terms changed
             tagsReady = true;
             chartReady = false;
             answersReady = false;
-            answersNeedScan = true;
+            if (!noScan) {
+                answersNeedScan = true;
+            }
         }
 
 
