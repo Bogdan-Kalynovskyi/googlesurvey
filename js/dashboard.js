@@ -134,10 +134,12 @@
         this.loadSurvey = function (id) {
             answersNeedLoad = true;
             this.sId = id;
-            total = +surveys.surveys[id].total;
+            var survey = this.surveys[id];
+            total = +survey.total;
+            model.printSentiment(+survey.positive, +survey.negative);
             model.clearTables();
             setMaxState(1);
-            navigateTagsTab(surveys.surveys[this.sId].question);
+            navigateTagsTab(survey.question);
             var q1 = model.getTags(id).success(function () {
                     that.maxTags = model.tags.length;
                     that.minCount = model.minTag();
@@ -151,7 +153,7 @@
 
             var q4 = $q.all([q1, q2]).then(function () {
                 if (dupe) {
-                    return saveTagTerms(surveys.surveys[that.sId], true);
+                    return saveTagTerms(survey, true);
                 }
             });
 
@@ -251,12 +253,12 @@
 
         this.deleteRow = function (index, isTagsTable) {
             if (isTagsTable) {
-                total -= model.tags[index][1];
+                total -= model.tags[index][1] / 100;
                 var trashId = trash.push([model.tags[index], isTagsTable]) - 1;
                 model.deleteTag(index, trashId);
             }
             else {
-                total -= model.terms[index][1];
+                total -= model.terms[index][1] / 100;
                 trashId = trash.push([model.terms[index], isTagsTable]) - 1;
                 model.deleteTerm(index, trashId);
             }
@@ -266,14 +268,14 @@
 
         this.deleteSyn = function (index, pos) {
             var line = model.deleteSyn(index, pos, trash.length);
-            total -= +line[1];
+            total -= line[1] / 100;
             trash.push([line, index]);
             saveTotalTagTerms();
         };
 
 
         this.cloneSyn = function (index, pos) {
-            total += model.cloneSyn(index, pos);
+            total += model.cloneSyn(index, pos) / 100;
             saveTotalTagTerms();
         };
 
@@ -311,7 +313,7 @@
                 model.addSyn(Math.min(type, model.tags.length - 1), data[0], data[1]);
             }
 
-            total += +data[1];
+            total += data[1] / 100;
             saveTotalTagTerms();
         };
 
@@ -436,7 +438,7 @@
             clearTimeout(saveTimeout);
 
             if (newSurvey) {
-                return model.saveNewSurvey(newSurvey).success(function (surveyId) {
+                return model.saveSurvey(newSurvey).success(function (surveyId) {
                     that.sId = surveyId;
                     if (!noScan) {
                         model.saveAnswers(surveyId);
@@ -446,8 +448,7 @@
             }
             else {
                 saveTimeout = setTimeout(function () {
-                    that.surveys[that.sId].total = total;
-                    model.overwriteSurvey(that.sId);
+                    model.updateSurvey(that.sId);
                 }, 500);
             }
 

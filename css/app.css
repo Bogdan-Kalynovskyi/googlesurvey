@@ -381,7 +381,14 @@ tbody ul {
     color: #ddd;
 }
 
-
+#perc-positive {
+    font-size: 19px;
+    color: #009900;
+}
+#perc-negative {
+    font-size: 19px;
+    color: #e00;
+}
 
 @media (max-width: 722px) {
     .cross {

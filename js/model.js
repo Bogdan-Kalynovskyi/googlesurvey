@@ -2,10 +2,25 @@ var total;
 
 app.service('model', ['$http', function ($http) {
     var that = this,
+        positive,
+        negative,
         tagsTable = new Table(byId('tags-table'), TBL_tags),
         termsTable = new Table(byId('terms-table'), TBL_terms),
         answersTable = new Table(byId('answers-table'), TBL_answers),
         shortTable = new Table(byId('short-table'), TBL_short);
+
+
+    $http.get('sentiment.json').success(function (response) {
+        positive = response.positive.split(',');
+        negative = response.negative.split(',');
+        for (var i in positive) {
+            positive[i] = positive[i].trim().split(' ');
+        }
+        for (i in negative) {
+            negative[i] = negative[i].trim().split(' ');
+        }
+    });
+
 
 
     this.initByExcel = function (workbook) {
@@ -14,14 +29,17 @@ app.service('model', ['$http', function ($http) {
             tagsObj = {},
             i = 2,
             row,
+            sentiment,
             splitter = / and | or | - | but | nor |\/|\.|,|;|:|\?|!|&+/,
             trash = / very | so much | much | many | a | an | the | such | hi | so | lot of | lots of /g,
-            space = /  /g;
+            number = /(\d+)[,|\s](\d+)/g,
+            space = /  /g,
+            answersCount = 0;
 
         while (row = raw['K' + i]) {
             var words = row.w.toLowerCase();
 
-            words = words.split(splitter);
+            words = words.replace(number, '$1$2').split(splitter);
             for (var j in words) {
                 var word = (' ' + words[j]).replace(trash, ' ').replace(space, ' ').trim();
                 if (word.length) {
@@ -31,6 +49,7 @@ app.service('model', ['$http', function ($http) {
                     else {
                         tagsObj[word] = 1;
                     }
+                    answersCount++;
                 }
             }
             i++;
@@ -46,14 +65,19 @@ app.service('model', ['$http', function ($http) {
         this.sort(this.answers, true);
 
         var split = this.splitMax(20, true);
-        this.prepareAnswers();
+        sentiment = {
+            a: answersCount
+        };
+        this.prepareAnswers(undefined, sentiment);
 
         return {
             split: split,
             survey_google_id: overview.A2.w,
             question: overview.C2.w,
             created: Date.now() / 1000,
-            total: total
+            total: total,
+            positive: sentiment.p,
+            negative: sentiment.n
         };
     };
 
@@ -82,18 +106,17 @@ app.service('model', ['$http', function ($http) {
     };
 
 
-    this.saveNewSurvey = function (newSurvey) {
+    this.saveSurvey = function (newSurvey) {
+        newSurvey.total = total;
         return $http.post('api/surveys.php', {
-            survey_google_id: newSurvey.survey_google_id,
-            question: newSurvey.question,
+            survey: newSurvey,
             tags: packTags(this.tags),
-            terms: this.terms,
-            total: total
+            terms: this.terms
         });
     };
 
 
-    this.overwriteSurvey = function (surveyId) {
+    this.updateSurvey = function (surveyId) {
         return $http.put('api/surveys.php', {
             surveyId: surveyId,
             tags: packTags(that.tags),
@@ -258,7 +281,7 @@ app.service('model', ['$http', function ($http) {
 
         answer[2] = indexTag + ',' + answer[2];
         answersTable.addSyn(indexAnswer, tag[0]);
-        total += count;
+        total += count / 100;
         tag[1] += count;
         shortTable.updateCount(indexTag, tag[1]);
         shortTable.updatePerc(this.tags);
@@ -281,7 +304,7 @@ app.service('model', ['$http', function ($http) {
             answer[2] = '';
         }
         answersTable.deleteSyn(indexAnswer, pos);
-        total -= count;
+        total -= count / 100;
         if (tag) {
             tag[1] -= count;
             shortTable.updateCount(indexTag, tag[1]);
@@ -290,7 +313,15 @@ app.service('model', ['$http', function ($http) {
     };
 
 
-    this.prepareAnswers = function (surveyId) {
+    this.prepareAnswers = function (surveyId, sentiment) {
+        function findAdj (haystack, needle) {
+            for (var i in needle) {
+                if (findSub(haystack, needle[i])) {
+                    return true;
+                }
+            }
+        }
+
         function findSub (haystack, needle) {
             var j,
                 i = 0,
@@ -314,10 +345,11 @@ app.service('model', ['$http', function ($http) {
         undo2.innerHTML = '';
 
         var spaceNCommaSplitTrim = /[\s,]+/,
+            positiveScore = 0,
+            negativeScore = 0,
             l = this.tags.length,
             tagWords = Array(l),
-            tagSynWords = Array(l),
-            count;
+            tagSynWords = Array(l);
 
         for (var j in this.tags) {
             var tag = this.tags[j],
@@ -336,13 +368,13 @@ app.service('model', ['$http', function ($http) {
         for (var i in this.answers) {
             var answer = this.answers[i],
                 ansWords = answer[0].split(spaceNCommaSplitTrim),
+                count = +answer[1],
                 tagIds = '';
 
             for (j in this.tags) {
                 tag = this.tags[j];
                 if (findSub(ansWords, tagWords[j])) {
                     tagIds += j + ',';
-                    count = +answer[1];
                     tag[1] += count;
                     total += count;
                     continue;
@@ -352,7 +384,6 @@ app.service('model', ['$http', function ($http) {
                     for (k in syn) {
                         if (findSub(ansWords, syn[k])) {
                             tagIds += j + ',';
-                            count = +answer[1];
                             tag[1] += count;
                             total += count;
                             break;
@@ -361,18 +392,42 @@ app.service('model', ['$http', function ($http) {
                 }
             }
 
+            if (surveyId === undefined) {
+                if (findAdj(ansWords, negative)) {
+                    negativeScore += count;
+                }
+                else if (findAdj(ansWords, positive)) {
+                    positiveScore += count;
+                }
+            }
+
             answer[2] = tagIds;
         }
 
-        if (surveyId !== undefined) {
+        total /= 100;
+
+        if (surveyId === undefined) {
+            positiveScore /= sentiment.a;
+            negativeScore /= sentiment.a;
+            sentiment.p = positiveScore;
+            sentiment.n = negativeScore;
+            this.printSentiment(positiveScore, negativeScore);
+        }
+        else {
             this.updateAnswers(surveyId);
+            this.updateSurvey(surveyId);  // todo: this is done only to save total
         }
     };
 
 
-    var sortOrder = 1;
+    this.printSentiment = function (positive, negative) {
+        var any = positive || negative;
+        byId('perc-positive').innerHTML = any ? ((positive * 100).toFixed(2) + '%') : 'n/a';
+        byId('perc-negative').innerHTML = any ? ((negative * 100).toFixed(2) + '%') : 'n/a';
+    };
 
-    this.sort = function (arr, alpha, toggle) {
+
+    this.sort = function (arr, alpha, sortOrder) {
         function alphabetical (a, b) {
             if (a[0] > b[0]) {
                 return sortOrder;
@@ -397,18 +452,7 @@ app.service('model', ['$http', function ($http) {
             }
         }
 
-        if (toggle) {
-            sortOrder *= -1;
-        }
-
-        arr.sort(alpha ? alphabetical : numeric);
-
-        if (toggle) {
-            termsTable.draw(this.terms);
-            byQs('.pull-xs-right').innerHTML = 'Sort terms ' + (sortOrder === 1 ? '▼' : '▲');
-        }
-
-        return arr;
+        return arr.sort(alpha ? alphabetical : numeric);
     };
 
 
@@ -509,6 +553,7 @@ app.service('model', ['$http', function ($http) {
             for (var i in this.tags) {
                 total += +this.tags[i][1];
             }
+            total /= 100;
         }
 
         setTimeout(function () {

@@ -78,7 +78,8 @@ function appendTerms ($terms, $surveyId) {
 
 function create () {
     $post = json_decode(file_get_contents('php://input'), true);
-    mysql_query('INSERT INTO surveys (survey_google_id, user_google_id, question, total, created) VALUES ('.esc($post['survey_google_id']).', '.esc($_SESSION['userGoogleId']).', '.esc($post['question']).', '.intval($post['total']).', UNIX_TIMESTAMP())');
+    $survey = $post['survey'];
+    mysql_query('INSERT INTO surveys (survey_google_id, user_google_id, question, total, positive, negative, created) VALUES ('.esc($survey['survey_google_id']).','.esc($_SESSION['userGoogleId']).','.esc($survey['question']).','.floatval($survey['total']).','.floatval($survey['positive']).','.floatval($survey['negative']).',UNIX_TIMESTAMP())');
     $surveyId = mysql_insert_id();
     appendTags($post['tags'], $surveyId);
     appendTerms($post['terms'], $surveyId);

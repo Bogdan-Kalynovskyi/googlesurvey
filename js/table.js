@@ -41,7 +41,7 @@ function Table (container, tblType) {
 
 
     function toPerc (count) {
-        return (100 * count / total).toFixed(2);
+        return (count / total).toFixed(2);
     }
 
 
@@ -130,8 +130,8 @@ function Table (container, tblType) {
                     line = arr[i];
 
                     str +=
-                        '<tr><td><input type=checkbox></td>' +
-                        '<td><span draggable=true>' + line[0] + '</span></td>' +
+                        '<tr draggable=true><td><input type=checkbox></td>' +
+                        '<td><span>' + line[0] + '</span></td>' +
                         '<td>' + toPerc(line[1]) + '%</td><td>' + line[1] + '</td><td class=del-line>×</td></tr>';
                 }
                 break;

@@ -38,7 +38,7 @@ function Chart (container) {
 
                 for (; i < n; i++) {
                     var line = data[i],
-                        perc = line[1] / total * 100,
+                        perc = line[1] / total,
                         row1 = [line[0], perc],
                         row2 = [line[0], perc.toFixed(2) + '%', line[1]];
 
