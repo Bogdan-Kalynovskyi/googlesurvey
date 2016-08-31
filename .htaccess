@@ -1,7 +1,7 @@
 Options -Indexes
 ServerSignature Off
 
-<FilesMatch ".(gif|jpg|jpeg|png|ico|js|css)$">
+<FilesMatch ".(gif|jpg|jpeg|png|ico|js|css|json)$">
     Header set Cache-Control "max-age=25920000"
 </FilesMatch>
 

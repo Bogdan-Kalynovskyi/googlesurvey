@@ -35,9 +35,12 @@ undo2.onclick = function (evt) {
 function Table (container, tblType) {
     var that = this,
         tbody,
+        cachedArr,
+        cachedTags,
         masterCheckbox,
         visibleTerms,
-        isFiltered;
+        isFiltered,
+        sortCol = tblType === TBL_answers ? 1 : 2;
 
 
     function toPerc (count) {
@@ -46,8 +49,9 @@ function Table (container, tblType) {
 
 
     this.draw = function (arr, unpackOrTags) {
+        cachedArr = arr;
         if (tblType === TBL_terms) {
-            visibleTerms = Array(arr.length).fill(true);
+            visibleTerms = new Array(arr.length).fill(true);
         }
 
         if (tbody) {
@@ -67,7 +71,7 @@ function Table (container, tblType) {
             if (tblType !== TBL_answers) {
                 str += '<th><input type=checkbox></th>';
             }
-            str += '<th>' + columnHeading[tblType] + '</th>' +
+            str += '<th class=asc>' + columnHeading[tblType] + '</th>' +
                    '<th colspan=' + (colCount[tblType] - 2) + '>Repeats</th></tr></thead>' +
                    '<tbody>' +
                        fillTableBody(arr, unpackOrTags) +
@@ -80,6 +84,9 @@ function Table (container, tblType) {
             ctrl = ctrl || angular.element(byId('logged-in')).scope().ctrl;
             if (tblType !== TBL_answers) {
                 addMasterCheckbox();
+            }
+            if (tblType !== TBL_short) {
+                assignSort();
             }
             assignDragNDrop();
             assignDynamicInput();
@@ -137,6 +144,7 @@ function Table (container, tblType) {
                 break;
 
             case TBL_answers:
+                cachedTags = unpackOrTags;
                 for (i in arr) {
                     line = arr[i];
 
@@ -191,6 +199,44 @@ function Table (container, tblType) {
     }
 
 
+    function assignSort () {
+        var ths = container.querySelectorAll('tr:last-child > th');
+        for (var i = 0, n = ths.length; i < n; i++) {
+            if (i > 0 || tblType === TBL_answers) {
+
+                ths[i].onclick = function (i) {
+                    if (i === Math.abs(sortCol)) {
+                        sortCol = -sortCol;
+                    }
+                    else {
+                        ths[Math.abs(sortCol) - 1].className = '';
+                        sortCol = i;
+                    }
+                    ths[i - 1].className = sortCol > 0 ? 'asc' : 'desc';
+
+                    var alpha = tblType === TBL_answers ? i === 1 : i === 2,
+                        order = sortCol > 0 ? 1 : -1;
+                    sortArr(cachedArr, alpha, order);
+                    that.update(cachedArr, cachedTags);
+                }.bind(null, i + 1); // because 0 === -0
+
+            }
+        }
+    }
+
+
+    this.sort1 = function () {
+        var ths = container.querySelectorAll('tr:last-child > th');
+        for (var i = 0, n = ths.length; i < n; i++) {
+            ths[i].className = '';
+        }
+        sortCol = 2;
+        ths[1].className = 'asc';
+        sortArr(cachedArr, true, 1);
+        this.update(cachedArr);
+    };
+
+
     function addMasterCheckbox () {
         masterCheckbox = container.querySelector('thead input');
         masterCheckbox.onchange = function () {
@@ -212,6 +258,27 @@ function Table (container, tblType) {
             }
         };
     }
+
+
+    this.invertChecked = function () {
+        var rows = tbody.children,
+            i, n;
+
+        if (isFiltered && tblType === TBL_terms) {
+            for (i in visibleTerms) {
+                if (visibleTerms[i]) {
+                    var el = rows[i].children[0].children[0];
+                    el.checked = !el.checked;
+                }
+            }
+        }
+        else {
+            for (i = 0, n = rows.length; i < n; i++) {
+                el = rows[i].children[0].children[0];
+                el.checked = !el.checked;
+            }
+        }
+    };
 
 
     function getClosestRow (el) {
@@ -301,7 +368,7 @@ function Table (container, tblType) {
                     lastTarget = undefined;
                 }
 
-                if (!dragData.startRow.contains(target)) {
+                if (!dragData.startRow.contains(target) && (tblType !== TBL_terms || dragData.tblType !== TBL_terms)) {
                     if (tblType === TBL_terms) {
                         target = table;
                     }
@@ -458,7 +525,7 @@ function Table (container, tblType) {
                     rows[i].style.display = '';
                 }
             }
-            visibleTerms = Array(arr.length).fill(true);
+            visibleTerms = new Array(arr.length).fill(true);
             isFiltered = false;
         }
     };
@@ -514,7 +581,7 @@ function Table (container, tblType) {
         tbody.insertAdjacentHTML('afterbegin', fillTableBody(arr, unpackOrTags));
 
         if (tblType === TBL_terms) {
-            visibleTerms = Array(arr.length).fill(true).concat(visibleTerms);
+            visibleTerms = new Array(arr.length).fill(true).concat(visibleTerms);
         }
     };
 

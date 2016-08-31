@@ -33,7 +33,7 @@ function get () {
 
     while ($row = mysql_fetch_array($query, MYSQL_ASSOC)) {
         $num = array_shift($row);
-        $result[$num] = $row;
+        $result[$num] = $row;  // todo floatval for light performance
     }
 
     if ($result) {

@@ -163,7 +163,7 @@
             <thead class="thead-default"><tr>
                 <th colspan=3 class="p-x-1">Survey</th><th>Google ID</th><th>Question</th><th>Created</th>
             </tr></thead>
-            <tr ng-class="{active: id === ctrl.sId}" ng-repeat="(id, survey) in ctrl.surveys">
+            <tr ng-class="{active: id == ctrl.sId}" ng-repeat="(id, survey) in ctrl.surveys">
                 <td><a ng-click="ctrl.loadSurvey(id)" class="p-x-1">edit</a></td>
                 <td><a ng-click="ctrl.cloneSurvey(id)">clone & edit</a></td>
                 <td><a ng-click="ctrl.deleteSurveyById(id)">delete</a></td>
@@ -189,7 +189,7 @@
                 <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags()" style="position: relative; top: -1px; left: -2px">Add tags manually</button>
             </div>
             <div class="col-xs-3">
-                <button class="btn btn-sm btn-primary pull-xs-right" ng-click="ctrl.sort()">Sort terms ▼</button>
+                <button class="btn btn-sm btn-primary pull-xs-right" id="invert">Invert checked</button>
             </div>
         </div>
         <div class="row m-t-1">
@@ -213,7 +213,8 @@
 
 
     <div id="answers" class="nav-body">
-        <div class="row" style="height: 100%">
+        Positive: <b id="perc-positive"></b> &emsp; Negative: <b id="perc-negative"></b><br>
+        <div class="row" style="height: calc(100% - 19px)">
             <div class="col-sm-6 scroll" id="answers-table"></div>
             <div class="col-sm-6 scroll" id="short-table"></div>
         </div>
@@ -226,16 +227,23 @@
         <div id="tags-chart"></div>
         <br>
         <div id="chart-table"></div>
-        <button class="btn btn-sm btn-primary block-center m-y-1 p-x-1" ng-click="ctrl.downloadCsv()">Download tags as CSV</button>
+        <button class="btn btn-sm btn-primary m-y-1 p-x-1" ng-click="ctrl.downloadCsv()">Download tags as CSV</button>
     </div>
 
     <div id="modal-placeholder"></div>
 
-    <link rel=stylesheet href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/css/bootstrap.min.css">
+    <link rel=stylesheet href="node_modules/bootstrap/dist/css/bootstrap.css">
     <link rel=stylesheet href="css/app.css">
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/xls/0.7.5/xls.core.min.js"></script>
-    <script src="app10.js"></script>
+    <script src="node_modules/angular/angular.js"></script>
+    <script src="node_modules/xlsjs/dist/xls.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/chart.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/table.js"></script>
+    <script src="js/simple-table.js"></script>
+    <script src="js/model.js"></script>
+    <script src="js/surveys.js"></script>
+    <script src="js/ui.js"></script>
 </div>
 </body>
 </html>

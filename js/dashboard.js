@@ -59,7 +59,7 @@
 
         this.navigate = function (state) {
             if (state > maxState) {
-                bootstrapAlert('Nothing to display, please load survey first');
+                bootstrapAlert('Nothing to display, please select or load survey');
                 return;
             }
 
@@ -74,6 +74,9 @@
             if (state === 1 && !tagsReady) {
                 model.updateTagsTbl();
                 tagsReady = true;
+            }
+            if (state === 2) {
+                tagsTable.sort1();
             }
 
             if (state === 2 && !answersReady) {
@@ -192,6 +195,8 @@
         };
 
 
+        // todo dragndrop upload
+        // todo history states and back-forward
         this.uploadFile = function (event) {
             var file = event.target.files[0];
             if (file && !file.$error) {
@@ -416,7 +421,7 @@
 
         
         this.sort = function () {
-            model.sort(model.terms, true, true);
+            sortArr(model.terms, true, true);
         };
 
 
@@ -424,13 +429,6 @@
             model.filterTerms(this.filterTerm);
         };
 
-
-        // this.clearFilter = function () {
-        //     this.filterTerm = '';
-        //     $('#terms-table thead input')[0].checked = false;
-        //     //ctrl.filterTerms()
-        // };
-        
 
         var saveTimeout;
 

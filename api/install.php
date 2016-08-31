@@ -44,13 +44,11 @@ CREATE TABLE IF NOT EXISTS `surveys` (
 mysql_query($query);
 $query = '
 CREATE TABLE IF NOT EXISTS `tags` (
-  `id` int NOT NULL AUTO_INCREMENT,
   `survey_id` int NOT NULL,
   `tag` varchar(255) NOT NULL,
   `count` int NOT NULL,
   `synonyms` text NOT NULL,
   `syn_count` text NOT NULL,
-  PRIMARY KEY (`id`),
   INDEX `tag` (`tag`(32)),
   INDEX `survey_id` (`survey_id`)
 ) DEFAULT CHARSET=utf8 ENGINE = MyISAM;

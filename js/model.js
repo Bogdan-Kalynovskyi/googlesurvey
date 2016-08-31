@@ -1,5 +1,39 @@
 var total;
 
+
+function sortArr (arr, alpha, sortOrder) {
+    if (!sortOrder) {
+        sortOrder = 1;
+    }
+
+    function alphabetical (a, b) {
+        if (a[0] > b[0]) {
+            return sortOrder;
+        }
+        else if (a[0] < b[0]) {
+            return -sortOrder;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    function numeric (a, b) {
+        if (a[1] > b[1]) {
+            return -sortOrder;
+        }
+        else if (a[1] < b[1]) {
+            return sortOrder;
+        }
+        else {
+            return 0;
+        }
+    }
+
+    return arr.sort(alpha ? alphabetical : numeric);
+}
+
+
 app.service('model', ['$http', function ($http) {
     var that = this,
         positive,
@@ -8,7 +42,7 @@ app.service('model', ['$http', function ($http) {
         termsTable = new Table(byId('terms-table'), TBL_terms),
         answersTable = new Table(byId('answers-table'), TBL_answers),
         shortTable = new Table(byId('short-table'), TBL_short);
-
+    window.tagsTable = tagsTable;
 
     $http.get('sentiment.json').success(function (response) {
         positive = response.positive.split(',');
@@ -21,6 +55,7 @@ app.service('model', ['$http', function ($http) {
         }
     });
 
+    byId('invert').onclick = termsTable.invertChecked;
 
 
     this.initByExcel = function (workbook) {
@@ -62,7 +97,7 @@ app.service('model', ['$http', function ($http) {
             this.tags.push([i, count]);
             this.answers.push([i, count]);
         }
-        this.sort(this.answers, true);
+        sortArr(this.answers, true);
 
         var split = this.splitMax(20, true);
         sentiment = {
@@ -344,12 +379,16 @@ app.service('model', ['$http', function ($http) {
         total = 0;
         undo2.innerHTML = '';
 
+        if (surveyId) {
+            tagsTable.sort1();
+        }
+
         var spaceNCommaSplitTrim = /[\s,]+/,
             positiveScore = 0,
             negativeScore = 0,
             l = this.tags.length,
-            tagWords = Array(l),
-            tagSynWords = Array(l);
+            tagWords = new Array(l),
+            tagSynWords = new Array(l);
 
         for (var j in this.tags) {
             var tag = this.tags[j],
@@ -421,38 +460,8 @@ app.service('model', ['$http', function ($http) {
 
 
     this.printSentiment = function (positive, negative) {
-        var any = positive || negative;
-        byId('perc-positive').innerHTML = any ? ((positive * 100).toFixed(2) + '%') : 'n/a';
-        byId('perc-negative').innerHTML = any ? ((negative * 100).toFixed(2) + '%') : 'n/a';
-    };
-
-
-    this.sort = function (arr, alpha, sortOrder) {
-        function alphabetical (a, b) {
-            if (a[0] > b[0]) {
-                return sortOrder;
-            }
-            else if (a[0] < b[0]) {
-                return -sortOrder;
-            }
-            else {
-                return 0;
-            }
-        }
-
-        function numeric (a, b) {
-            if (a[1] > b[1]) {
-                return -1;
-            }
-            else if (a[1] < b[1]) {
-                return 1;
-            }
-            else {
-                return 0;
-            }
-        }
-
-        return arr.sort(alpha ? alphabetical : numeric);
+        byId('perc-positive').innerHTML = (positive * 100).toFixed(2) + '%';
+        byId('perc-negative').innerHTML = (negative * 100).toFixed(2) + '%';
     };
 
 
@@ -482,7 +491,7 @@ app.service('model', ['$http', function ($http) {
             if (name = line[2]) {
                 count = +line[3];
                 for (var j in name) {
-                    that.terms.push([name[j], count[j]]); // unshift??
+                    that.terms.unshift([name[j], count[j]]);
                 }
                 line.splice(2, 2);
             }
@@ -514,6 +523,7 @@ app.service('model', ['$http', function ($http) {
 
 
     this.updateShort = function () {
+        tagsTable.sort1();
         shortTable.draw(this.tags);
     };
 
@@ -537,7 +547,7 @@ app.service('model', ['$http', function ($http) {
         }
 
         maxTags = Math.min(maxTags, arr.length);
-        this.sort(arr);
+        sortArr(arr);
 
         this.tags = arr.slice(0, maxTags);
         this.terms = arr.slice(maxTags);
@@ -545,8 +555,8 @@ app.service('model', ['$http', function ($http) {
         if (!tagsJustBorn) {
             unpackTerms();
         }
-        this.sort(this.tags, true);
-        this.sort(this.terms, true);
+        sortArr(this.tags, true);
+        sortArr(this.terms, true);
 
         if (!tagsJustBorn) {
             total = 0;
@@ -570,7 +580,7 @@ app.service('model', ['$http', function ($http) {
             i = 0,
             n = arr.length;
 
-        this.sort(arr);
+        sortArr(arr);
 
         while (i < n && arr[i][1] >= minCount) {
             i++;
@@ -579,8 +589,8 @@ app.service('model', ['$http', function ($http) {
         this.tags = arr.slice(0, i);
         this.terms = arr.slice(i);
         unpackTerms();
-        this.sort(this.tags, true);
-        this.sort(this.terms, true);
+        sortArr(this.tags, true);
+        sortArr(this.terms, true);
 
         tagsTable.draw(this.tags);
         termsTable.draw(this.terms);

@@ -179,8 +179,8 @@ td {
     line-height: 1.2;
 }
 
-tr.active {
-    background: #f0f0ff!important;
+table > tbody > tr.active {
+    background: #f0eaff!important;
 }
 
 th {
@@ -190,13 +190,22 @@ th {
     border-top: 0!important;
 }
 
-th:first-child {
+tr:last-child th {
+    cursor: pointer;
+    border-bottom-width: 4px;
+}
+
+#short-table th {
+    cursor: default;
+}
+
+tr:first-child th {
     border-bottom: 0!important;
 }
 
 th > b {
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 #surveys th,
@@ -389,6 +398,34 @@ tbody ul {
     font-size: 19px;
     color: #e00;
 }
+
+.asc, .desc {
+    position: relative;
+    padding-right: 10px!important;
+}
+
+.asc:after,
+.desc:after {
+    position: absolute;
+    top: 2px;
+    right: 2.5%;
+    font-size: 10px;
+    background: rgba(236, 238, 239, 0.8);
+    border-radius: 50%;
+}
+
+.asc:hover:after,
+.desc:hover:after {
+    font-size: 11px;
+}
+
+.asc:after {
+    content: '▼';
+}
+.desc:after {
+    content: '▲';
+}
+
 
 @media (max-width: 722px) {
     .cross {

@@ -31,7 +31,7 @@ function get () {
     $query = mysql_query('SELECT answer, count, tags FROM answers WHERE survey_id = '.intval($_GET['surveyId']).' ORDER BY answer');
     $result = array();
     while ($row = mysql_fetch_array($query, MYSQL_NUM)) {
-        $result[] = $row;
+        $result[] = array($row[0], intval($row[1]), $row[2]);
     }
     echo json_encode($result);
 }
