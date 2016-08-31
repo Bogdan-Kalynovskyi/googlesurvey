@@ -66,9 +66,13 @@ big {
 }
 
 input[ng-model] {
-    width: 57px;
+    width: 46px;
     padding: 0 4px;
     line-height: 23px;
+}
+
+label {
+    padding-right: 0!important;
 }
 
 
@@ -108,7 +112,7 @@ input[ng-model] {
 
 
 #tags-f-input {
-    width: calc(100% - 36px);
+    width: calc(100% - 33px);
     float: right;
 }
 
@@ -124,7 +128,7 @@ input[ng-model] {
     line-height: 13px;
     text-align: center;
     bottom: 8px;
-    right: 22px;
+    right: 7px;
     border-radius: 50%;
     background: #ddd;
     color: #fff;
@@ -145,7 +149,7 @@ input[ng-model] {
 }
 
 #scroll-tbl {
-    height: calc(100% - 98px);
+    height: calc(100% - 90px);
     margin-top: 3px;
 }
 
@@ -161,6 +165,8 @@ input[ng-model] {
     color: #888;
     font-size: 13px;
     margin-bottom: 11px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 #tags-table,
@@ -437,8 +443,11 @@ tbody ul {
         line-height: 1;
     }
 
+    header {
+        height: 50px;
+    }
+
     #scroll-tbl {
-        height: calc(100% - 98px);
         margin-top: 0;
     }
 
@@ -447,12 +456,17 @@ tbody ul {
         margin-bottom: 6px;
     }
 
+    #tags-f-span {
+        top: 0;
+    }
+
     #tags-f-input {
         width: 100%;
     }
 
-    #tags-f-span {
-        top: 0;
+    #invert {
+        position: relative;
+        top: 1.111em;
     }
 
     #terms-table,
@@ -476,10 +490,10 @@ tbody ul {
         height: 77px;
     }
     .nav-body {
-        height: calc(100% - 77px);
+        height: calc(100% - 77px)!important;
     }
     #scroll-tbl {
-        height: calc(100% - 114px);
+        height: calc(100% - 108px);
     }
     tbody span {
         max-width: 189px;

@@ -184,24 +184,24 @@
     <div id="tags" class="nav-body">
         <div id="tags-question"></div>
         <div class="row">
-            <div class="col-xs-9 col-lg-6">
+            <div class="col-xs-12 col-md-9 col-lg-6">
                 <input ng-model="ctrl.bulkAdd" placeholder="Comma separated tags list" ng-keyup="$event.keyCode == 13 && ctrl.addTags()" style="width: calc(100% - 148px);">
                 <button class="btn btn-sm btn-secondary" ng-click="ctrl.addTags()" style="position: relative; top: -1px; left: -2px">Add tags manually</button>
             </div>
-            <div class="col-xs-3">
-                <button class="btn btn-sm btn-primary pull-xs-right" id="invert">Invert checked</button>
-            </div>
         </div>
-        <div class="row m-t-1">
-            <label class="col-xs-6 col-sm-4 col-lg-3"><small>Maximum number of tags:</small>
+        <div class="row" style="margin-top: 10px">
+            <label class="col-xs-6 col-sm-3"><small>Max number of tags</small>
                 <input ng-model="ctrl.maxTags" ng-change="ctrl.splitMax()" ng-model-options='{ debounce: 110 }' type="number">
             </label>
-            <label class="col-xs-6 col-sm-4 col-lg-3"><small>Minimum repeat for tag:</small>
+            <label class="col-xs-6 col-sm-3"><small>Min repeat for tag</small>
                 <input ng-model="ctrl.minCount" ng-change="ctrl.splitMin()" ng-model-options='{ debounce: 110 }' type="number">
             </label>
-            <label class="col-xs-6 col-sm-4 col-lg-3"><small id="tags-f-span">Filter:</small>
+            <label class="col-xs-6 col-sm-3"><small id="tags-f-span">Filter</small>
                 <input ng-model="ctrl.filterTerm" ng-change="ctrl.filterTerms()" ng-model-options='{ debounce: 110 }' placeholder="Filter tags" id="tags-f-input">
                 <span class="cross" ng-click="ctrl.filterTerm = '';ctrl.filterTerms()">×</span>
+            </label>
+            <label class="col-xs-6 col-sm-3 text-xs-center">
+                <button class="btn btn-sm btn-primary" id="invert">Invert checked</button>
             </label>
         </div>
         <div class="row" id="scroll-tbl">
@@ -232,18 +232,11 @@
 
     <div id="modal-placeholder"></div>
 
-    <link rel=stylesheet href="node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel=stylesheet href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/css/bootstrap.min.css">
     <link rel=stylesheet href="css/app.css">
-    <script src="node_modules/angular/angular.js"></script>
-    <script src="node_modules/xlsjs/dist/xls.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/chart.js"></script>
-    <script src="js/dashboard.js"></script>
-    <script src="js/table.js"></script>
-    <script src="js/simple-table.js"></script>
-    <script src="js/model.js"></script>
-    <script src="js/surveys.js"></script>
-    <script src="js/ui.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/xls/0.7.5/xls.core.min.js"></script>
+    <script src="app13.js"></script>
 </div>
 </body>
 </html>
