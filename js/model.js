@@ -44,18 +44,20 @@ app.service('model', ['$http', function ($http) {
         shortTable = new Table(byId('short-table'), TBL_short);
     window.tagsTable = tagsTable;
 
+
     $http.get('sentiment.json').success(function (response) {
         positive = response.positive.split(',');
         negative = response.negative.split(',');
         for (var i in positive) {
-            positive[i] = positive[i].trim().split(' ');
+            positive[i] = positive[i].split(' ');
         }
         for (i in negative) {
-            negative[i] = negative[i].trim().split(' ');
+            negative[i] = negative[i].split(' ');
         }
     });
 
     byId('invert').onclick = termsTable.invertChecked;
+
 
 
     this.initByExcel = function (workbook) {
@@ -350,8 +352,18 @@ app.service('model', ['$http', function ($http) {
 
     this.prepareAnswers = function (surveyId, sentiment) {
         function findAdj (haystack, needle) {
+            var response;
             for (var i in needle) {
-                if (findSub(haystack, needle[i])) {
+                if (response = findSub(haystack, needle[i])) {
+                    if (haystack[response - 1 - needle[i].length] === 'not') {
+                        return false;
+                    }
+                    if (needle === negative) {
+                        console.warn('negative: ' + needle[i].join(' '));
+                    }
+                    else {
+                        console.info('positive: ' + needle[i].join(' '));
+                    }
                     return true;
                 }
             }
@@ -370,7 +382,7 @@ app.service('model', ['$http', function ($http) {
                         j++;
                     }
                     if (j === m) {
-                        return true;
+                        return i + 1;
                     }
                 }
             }

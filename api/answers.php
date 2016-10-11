@@ -26,6 +26,8 @@ if ($s = mysql_error()) {
     die;
 }
 
+//        header("Content-Type: application/json");
+
 
 function get () {
     $query = mysql_query('SELECT answer, count, tags FROM answers WHERE survey_id = '.intval($_GET['surveyId']).' ORDER BY answer');

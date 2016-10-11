@@ -8,7 +8,10 @@
         function close () {
             modal.classList.remove('in');
             setTimeout(function () {
-                modal.parentNode.removeChild(modal);
+                modal.style.display = 'none';
+                setTimeout(function () {
+                    modal.parentNode.removeChild(modal);
+                }, 100);
             }, 300);
         }
 
