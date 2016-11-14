@@ -7,7 +7,11 @@
     // compare header with xsrf token to cookie-based session
 
     if (isset($_SERVER['HTTP_AUTHORIZATION']) && isset($_SESSION['xsrfToken']) && $_SERVER['HTTP_AUTHORIZATION'] === $_SESSION['xsrfToken']) {
-        mysql_connect($db_host, $db_user, $db_pass);
+        $link = mysql_connect($db_host, $db_user, $db_pass);
+        if (!$link) {
+            header("HTTP/1.0 500 Internal Server Error", true, 500);
+            die;
+        }
         mysql_select_db($db_name);   //mysql_query("SET NAMES $db_charset"
     }
     else {
